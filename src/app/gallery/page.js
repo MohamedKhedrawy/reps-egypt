@@ -1,111 +1,66 @@
+import Link from "next/link";
+
 export const metadata = {
-    title: 'Gallery',
-    description: 'Explore photos and highlights from our events, conferences, and community gatherings.',
-    openGraph: {
-        title: 'Gallery | Reps Egypt',
-        description: 'Explore photos and highlights from our events, conferences, and community gatherings.',
-        type: 'website',
-    },
+  title: "Gallery | Reps Egypt",
+  description: "A glimpse into our training sessions, events, and community.",
 };
 
-const galleryImages = [
-    {
-        src: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000&auto=format&fit=crop',
-        alt: 'Annual Tech Conference 2025',
-        category: 'Events'
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=1000&auto=format&fit=crop',
-        alt: 'Community Networking Night',
-        category: 'Community'
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1000&auto=format&fit=crop',
-        alt: 'Strategy Workshop',
-        category: 'Workshops'
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=1000&auto=format&fit=crop',
-        alt: 'Award Ceremony',
-        category: 'Events'
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1000&auto=format&fit=crop',
-        alt: 'Team Building Day',
-        category: 'Team'
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=1000&auto=format&fit=crop',
-        alt: 'Partner Summit',
-        category: 'Events'
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1591115765373-5207764f72e7?q=80&w=1000&auto=format&fit=crop',
-        alt: 'Hackathon 2025',
-        category: 'Competitions'
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1000&auto=format&fit=crop',
-        alt: 'Office Life',
-        category: 'Culture'
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?q=80&w=1000&auto=format&fit=crop',
-        alt: 'Leadership Summit',
-        category: 'Leadership'
-    }
-];
-
 export default function GalleryPage() {
-    return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
-            <div className="max-w-7xl mx-auto px-6 py-20">
-                <header className="text-center mb-16">
-                    <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-6">
-                        Media Gallery
-                    </h1>
-                    <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto rounded-full" />
-                    <p className="mt-4 text-gray-300 text-lg">Capturing moments that define our journey</p>
-                </header>
+  const media = [
+    { type: "image", src: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop", caption: "Advanced Strength Workshop" },
+    { type: "image", src: "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=1469&auto=format&fit=crop", caption: "Calisthenics Certification" },
+    { type: "image", src: "https://images.unsplash.com/photo-1574680096141-983200526388?q=80&w=1469&auto=format&fit=crop", caption: "Personal Trainer Exams" },
+    { type: "image", src: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1470&auto=format&fit=crop", caption: "Powerlifting Meet" },
+    { type: "image", src: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1470&auto=format&fit=crop", caption: "Group Class" },
+    { type: "image", src: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?q=80&w=1470&auto=format&fit=crop", caption: "Mobility Seminar" },
+  ];
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {galleryImages.map((image, index) => (
-                        <div 
-                            key={index}
-                            className="group relative overflow-hidden rounded-2xl aspect-video border border-white/10 cursor-pointer"
-                        >
-                            <img 
-                                src={image.src} 
-                                alt={image.alt}
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                                <span className="text-purple-400 text-sm font-medium mb-1 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
-                                    {image.category}
-                                </span>
-                                <h3 className="text-white text-lg font-bold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                                    {image.alt}
-                                </h3>
-                            </div>
-                        </div>
-                    ))}
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
+      
+      {/* Search Header */}
+      <section className="pt-32 pb-12 px-6 border-b border-white/5">
+        <div className="max-w-7xl mx-auto text-center">
+           <h1 className="text-4xl lg:text-5xl font-bold mb-6">Our <span className="text-red-600">Gallery</span></h1>
+           <p className="text-gray-400 max-w-2xl mx-auto text-lg mb-10">See our champions in action. Highlights from our certification programs, workshops, and community events across Egypt.</p>
+           
+           {/* Filters */}
+           <div className="flex justify-center flex-wrap gap-4">
+              {['All', 'Certifications', 'Workshops', 'Events', 'Community'].map((tag, i) => (
+                <button key={i} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${i === 0 ? 'bg-red-600 text-white shadow-[0_0_20px_rgba(220,38,38,0.4)]' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}`}>
+                  {tag}
+                </button>
+              ))}
+           </div>
+        </div>
+      </section>
+
+      {/* Gallery Grid */}
+      <section className="py-20 px-6 max-w-7xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+           {media.map((item, idx) => (
+             <div key={idx} className="group relative aspect-[4/3] rounded-2xl overflow-hidden bg-[#121212] border border-white/5 cursor-pointer">
+                <img src={item.src} alt={item.caption} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
+                   <div>
+                     <span className="text-red-500 text-xs font-bold uppercase tracking-wider mb-2 block">Event</span>
+                     <h3 className="text-xl font-bold text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-300">{item.caption}</h3>
+                   </div>
                 </div>
+             </div>
+           ))}
+        </div>
+        
+        {/* Load More */}
+        <div className="mt-16 text-center">
+           <button className="px-8 py-3.5 border border-white/10 rounded-xl text-sm font-bold text-gray-400 hover:text-white hover:border-white/30 transition-colors">
+             Load More Photos
+           </button>
+        </div>
+      </section>
 
-                <div className="mt-16 text-center">
-                    <button className="px-8 py-3 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-all font-medium">
-                        View More Photos
-                    </button>
-                </div>
-
-                <footer className="mt-16 text-center">
-                    <a
-                        href="/"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-medium hover:from-purple-500 hover:to-pink-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25"
-                    >
-                        ← Back to Home
-                    </a>
-                </footer>
-            </div>
-        </main>
-    );
+    </div>
+  );
 }

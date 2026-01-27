@@ -5,137 +5,370 @@ export const metadata = {
   description: "Welcome to Reps Egypt - Your premier digital solutions platform for innovative technology and seamless user experiences.",
 };
 
-export default function Home() {
+// Inline Icons for Portability
+const ArrowRight = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+  </svg>
+);
+
+const UserIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+    <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clipRule="evenodd" />
+  </svg>
+);
+
+const CheckBadge = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-white">
+    <path fillRule="evenodd" d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.25 9.75c0 5.942 4.064 10.933 9.563 12.086a.75.75 0 0 0 .374 0c5.499-1.153 9.563-6.144 9.563-12.086 0-1.91-.487-3.686-1.335-5.265a.75.75 0 0 0-.722-.515 11.208 11.208 0 0 1-7.877-3.08ZM12 7a.75.75 0 0 1 .75.75v3.25H16a.75.75 0 0 1 0 1.5h-3.25V16a.75.75 0 0 1-1.5 0v-3.5H8a.75.75 0 0 1 0-1.5h3.25V7.75A.75.75 0 0 1 12 7Z" clipRule="evenodd" />
+    <path d="M12 7a.75.75 0 0 1 .75.75v.938l.68-.313a.75.75 0 1 1 .632 1.378L12.75 9.39l-1.312-.604a.75.75 0 0 1 .632-1.378l.68.313V7.75A.75.75 0 0 1 12 7Z" /> 
+    {/* Simplified check visuals for badge */}
+  </svg>
+);
+
+export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-red-600 selection:text-white">
+      {/* 
+        --------------------------------------------------
+        NAVBAR
+        Structure: Logo (Left) | Links (Center) | Auth (Right)
+        Visuals: Dark, sticky, red accent on CTA
+        --------------------------------------------------
+      */}
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
+
+      {/* 
+        --------------------------------------------------
+        HERO SECTION
+        Structure: Left Text, Right Background/Image Presence
+        Visuals: Premium Dark, Red Accent Text, Bold Typography
+        --------------------------------------------------
+      */}
+      {/* Hero Section */}
+      <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden pt-20">
+        {/* Background & Overlay */}
+        <div className="absolute inset-0 z-0">
+            {/* Gradient overlays to match the reference image */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-transparent to-[#0a0a0a] z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-transparent to-[#0a0a0a] z-10" />
+            <div className="absolute inset-0 bg-black/70 z-10" />
+            <img 
+                src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop"
+                alt="Gym Background" 
+                className="w-full h-full object-cover"
+            />
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-6 py-24 lg:py-32">
-          {/* Navigation */}
-          <nav className="flex items-center justify-between mb-20">
-            <div className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Reps Egypt
-            </div>
-            <div className="flex items-center gap-6">
-              <Link
-                href="/about"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                About
-              </Link>
-              <Link
-                href="/api/health"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                API Status
-              </Link>
-            </div>
-          </nav>
+        <div className="relative z-20 max-w-5xl mx-auto px-6 flex flex-col items-center text-center">
+          
+          {/* Top Badge */}
+          <div className="mb-8 mt-8 inline-flex items-center gap-2 px-4 py-1.5 bg-[#1f0505] border border-red-900/40 rounded-full shadow-[0_0_15px_rgba(220,38,38,0.1)]">
+            <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_#dc2626]" />
+            <span className="text-red-500/90 text-[11px] font-bold uppercase tracking-widest">Egypt's Premier Fitness Certification</span>
+          </div>
 
-          {/* Hero Content */}
-          <div className="text-center space-y-8">
-            <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">
-              Build the Future with{" "}
-              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-                Digital Excellence
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Empowering businesses with cutting-edge technology solutions.
-              Transform your ideas into reality with our innovative platform.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              <Link
-                href="/about"
-                className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full hover:from-purple-500 hover:to-pink-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5"
-              >
-                Get Started
-              </Link>
-              <Link
-                href="/api/health"
-                className="px-8 py-4 border border-white/20 text-white font-semibold rounded-full hover:bg-white/10 transition-all duration-300"
-              >
-                View API Docs
-              </Link>
+          {/* Headline */}
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight text-white leading-tight">
+            Transform Your <span className="text-red-600">Fitness Career</span>
+          </h1>
+
+          {/* Subtext */}
+          <p className="text-gray-400 text-lg mb-10 max-w-2xl leading-relaxed">
+            Join Egypt's most trusted fitness certification organization. Get accredited, connect with professionals, and elevate your coaching to world-class standards.
+          </p>
+
+          {/* Search Bar */}
+          <div className="w-full max-w-xl mb-10 relative group">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-red-500 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+              </svg>
             </div>
+            <input 
+              type="text" 
+              placeholder="Search for training programs or coaches..." 
+              className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-12 py-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-600/50 focus:bg-white/[0.05] focus:ring-1 focus:ring-red-600/20 transition-all shadow-xl"
+            />
+          </div>
+
+          {/* Main CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 mb-12 w-full sm:w-auto">
+            <Link 
+              href="/certification" 
+              className="w-full sm:w-auto px-8 py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-all shadow-lg shadow-red-600/20 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+            >
+              Get Certified <ArrowRight />
+            </Link>
+            <Link 
+              href="/programs" 
+              className="w-full sm:w-auto px-8 py-3.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold rounded-lg backdrop-blur-sm transition-all hover:-translate-y-0.5 text-center"
+            >
+              Explore Programs
+            </Link>
+          </div>
+
+          {/* Secondary Segments */}
+          {/* <div className="flex flex-wrap items-center justify-center gap-3">
+            {[
+              { label: "I'm a Trainer", href: "/trainer" },
+              { label: "I'm a Trainee", href: "/trainee" },
+              { label: "Admin Portal", href: "/admin" }
+            ].map((btn, idx) => (
+              <Link 
+                key={idx}
+                href={btn.href}
+                className="px-5 py-2 rounded-lg border border-white/10 bg-white/[0.02] text-gray-400 text-sm font-medium hover:text-white hover:border-white/20 hover:bg-white/[0.05] transition-all"
+              >
+                {btn.label}
+              </Link>
+            ))}
+          </div> */}
+        </div>
+      </section>
+
+      {/* 
+        --------------------------------------------------
+        STATS BAR
+        Structure: 4 Columns
+        Visuals: Minimal, High Contrast Numbers
+        --------------------------------------------------
+      */}
+      <section className="border-y border-white/5 bg-white/[0.02]">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/5">
+            {[
+              { number: "500+", label: "Certified Coaches" },
+              { number: "12k+", label: "Active Trainees" },
+              { number: "350+", label: "Programs" },
+              { number: "10 Years", label: "Excellence" },
+            ].map((stat, idx) => (
+              <div key={idx} className="flex flex-col items-center">
+                <span className="text-3xl lg:text-4xl font-bold text-white mb-1 tracking-tight">{stat.number}</span>
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{stat.label}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="max-w-6xl mx-auto px-6 py-24">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-16">
-          Why Choose{" "}
-          <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Reps Egypt
-          </span>
-        </h2>
-        <div className="grid md:grid-cols-3 gap-8">
+      {/* 
+        --------------------------------------------------
+        TRAINERS SECTION
+        Structure: Header, Grid of 4 Cards
+        Visuals: Dark Cards, Red Tags
+        --------------------------------------------------
+      */}
+      <section className="py-24 max-w-7xl mx-auto px-6">
+        <div className="flex items-end justify-between mb-12">
+          <div>
+            <span className="text-red-500 font-bold uppercase tracking-wider text-sm">World Class Talent</span>
+            <h2 className="text-3xl lg:text-4xl font-bold mt-2">Meet Our Elite Trainers</h2>
+          </div>
+          <Link href="/coaches" className="hidden sm:flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-white transition-colors">
+            View All Coaches <ArrowRight />
+          </Link>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            {
-              title: "Modern Technology",
-              description: "Built with Next.js and MongoDB for blazing-fast performance and scalability.",
-              icon: "⚡",
-              gradient: "from-purple-500 to-blue-500",
-            },
-            {
-              title: "SEO Optimized",
-              description: "Server-side rendering ensures your content is discoverable by search engines.",
-              icon: "🔍",
-              gradient: "from-pink-500 to-purple-500",
-            },
-            {
-              title: "Full Stack",
-              description: "Complete solution with API routes, database integration, and responsive design.",
-              icon: "🚀",
-              gradient: "from-blue-500 to-cyan-500",
-            },
-          ].map((feature, index) => (
-            <article
-              key={index}
-              className="group bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10 hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-1"
-            >
-              <div className={`w-14 h-14 bg-gradient-to-br ${feature.gradient} rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform`}>
-                {feature.icon}
+            { name: "Ahmed Ali", role: "Strength & Conditioning", tag: "Lvl 4 Certified", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1470&auto=format&fit=crop" },
+            { name: "Sara Mahmoud", role: "Yoga & Flexibility", tag: "Yoga Master", img: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=1470&auto=format&fit=crop" },
+            { name: "Omar Hassan", role: "CrossFit Specialist", tag: "Elite Trainer", img: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=1470&auto=format&fit=crop" },
+            { name: "Nour El-Sherif", role: "Sports Nutrition", tag: "PhD Nutrition", img: "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=1470&auto=format&fit=crop" },
+          ].map((trainer, idx) => (
+            <div key={idx} className="group relative bg-white/5 rounded-xl overflow-hidden border border-white/5 hover:border-red-600/50 transition-all duration-300">
+              <div className="aspect-[4/5] w-full overflow-hidden">
+                <img src={trainer.img} alt={trainer.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-gray-400 leading-relaxed">
-                {feature.description}
-              </p>
-            </article>
+              
+              {/* Overlay Gradient at bottom */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-80" />
+
+              {/* Tag */}
+              <div className="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">
+                {trainer.tag}
+              </div>
+
+              {/* Content */}
+              <div className="absolute bottom-0 w-full p-4">
+                <h3 className="text-lg font-bold text-white mb-1 group-hover:text-red-500 transition-colors">{trainer.name}</h3>
+                <p className="text-sm text-gray-400 mb-4">{trainer.role}</p>
+                
+                <button className="w-full py-2 bg-white/10 hover:bg-red-600 text-xs font-bold uppercase rounded transition-colors flex items-center justify-center gap-2">
+                   View Profile
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 mt-24">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Reps Egypt
+      {/* 
+        --------------------------------------------------
+        PROGRAMS SECTION
+        Structure: 3 Card Grid
+        Visuals: Landscape Cards, Price Tag
+        --------------------------------------------------
+      */}
+      <section className="py-24 bg-white/[0.02]">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <span className="text-red-500 font-bold uppercase tracking-wider text-sm">Start Your Journey</span>
+              <h2 className="text-3xl lg:text-4xl font-bold mt-2">Latest Training Programs</h2>
             </div>
-            <div className="flex items-center gap-6 text-gray-400">
-              <Link href="/about" className="hover:text-white transition-colors">
-                About
-              </Link>
-              <Link href="/api/health" className="hover:text-white transition-colors">
-                API Status
-              </Link>
-            </div>
-            <p className="text-gray-500 text-sm">
-              © 2026 Reps Egypt. All rights reserved.
-            </p>
+            <Link href="/programs" className="hidden sm:flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-white transition-colors">
+              Browse All Programs <ArrowRight />
+            </Link>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { 
+                title: "Advanced Hypertrophy", 
+                category: "Certification", 
+                desc: "Master the science of muscle growth with our comprehensive level 3 certification.",
+                price: "$299",
+                instructor: "Mike R.",
+                img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1470&auto=format&fit=crop"
+              },
+              { 
+                title: "Calisthenics Basics", 
+                category: "Workshop", 
+                desc: "Learn to control your bodyweight and build functional strength from the ground up.",
+                price: "$99",
+                instructor: "Sarah J.",
+                img: "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=1469&auto=format&fit=crop"
+              },
+              { 
+                title: "Personal Trainer L4", 
+                category: "Diploma", 
+                desc: "The gold standard for aspiring personal trainers. Get accredited internationally.",
+                price: "$899",
+                instructor: "Dr. Samy",
+                img: "https://images.unsplash.com/photo-1574680096141-983200526388?q=80&w=1469&auto=format&fit=crop"
+              },
+            ].map((program, idx) => (
+              <div key={idx} className="group bg-[#0a0a0a] border border-white/5 rounded-2xl overflow-hidden hover:border-red-600/30 hover:shadow-2xl hover:shadow-red-900/10 transition-all duration-300">
+                {/* Image Area */}
+                <div className="h-48 overflow-hidden relative">
+                   <div className="absolute top-4 left-4 z-10 bg-red-600 text-[10px] font-bold px-2 py-1 rounded uppercase">
+                     {program.category}
+                   </div>
+                   <img src={program.img} alt={program.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                </div>
+                
+                {/* Content Area */}
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-white mb-2">{program.title}</h3>
+                  <p className="text-sm text-gray-400 mb-6 line-clamp-2">{program.desc}</p>
+                  
+                  <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-gray-700 overflow-hidden">
+                        <img src={`https://i.pravatar.cc/100?u=${program.instructor}`} alt="" />
+                      </div>
+                      <span className="text-xs font-medium text-gray-300">By {program.instructor}</span>
+                    </div>
+                    <span className="text-lg font-bold text-white">{program.price}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </footer>
-    </main>
+      </section>
+
+      {/* 
+        --------------------------------------------------
+        WHY CHOOSE US & CTA
+        --------------------------------------------------
+      */}
+      <section className="py-24 bg-[#0a0a0a] relative overflow-hidden">
+        
+        {/* Why Choose Us */}
+        <div className="max-w-7xl mx-auto px-6 mb-32">
+           <div className="text-center mb-16">
+             <h2 className="text-3xl lg:text-5xl font-bold text-white mb-4 tracking-tight">Why Choose Reps Egypt?</h2>
+             <p className="text-gray-400 text-lg">The leading choice for fitness professionals across Egypt</p>
+           </div>
+
+           <div className="grid md:grid-cols-3 gap-12">
+              {[
+                { 
+                  title: "Accredited Standards", 
+                  desc: "Internationally recognized certification programs that meet the highest industry standards.",
+                  icon: (
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-red-500">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="G9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                    </svg>
+                  )
+                },
+                { 
+                  title: "Expert Community", 
+                  desc: "Connect with top coaches and trainers in Egypt's most active fitness community.",
+                  icon: (
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-red-500">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                    </svg>
+                  )
+                },
+                { 
+                  title: "Career Growth", 
+                  desc: "Access exclusive opportunities and resources to advance your fitness career.",
+                  icon: (
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-red-500">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.563.563 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.563.563 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                    </svg>
+                  )
+                },
+              ].map((item, idx) => (
+                <div key={idx} className="flex flex-col items-center text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-6 border border-white/5 text-red-500 shadow-[0_0_20px_rgba(220,38,38,0.1)]">
+                    {item.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed max-w-xs">{item.desc}</p>
+                </div>
+              ))}
+           </div>
+        </div>
+
+        {/* New Bottom CTA */}
+        <div className="max-w-4xl mx-auto px-6 text-center">
+           <div className="relative z-10">
+              <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">Ready to Elevate Your Fitness Journey?</h2>
+              <p className="text-gray-400 text-lg mb-10">Join thousands of certified professionals who trust Reps Egypt for their career development.</p>
+              
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link 
+                  href="/certification" 
+                  className="w-full sm:w-auto px-8 py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all hover:-translate-y-1"
+                >
+                  Apply for Certification
+                </Link>
+                <Link 
+                  href="/contact" 
+                  className="w-full sm:w-auto px-8 py-3.5 bg-transparent border border-white/20 hover:border-white text-white font-bold rounded-lg transition-all hover:-translate-y-1"
+                >
+                  Contact Us
+                </Link>
+              </div>
+           </div>
+           
+           {/* Subtle background glow for CTA */}
+           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-64 bg-red-600/10 blur-[100px] pointer-events-none -z-0" />
+        </div>
+
+      </section>
+
+      {/* 
+        --------------------------------------------------
+        FOOTER
+        --------------------------------------------------
+      */}
+
+    </div>
   );
 }
