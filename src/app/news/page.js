@@ -52,13 +52,13 @@ export default function NewsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-background text-foreground">
       
       {/* Header */}
-      <section className="pt-32 pb-12 px-6 border-b border-white/5">
+      <section className="pt-32 pb-12 px-6 border-b border-border">
         <div className="max-w-7xl mx-auto">
            <h1 className="text-4xl lg:text-5xl font-bold mb-6">Latest <span className="text-red-600">News</span></h1>
-           <p className="text-gray-400 max-w-2xl text-lg mb-10">Insights, updates, and stories from the heart of Egypt's fitness community.</p>
+           <p className="text-muted max-w-2xl text-lg mb-10">Insights, updates, and stories from the heart of Egypt's fitness community.</p>
            
            {/* Featured Article layout could go here, but keeping simple grid for now */}
         </div>
@@ -69,7 +69,7 @@ export default function NewsPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
            {articles.map((article, idx) => (
              <article key={idx} className="flex flex-col group">
-                <div className="h-64 rounded-2xl overflow-hidden bg-[#121212] border border-white/5 mb-6 relative">
+                <div className="h-64 rounded-2xl overflow-hidden bg-secondary border border-border mb-6 relative">
                    <div className="absolute top-4 left-4 z-10 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider border border-white/10">
                      {article.category}
                    </div>
@@ -79,16 +79,16 @@ export default function NewsPage() {
                 <div className="flex flex-col flex-grow">
                    <div className="flex items-center gap-3 text-xs text-red-500 font-bold mb-3 uppercase tracking-wider">
                       <span>{article.date}</span>
-                      <span className="w-1 h-1 rounded-full bg-gray-600"></span>
-                      <span className="text-gray-500 font-normal">5 min read</span>
+                      <span className="w-1 h-1 rounded-full bg-background-muted"></span>
+                      <span className="text-muted font-normal">5 min read</span>
                    </div>
-                   <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-red-500 transition-colors leading-tight">
+                   <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-red-500 transition-colors leading-tight">
                      <Link href="#">{article.title}</Link>
                    </h3>
-                   <p className="text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3">
+                   <p className="text-muted text-sm leading-relaxed mb-6 line-clamp-3">
                      {article.desc}
                    </p>
-                   <Link href="#" className="mt-auto inline-flex items-center gap-2 text-sm font-bold text-white hover:text-red-500 transition-colors">
+                   <Link href="#" className="mt-auto inline-flex items-center gap-2 text-sm font-bold text-foreground hover:text-red-500 transition-colors">
                      Read Article
                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -100,16 +100,16 @@ export default function NewsPage() {
         </div>
 
         {/* Newsletter CTA */}
-        <div className="mt-32 p-12 bg-gradient-to-r from-[#110505] to-[#0a0a0a] border border-white/5 rounded-3xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-12">
+        <div className="mt-32 p-12 bg-secondary border border-border rounded-3xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-12">
            <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/10 blur-[100px] -z-10" />
            
            <div className="max-w-xl">
-             <h2 className="text-3xl font-bold mb-4">Subscribe to our newsletter</h2>
-             <p className="text-gray-400">Get the latest news and specialized fitness articles delivered directly to your inbox every week.</p>
+             <h2 className="text-3xl font-bold mb-4 text-foreground">Subscribe to our newsletter</h2>
+             <p className="text-muted">Get the latest news and specialized fitness articles delivered directly to your inbox every week.</p>
            </div>
            
            <div className="flex w-full md:w-auto flex-col sm:flex-row gap-3">
-              <input type="email" placeholder="Email address" className="w-full sm:w-80 bg-white/5 border border-white/10 rounded-xl px-5 py-3.5 text-sm focus:outline-none focus:border-red-600 transition-colors text-white" />
+              <input type="email" placeholder="Email address" className="w-full sm:w-80 bg-tertiary border border-border rounded-xl px-5 py-3.5 text-sm focus:outline-none focus:border-red-600 transition-colors text-foreground" />
               <button className="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-red-900/20 whitespace-nowrap">
                 Subscribe
               </button>

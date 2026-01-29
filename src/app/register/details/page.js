@@ -60,32 +60,32 @@ export default function ProfessionalInfo() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center px-6 py-12">
       
       {/* Terms Modal */}
       {showTermsModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#121212] border border-white/10 rounded-2xl max-w-lg w-full p-6 md:p-8 shadow-2xl">
+          <div className="bg-secondary border border-border rounded-2xl max-w-lg w-full p-6 md:p-8 shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-white">Terms & Agreements</h3>
-              <button onClick={() => setShowTermsModal(false)} className="text-gray-400 hover:text-white transition-colors">
+              <h3 className="text-xl font-bold text-foreground">Terms & Agreements</h3>
+              <button onClick={() => setShowTermsModal(false)} className="text-muted hover:text-foreground transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            <div className="space-y-4 text-sm text-gray-300 max-h-[60vh] overflow-y-auto pr-2">
-              <div className="p-4 bg-white/5 rounded-xl border border-white/5">
+            <div className="space-y-4 text-sm text-muted max-h-[60vh] overflow-y-auto pr-2">
+              <div className="p-4 bg-tertiary rounded-xl border border-border">
                 <p className="leading-relaxed">
                   I declare that I consent to the collection and processing of my personal data in the scope of: name, surname, telephone number and e-mail address, date of birth, place of residence.
                 </p>
               </div>
-              <div className="p-4 bg-white/5 rounded-xl border border-white/5">
+              <div className="p-4 bg-tertiary rounded-xl border border-border">
                 <p className="leading-relaxed">
                   I declare that I am joining the REPs Egypt Association and undertake to implement the provisions of the Statute.
                 </p>
               </div>
-              <div className="p-4 bg-white/5 rounded-xl border border-white/5">
+              <div className="p-4 bg-tertiary rounded-xl border border-border">
                 <p className="leading-relaxed">
                   I consent to receiving information sent to my e-mail account by REPs Egypt - Register of Professional Schools and Instructors on its own behalf or on its behalf.
                 </p>
@@ -110,7 +110,7 @@ export default function ProfessionalInfo() {
         {/* Header Title */}
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold mb-2">Professional Information</h1>
-          <p className="text-gray-400">Final step to complete your registration</p>
+          <p className="text-muted">Final step to complete your registration</p>
         </div>
 
         {/* Stepper - 4 Steps */}
@@ -168,12 +168,12 @@ export default function ProfessionalInfo() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-[#121212] border border-white/5 rounded-3xl p-8 md:p-10 shadow-2xl">
+        <div className="bg-secondary border border-border rounded-3xl p-8 md:p-10 shadow-2xl">
            
            <form onSubmit={handleSubmit} className="space-y-8">
               {/* Specialization */}
               <div className="space-y-2">
-                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Specialization *</label>
+                 <label className="text-xs font-bold text-muted uppercase tracking-wider">Specialization *</label>
                  <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-red-500 transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -184,7 +184,7 @@ export default function ProfessionalInfo() {
                       required 
                       value={specialization}
                       onChange={(e) => setSpecialization(e.target.value)}
-                      className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl pl-12 pr-4 py-3.5 text-sm text-white focus:outline-none focus:border-red-600 transition-colors appearance-none relative z-10"
+                      className="w-full bg-tertiary border border-border rounded-xl pl-12 pr-4 py-3.5 text-sm text-foreground focus:outline-none focus:border-red-600 transition-colors appearance-none relative z-10"
                     >
                         <option value="">Select Primary Field</option>
                         <option value="personal-trainer">Personal Trainer</option>
@@ -209,7 +209,7 @@ export default function ProfessionalInfo() {
 
               {/* File Upload */}
               <div className="space-y-2">
-                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Upload Certifications / CV</label>
+                 <label className="text-xs font-bold text-muted uppercase tracking-wider">Upload Certifications / CV</label>
                  <div className="relative">
                     <input 
                       type="file" 
@@ -217,14 +217,14 @@ export default function ProfessionalInfo() {
                       onChange={handleFileChange}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                     />
-                    <div className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center hover:border-red-600/50 transition-colors">
-                       <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-red-600/50 transition-colors">
+                       <div className="w-12 h-12 bg-tertiary rounded-full flex items-center justify-center mx-auto mb-3">
                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-400">
                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                          </svg>
                        </div>
-                       <p className="text-sm text-gray-400">Drag and drop files here or <span className="text-red-500 font-semibold">browse</span></p>
-                       <p className="text-xs text-gray-600 mt-1">PDF, JPG, PNG up to 10MB</p>
+                       <p className="text-sm text-muted">Drag and drop files here or <span className="text-red-500 font-semibold">browse</span></p>
+                       <p className="text-xs text-muted mt-1">PDF, JPG, PNG up to 10MB</p>
                     </div>
                  </div>
                  {uploadedFiles.length > 0 && (
@@ -242,15 +242,15 @@ export default function ProfessionalInfo() {
               </div>
 
               {/* Terms & Conditions */}
-              <div className="pt-4 border-t border-white/5">
+              <div className="pt-4 border-t border-border">
                 <label className="flex items-start gap-3 cursor-pointer group">
                   <input 
                     type="checkbox" 
                     checked={termsAccepted}
                     onChange={(e) => setTermsAccepted(e.target.checked)}
-                    className="w-5 h-5 mt-0.5 rounded border-white/20 bg-[#1a1a1a] text-red-600 focus:ring-red-600 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer"
+                    className="w-5 h-5 mt-0.5 rounded border-white/20 bg-tertiary text-red-600 focus:ring-red-600 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer"
                   />
-                  <span className="text-sm text-gray-300">
+                  <span className="text-sm text-muted">
                     I agree to the{" "}
                     <button 
                       type="button"
@@ -265,7 +265,7 @@ export default function ProfessionalInfo() {
               
               {/* Action Buttons */}
               <div className="flex items-center gap-4 pt-4">
-                 <Link href="/register/personal-info" className="w-full md:w-auto px-8 py-3.5 bg-transparent border border-white/10 hover:bg-white/5 text-white font-bold rounded-xl transition-colors text-center">
+                 <Link href="/register/personal-info" className="w-full md:w-auto px-8 py-3.5 bg-transparent border border-border hover:bg-tertiary text-foreground font-bold rounded-xl transition-colors text-center">
                    Back
                  </Link>
                  <button type="submit" className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-xl transition-all hover:shadow-[0_0_20px_rgba(220,38,38,0.4)]">

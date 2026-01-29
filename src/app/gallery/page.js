@@ -16,20 +16,20 @@ export default function GalleryPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-background text-foreground">
       
       {/* Search Header */}
-      <section className="pt-32 pb-12 px-6 border-b border-white/5">
+       <section className="pt-32 pb-12 px-6 border-b border-border">
         <div className="max-w-7xl mx-auto text-center">
            <h1 className="text-4xl lg:text-5xl font-bold mb-6">Our <span className="text-red-600">Gallery</span></h1>
-           <p className="text-gray-400 max-w-2xl mx-auto text-lg mb-10">See our champions in action. Highlights from our certification programs, workshops, and community events across Egypt.</p>
+           <p className="text-muted max-w-2xl mx-auto text-lg mb-10">See our champions in action. Highlights from our certification programs, workshops, and community events across Egypt.</p>
            
            {/* Filters */}
-           <div className="flex justify-center flex-wrap gap-4">
-              {['All', 'Certifications', 'Workshops', 'Events', 'Community'].map((tag, i) => (
-                <button key={i} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${i === 0 ? 'bg-red-600 text-white shadow-[0_0_20px_rgba(220,38,38,0.4)]' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}`}>
-                  {tag}
-                </button>
+            <div className="flex justify-center flex-wrap gap-4">
+               {['All', 'Certifications', 'Workshops', 'Events', 'Community'].map((tag, i) => (
+                 <button key={i} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${i === 0 ? 'bg-red-600 text-white shadow-[0_0_20px_rgba(220,38,38,0.4)]' : 'bg-tertiary text-muted hover:bg-background border border-transparent hover:border-border hover:text-foreground'}`}>
+                   {tag}
+                 </button>
               ))}
            </div>
         </div>
@@ -38,8 +38,8 @@ export default function GalleryPage() {
       {/* Gallery Grid */}
       <section className="py-20 px-6 max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-           {media.map((item, idx) => (
-             <div key={idx} className="group relative aspect-[4/3] rounded-2xl overflow-hidden bg-[#121212] border border-white/5 cursor-pointer">
+            {media.map((item, idx) => (
+             <div key={idx} className="group relative aspect-[4/3] rounded-2xl overflow-hidden bg-secondary border border-border cursor-pointer">
                 <img src={item.src} alt={item.caption} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 
                 {/* Overlay */}
@@ -54,8 +54,8 @@ export default function GalleryPage() {
         </div>
         
         {/* Load More */}
-        <div className="mt-16 text-center">
-           <button className="px-8 py-3.5 border border-white/10 rounded-xl text-sm font-bold text-gray-400 hover:text-white hover:border-white/30 transition-colors">
+         <div className="mt-16 text-center">
+            <button className="px-8 py-3.5 border border-border rounded-xl text-sm font-bold text-muted hover:text-foreground hover:border-border-border transition-colors">
              Load More Photos
            </button>
         </div>

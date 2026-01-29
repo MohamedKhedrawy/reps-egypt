@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -17,30 +19,17 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Login failed");
-        setLoading(false);
-        return;
-      }
-
+      await login(email, password);
       // Redirect on success
       router.push("/");
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      setError(err.message || "Something went wrong. Please try again.");
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center px-6 py-12">
       
       {/* Main Container */}
       <div className="w-full max-w-md">
@@ -53,11 +42,11 @@ export default function LoginPage() {
               </svg>
            </div>
           <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
-          <p className="text-gray-400">Sign in to access your dashboard</p>
+          <p className="text-muted">Sign in to access your dashboard</p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-[#121212] border border-white/5 rounded-3xl p-8 md:p-10 shadow-2xl">
+        <div className="bg-secondary border border-border rounded-3xl p-8 md:p-10 shadow-2xl">
            
            {error && (
              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
@@ -68,29 +57,29 @@ export default function LoginPage() {
            <form className="space-y-6" onSubmit={handleSubmit}>
               
               {/* Email */}
-              <div className="space-y-2">
-                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address</label>
-                 <div className="relative group">
+               <div className="space-y-2">
+                  <label className="text-xs font-bold text-muted uppercase tracking-wider">Email Address</label>
+                  <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-red-500 transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                       </svg>
                     </div>
-                    <input 
-                      type="email" 
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl pl-12 pr-4 py-3.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-red-600 transition-colors" 
-                      placeholder="you@example.com" 
-                    />
+                      <input 
+                        type="email" 
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="w-full bg-tertiary border border-border rounded-xl pl-12 pr-4 py-3.5 text-sm text-foreground placeholder-muted focus:outline-none focus:border-red-600 transition-colors" 
+                        placeholder="you@example.com" 
+                      />
                  </div>
               </div>
 
               {/* Password */}
-              <div className="space-y-2">
-                 <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Password</label>
+               <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                     <label className="text-xs font-bold text-muted uppercase tracking-wider">Password</label>
                     <Link href="#" className="text-xs text-red-500 hover:text-red-400 transition-colors">Forgot Password?</Link>
                  </div>
                  <div className="relative group">
@@ -99,14 +88,14 @@ export default function LoginPage() {
                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                       </svg>
                     </div>
-                    <input 
-                      type="password" 
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl pl-12 pr-4 py-3.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-red-600 transition-colors" 
-                      placeholder="••••••••" 
-                    />
+                      <input 
+                        type="password" 
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="w-full bg-tertiary border border-border rounded-xl pl-12 pr-4 py-3.5 text-sm text-foreground placeholder-muted focus:outline-none focus:border-red-600 transition-colors" 
+                        placeholder="••••••••" 
+                      />
                  </div>
               </div>
 
@@ -122,8 +111,8 @@ export default function LoginPage() {
            </form>
         </div>
         
-        <div className="mt-8 text-center text-sm text-gray-500">
-           Don't have an account? <Link href="/register" className="text-red-500 hover:text-white transition-colors font-bold">Register Now</Link>
+        <div className="mt-8 text-center text-sm text-muted">
+           Don't have an account? <Link href="/register" className="text-red-500 hover:text-foreground transition-colors font-bold">Register Now</Link>
         </div>
       </div>
     </div>

@@ -82,29 +82,29 @@ export default function FAQPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white pt-12 pb-24">
+    <div className="min-h-screen bg-background text-foreground pt-12 pb-24">
       <div className="max-w-3xl mx-auto px-6">
         
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="w-16 h-16 bg-[#1a0505] rounded-2xl flex items-center justify-center mx-auto mb-6 border border-red-900/20 shadow-[0_0_30px_rgba(220,38,38,0.1)]">
+          <div className="w-16 h-16 bg-tertiary rounded-2xl flex items-center justify-center mx-auto mb-6 border border-border shadow-[0_0_30px_rgba(220,38,38,0.1)]">
              <span className="text-red-600 text-3xl font-bold">?</span>
           </div>
           <h1 className="text-4xl font-bold mb-3">Frequently Asked Questions</h1>
-          <p className="text-gray-400">Find answers to common questions about Reps Egypt</p>
+          <p className="text-muted">Find answers to common questions about Reps Egypt</p>
         </div>
 
         {/* Search Bar */}
         <div className="relative mb-16">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-muted">
               <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
             </svg>
           </div>
           <input 
             type="text" 
             placeholder="Search for answers..." 
-            className="w-full bg-[#121212] border border-white/5 rounded-xl py-4 pl-12 pr-4 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-red-900/50 focus:ring-1 focus:ring-red-900/50 transition-all"
+            className="w-full bg-secondary border border-border rounded-xl py-4 pl-12 pr-4 text-sm text-foreground placeholder-muted focus:outline-none focus:border-red-900/50 focus:ring-1 focus:ring-red-900/50 transition-all"
           />
         </div>
 
@@ -121,13 +121,13 @@ export default function FAQPage() {
                   return (
                     <div 
                       key={qIdx} 
-                      className={`bg-[#121212] border text-left overflow-hidden rounded-xl transition-all duration-300 ${isOpen ? 'border-red-900/30 shadow-[0_4px_20px_-12px_rgba(220,38,38,0.2)]' : 'border-white/5 hover:border-white/10'}`}
+                      className={`bg-secondary border text-left overflow-hidden rounded-xl transition-all duration-300 ${isOpen ? 'border-red-900/30 shadow-[0_4px_20px_-12px_rgba(220,38,38,0.2)]' : 'border-border hover:border-border-border'}`}
                     >
                       <button 
                         onClick={() => toggleAccordion(uniqueIndex)}
                         className="w-full px-6 py-5 flex items-center justify-between gap-4 text-left"
                       >
-                        <span className={`text-sm font-bold transition-colors ${isOpen ? 'text-white' : 'text-gray-300'}`}>
+                        <span className={`text-sm font-bold transition-colors ${isOpen ? 'text-foreground' : 'text-muted'}`}>
                           {faq.question}
                         </span>
                         <svg 
@@ -145,7 +145,7 @@ export default function FAQPage() {
                       <div 
                         className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
                       >
-                         <div className="px-6 pb-6 pt-0 text-sm text-gray-400 leading-relaxed border-t border-white/5 mt-2 pt-4">
+                         <div className="px-6 pb-6 pt-0 text-sm text-muted leading-relaxed border-t border-border mt-2 pt-4">
                            {faq.answer}
                          </div>
                       </div>
@@ -158,12 +158,12 @@ export default function FAQPage() {
         </div>
 
         {/* Contact Support CTA */}
-        <div className="mt-20 bg-[#121212] border border-white/5 rounded-2xl p-10 text-center relative overflow-hidden">
+        <div className="mt-20 bg-secondary border border-border rounded-2xl p-10 text-center relative overflow-hidden">
            <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-red-900/50 to-transparent" />
            <div className="absolute bottom-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-red-900/50 to-transparent" />
            
            <h3 className="text-2xl font-bold mb-2">Still have questions?</h3>
-           <p className="text-gray-400 text-sm mb-8">Our support team is here to help you with any inquiries</p>
+           <p className="text-muted text-sm mb-8">Our support team is here to help you with any inquiries</p>
            
            <Link href="#" className="inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 px-8 rounded-xl transition-all shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-[0_0_30px_rgba(220,38,38,0.5)]">
              Contact Support

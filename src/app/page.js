@@ -19,7 +19,7 @@ const UserIcon = () => (
 );
 
 const CheckBadge = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-white">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-foreground">
     <path fillRule="evenodd" d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.25 9.75c0 5.942 4.064 10.933 9.563 12.086a.75.75 0 0 0 .374 0c5.499-1.153 9.563-6.144 9.563-12.086 0-1.91-.487-3.686-1.335-5.265a.75.75 0 0 0-.722-.515 11.208 11.208 0 0 1-7.877-3.08ZM12 7a.75.75 0 0 1 .75.75v3.25H16a.75.75 0 0 1 0 1.5h-3.25V16a.75.75 0 0 1-1.5 0v-3.5H8a.75.75 0 0 1 0-1.5h3.25V7.75A.75.75 0 0 1 12 7Z" clipRule="evenodd" />
     <path d="M12 7a.75.75 0 0 1 .75.75v.938l.68-.313a.75.75 0 1 1 .632 1.378L12.75 9.39l-1.312-.604a.75.75 0 0 1 .632-1.378l.68.313V7.75A.75.75 0 0 1 12 7Z" /> 
     {/* Simplified check visuals for badge */}
@@ -28,7 +28,7 @@ const CheckBadge = () => (
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-red-600 selection:text-white">
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-red-600 selection:text-white">
       {/* 
         --------------------------------------------------
         NAVBAR
@@ -49,10 +49,9 @@ export default function LandingPage() {
       <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden pt-20">
         {/* Background & Overlay */}
         <div className="absolute inset-0 z-0">
-            {/* Gradient overlays to match the reference image */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-transparent to-[#0a0a0a] z-10" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-transparent to-[#0a0a0a] z-10" />
-            <div className="absolute inset-0 bg-black/70 z-10" />
+            {/* Gradient overlays */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-background z-10 opacity-70" />
+            <div className="absolute inset-0 bg-background z-10 mix-blend-multiply" style={{ opacity: 'var(--hero-overlay-opacity)' }} />
             <img 
                 src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop"
                 alt="Gym Background" 
@@ -62,21 +61,24 @@ export default function LandingPage() {
 
         <div className="relative z-20 max-w-5xl mx-auto px-6 flex flex-col items-center text-center">
           
-          {/* Top Badge */}
-          <div className="mb-8 mt-8 inline-flex items-center gap-2 px-4 py-1.5 bg-[#1f0505] border border-red-900/40 rounded-full shadow-[0_0_15px_rgba(220,38,38,0.1)]">
-            <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_#dc2626]" />
-            <span className="text-red-500/90 text-[11px] font-bold uppercase tracking-widest">Egypt's Premier Fitness Certification</span>
+          {/* Glass Card Container for Hero Content to ensure readability on Light Mode */}
+          <div className="backdrop-blur-[2px] bg-background/10 dark:bg-transparent p-8 rounded-3xl border border-white/10 shadow-2xl dark:shadow-none dark:border-none">
+            {/* Top Badge */}
+            <div className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 bg-tertiary/90 border border-red-600/40 rounded-full shadow-[0_0_15px_rgba(220,38,38,0.1)] backdrop-blur-md">
+              <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_#dc2626]" />
+              <span className="text-red-600 dark:text-red-500 text-[11px] font-bold uppercase tracking-widest">Egypt's Premier Fitness Certification</span>
+            </div>
+
+            {/* Headline */}
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight text-white dark:text-foreground leading-tight drop-shadow-lg">
+              Transform Your <span className="text-red-600 drop-shadow-md">Fitness Career</span>
+            </h1>
+
+            {/* Subtext */}
+            <p className="text-white/90 dark:text-muted text-lg mb-8 max-w-2xl leading-relaxed drop-shadow-md mx-auto font-medium">
+              Join Egypt's most trusted fitness certification organization. Get accredited, connect with professionals, and elevate your coaching to world-class standards.
+            </p>
           </div>
-
-          {/* Headline */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight text-white leading-tight">
-            Transform Your <span className="text-red-600">Fitness Career</span>
-          </h1>
-
-          {/* Subtext */}
-          <p className="text-gray-400 text-lg mb-10 max-w-2xl leading-relaxed">
-            Join Egypt's most trusted fitness certification organization. Get accredited, connect with professionals, and elevate your coaching to world-class standards.
-          </p>
 
           {/* Search Bar */}
           <div className="w-full max-w-xl mb-10 relative group">
@@ -88,7 +90,7 @@ export default function LandingPage() {
             <input 
               type="text" 
               placeholder="Search for training programs or coaches..." 
-              className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-12 py-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-600/50 focus:bg-white/[0.05] focus:ring-1 focus:ring-red-600/20 transition-all shadow-xl"
+              className="w-full bg-secondary border border-border rounded-xl px-12 py-4 text-sm text-foreground placeholder-muted focus:outline-none focus:border-red-600/50 focus:bg-secondary focus:ring-1 focus:ring-red-600/20 transition-all shadow-xl"
             />
           </div>
 
@@ -102,7 +104,7 @@ export default function LandingPage() {
             </Link>
             <Link 
               href="/programs" 
-              className="w-full sm:w-auto px-8 py-3.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold rounded-lg backdrop-blur-sm transition-all hover:-translate-y-0.5 text-center"
+              className="w-full sm:w-auto px-8 py-3.5 bg-secondary border border-border hover:bg-tertiary text-foreground font-bold rounded-lg backdrop-blur-sm transition-all hover:-translate-y-0.5 text-center"
             >
               Explore Programs
             </Link>
@@ -134,9 +136,9 @@ export default function LandingPage() {
         Visuals: Minimal, High Contrast Numbers
         --------------------------------------------------
       */}
-      <section className="border-y border-white/5 bg-white/[0.02]">
+      <section className="border-y border-border bg-secondary">
         <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-theme">
             {[
               { number: "500+", label: "Certified Coaches" },
               { number: "12k+", label: "Active Trainees" },
@@ -144,8 +146,8 @@ export default function LandingPage() {
               { number: "10 Years", label: "Excellence" },
             ].map((stat, idx) => (
               <div key={idx} className="flex flex-col items-center">
-                <span className="text-3xl lg:text-4xl font-bold text-white mb-1 tracking-tight">{stat.number}</span>
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{stat.label}</span>
+                <span className="text-3xl lg:text-4xl font-bold text-foreground mb-1 tracking-tight">{stat.number}</span>
+                <span className="text-xs font-bold text-muted uppercase tracking-widest">{stat.label}</span>
               </div>
             ))}
           </div>
@@ -163,9 +165,9 @@ export default function LandingPage() {
         <div className="flex items-end justify-between mb-12">
           <div>
             <span className="text-red-500 font-bold uppercase tracking-wider text-sm">World Class Talent</span>
-            <h2 className="text-3xl lg:text-4xl font-bold mt-2">Meet Our Elite Trainers</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold mt-2 text-foreground">Meet Our Elite Trainers</h2>
           </div>
-          <Link href="/coaches" className="hidden sm:flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-white transition-colors">
+          <Link href="/coaches" className="hidden sm:flex items-center gap-2 text-sm font-bold text-muted hover:text-foreground transition-colors">
             View All Coaches <ArrowRight />
           </Link>
         </div>
@@ -177,7 +179,7 @@ export default function LandingPage() {
             { name: "Omar Hassan", role: "CrossFit Specialist", tag: "Elite Trainer", img: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=1470&auto=format&fit=crop" },
             { name: "Nour El-Sherif", role: "Sports Nutrition", tag: "PhD Nutrition", img: "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=1470&auto=format&fit=crop" },
           ].map((trainer, idx) => (
-            <div key={idx} className="group relative bg-white/5 rounded-xl overflow-hidden border border-white/5 hover:border-red-600/50 transition-all duration-300">
+            <div key={idx} className="group relative bg-secondary rounded-xl overflow-hidden border border-border hover:border-red-600/50 transition-all duration-300">
               <div className="aspect-[4/5] w-full overflow-hidden">
                 <img src={trainer.img} alt={trainer.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               </div>
@@ -193,9 +195,9 @@ export default function LandingPage() {
               {/* Content */}
               <div className="absolute bottom-0 w-full p-4">
                 <h3 className="text-lg font-bold text-white mb-1 group-hover:text-red-500 transition-colors">{trainer.name}</h3>
-                <p className="text-sm text-gray-400 mb-4">{trainer.role}</p>
+                <p className="text-sm text-gray-300 mb-4">{trainer.role}</p>
                 
-                <button className="w-full py-2 bg-white/10 hover:bg-red-600 text-xs font-bold uppercase rounded transition-colors flex items-center justify-center gap-2">
+                <button className="w-full py-2 bg-black/40 hover:bg-red-600 text-xs text-white font-bold uppercase rounded transition-colors flex items-center justify-center gap-2">
                    View Profile
                 </button>
               </div>
@@ -211,14 +213,14 @@ export default function LandingPage() {
         Visuals: Landscape Cards, Price Tag
         --------------------------------------------------
       */}
-      <section className="py-24 bg-white/[0.02]">
+      <section className="py-24 bg-secondary">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-end justify-between mb-12">
             <div>
               <span className="text-red-500 font-bold uppercase tracking-wider text-sm">Start Your Journey</span>
-              <h2 className="text-3xl lg:text-4xl font-bold mt-2">Latest Training Programs</h2>
+              <h2 className="text-3xl lg:text-4xl font-bold mt-2 text-foreground">Latest Training Programs</h2>
             </div>
-            <Link href="/programs" className="hidden sm:flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-white transition-colors">
+            <Link href="/programs" className="hidden sm:flex items-center gap-2 text-sm font-bold text-muted hover:text-foreground transition-colors">
               Browse All Programs <ArrowRight />
             </Link>
           </div>
@@ -250,7 +252,7 @@ export default function LandingPage() {
                 img: "https://images.unsplash.com/photo-1574680096141-983200526388?q=80&w=1469&auto=format&fit=crop"
               },
             ].map((program, idx) => (
-              <div key={idx} className="group bg-[#0a0a0a] border border-white/5 rounded-2xl overflow-hidden hover:border-red-600/30 hover:shadow-2xl hover:shadow-red-900/10 transition-all duration-300">
+              <div key={idx} className="group bg-background border border-border rounded-2xl overflow-hidden hover:border-red-600/30 hover:shadow-2xl hover:shadow-red-900/10 transition-all duration-300">
                 {/* Image Area */}
                 <div className="h-48 overflow-hidden relative">
                    <div className="absolute top-4 left-4 z-10 bg-red-600 text-[10px] font-bold px-2 py-1 rounded uppercase">
@@ -261,17 +263,17 @@ export default function LandingPage() {
                 
                 {/* Content Area */}
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-2">{program.title}</h3>
-                  <p className="text-sm text-gray-400 mb-6 line-clamp-2">{program.desc}</p>
+                  <h3 className="text-xl font-bold text-foreground mb-2">{program.title}</h3>
+                  <p className="text-sm text-muted mb-6 line-clamp-2">{program.desc}</p>
                   
-                  <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                  <div className="flex items-center justify-between pt-4 border-t border-border">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-gray-700 overflow-hidden">
                         <img src={`https://i.pravatar.cc/100?u=${program.instructor}`} alt="" />
                       </div>
-                      <span className="text-xs font-medium text-gray-300">By {program.instructor}</span>
+                      <span className="text-xs font-medium text-muted">By {program.instructor}</span>
                     </div>
-                    <span className="text-lg font-bold text-white">{program.price}</span>
+                    <span className="text-lg font-bold text-foreground">{program.price}</span>
                   </div>
                 </div>
               </div>
@@ -285,13 +287,13 @@ export default function LandingPage() {
         WHY CHOOSE US & CTA
         --------------------------------------------------
       */}
-      <section className="py-24 bg-[#0a0a0a] relative overflow-hidden">
+      <section className="py-24 bg-background relative overflow-hidden">
         
         {/* Why Choose Us */}
         <div className="max-w-7xl mx-auto px-6 mb-32">
            <div className="text-center mb-16">
-             <h2 className="text-3xl lg:text-5xl font-bold text-white mb-4 tracking-tight">Why Choose Reps Egypt?</h2>
-             <p className="text-gray-400 text-lg">The leading choice for fitness professionals across Egypt</p>
+             <h2 className="text-3xl lg:text-5xl font-bold text-foreground mb-4 tracking-tight">Why Choose Reps Egypt?</h2>
+             <p className="text-muted text-lg">The leading choice for fitness professionals across Egypt</p>
            </div>
 
            <div className="grid md:grid-cols-3 gap-12">
@@ -325,11 +327,11 @@ export default function LandingPage() {
                 },
               ].map((item, idx) => (
                 <div key={idx} className="flex flex-col items-center text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-6 border border-white/5 text-red-500 shadow-[0_0_20px_rgba(220,38,38,0.1)]">
+                  <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-6 border border-border text-red-500 shadow-[0_0_20px_rgba(220,38,38,0.1)]">
                     {item.icon}
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed max-w-xs">{item.desc}</p>
+                  <h3 className="text-xl font-bold text-foreground mb-3">{item.title}</h3>
+                  <p className="text-muted text-sm leading-relaxed max-w-xs">{item.desc}</p>
                 </div>
               ))}
            </div>
@@ -338,8 +340,8 @@ export default function LandingPage() {
         {/* New Bottom CTA */}
         <div className="max-w-4xl mx-auto px-6 text-center">
            <div className="relative z-10">
-              <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">Ready to Elevate Your Fitness Journey?</h2>
-              <p className="text-gray-400 text-lg mb-10">Join thousands of certified professionals who trust Reps Egypt for their career development.</p>
+              <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">Ready to Elevate Your Fitness Journey?</h2>
+              <p className="text-muted text-lg mb-10">Join thousands of certified professionals who trust Reps Egypt for their career development.</p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link 
@@ -350,7 +352,7 @@ export default function LandingPage() {
                 </Link>
                 <Link 
                   href="/contact" 
-                  className="w-full sm:w-auto px-8 py-3.5 bg-transparent border border-white/20 hover:border-white text-white font-bold rounded-lg transition-all hover:-translate-y-1"
+                  className="w-full sm:w-auto px-8 py-3.5 bg-transparent border border-border hover:border-border-hover text-foreground font-bold rounded-lg transition-all hover:-translate-y-1"
                 >
                   Contact Us
                 </Link>
