@@ -34,16 +34,76 @@ export async function findUserById(id) {
 }
 
 /**
- * Create a new user
- * @param {object} userData - { email, password (hashed), fullName }
+ * Create a new user with extended fields
+ * @param {object} userData - User data from registration
  * @returns {Promise<import('mongodb').InsertOneResult>}
  */
 export async function createUser(userData) {
     const users = await getUsersCollection();
-    return users.insertOne({
-        ...userData,
+    
+    const user = {
+        // Core fields
         email: userData.email.toLowerCase(),
+        password: userData.password,
+        fullName: userData.fullName,
+        
+        // Contact info
+        phone: userData.phone || null,
+        
+        // Personal info
+        birthDate: userData.birthDate || null,
+        age: userData.age ? parseInt(userData.age) : null,
+        
+        // Social media
+        socialMedia: {
+            facebook: userData.socialMedia?.facebook || null,
+            instagram: userData.socialMedia?.instagram || null,
+            youtube: userData.socialMedia?.youtube || null,
+            linkedin: userData.socialMedia?.linkedin || null,
+        },
+        
+        // Professional info
+        specialization: userData.specialization || null,
+        
+        // Terms & status
+        termsAccepted: userData.termsAccepted || false,
+        role: userData.role || 'trainer', // trainer or trainee
+        status: 'pending', // pending, approved, rejected
+        
+        // Timestamps
         createdAt: new Date(),
         updatedAt: new Date(),
-    });
+    };
+    
+    return users.insertOne(user);
+}
+
+/**
+ * Update a user by ID
+ * @param {string} id 
+ * @param {object} updateData 
+ * @returns {Promise<import('mongodb').UpdateResult>}
+ */
+export async function updateUser(id, updateData) {
+    const { ObjectId } = await import('mongodb');
+    const users = await getUsersCollection();
+    return users.updateOne(
+        { _id: new ObjectId(id) },
+        { 
+            $set: {
+                ...updateData,
+                updatedAt: new Date()
+            }
+        }
+    );
+}
+
+/**
+ * Get all users with optional filters
+ * @param {object} filter - MongoDB filter
+ * @returns {Promise<object[]>}
+ */
+export async function getUsers(filter = {}) {
+    const users = await getUsersCollection();
+    return users.find(filter).toArray();
 }

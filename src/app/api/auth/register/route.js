@@ -5,9 +5,21 @@ import { findUserByEmail, createUser } from '@/lib/user';
 export async function POST(request) {
     try {
         const body = await request.json();
-        const { email, password, fullName } = body;
+        const { 
+            email, 
+            password, 
+            fullName,
+            // Extended fields
+            phone,
+            birthDate,
+            age,
+            socialMedia,
+            specialization,
+            termsAccepted,
+            role
+        } = body;
 
-        // Validate input
+        // Validate required fields
         if (!email || !password || !fullName) {
             return NextResponse.json(
                 { error: 'Email, password, and full name are required' },
@@ -31,18 +43,26 @@ export async function POST(request) {
             );
         }
 
-        // Hash password and create user
+        // Hash password and create user with all fields
         const hashedPassword = await hashPassword(password);
         const result = await createUser({
             email,
             password: hashedPassword,
             fullName,
+            phone,
+            birthDate,
+            age,
+            socialMedia,
+            specialization,
+            termsAccepted,
+            role: role || 'trainer'
         });
 
         // Create JWT token
         const token = await createToken({
             userId: result.insertedId.toString(),
             email,
+            role: role || 'trainer'
         });
 
         // Create response with token in cookie
@@ -53,6 +73,8 @@ export async function POST(request) {
                     id: result.insertedId.toString(),
                     email,
                     fullName,
+                    role: role || 'trainer',
+                    status: 'pending'
                 },
             },
             { status: 201 }

@@ -6,7 +6,7 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'default-s
 // Routes that require authentication
 const protectedRoutes = ['/api/auth/me'];
 
-export async function middleware(request) {
+export async function proxy(request) {
     const { pathname } = request.nextUrl;
 
     // Check if this is a protected route
