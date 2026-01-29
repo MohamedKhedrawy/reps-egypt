@@ -5,7 +5,7 @@ import { findUserByEmail } from '@/lib/user';
 export async function POST(request) {
     try {
         const body = await request.json();
-        const { email, password } = body;
+        const { email, password, rememberMe = false } = body;
 
         // Validate input
         if (!email || !password) {
@@ -33,11 +33,15 @@ export async function POST(request) {
             );
         }
 
-        // Create JWT token
+        // Token expiration: 30 days if remember me, else 1 day
+        const tokenExpiry = rememberMe ? '30d' : '1d';
+        const cookieMaxAge = rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24; // 30 days or 1 day
+
+        // Create JWT token with appropriate expiry
         const token = await createToken({
             userId: user._id.toString(),
             email: user.email,
-        });
+        }, tokenExpiry);
 
         // Create response with token
         const response = NextResponse.json({
@@ -49,12 +53,12 @@ export async function POST(request) {
             },
         });
 
-        // Set HTTP-only cookie
+        // Set HTTP-only cookie with appropriate maxAge
         response.cookies.set('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
-            maxAge: 60 * 60 * 24 * 7, // 7 days
+            maxAge: cookieMaxAge,
             path: '/',
         });
 
@@ -67,3 +71,4 @@ export async function POST(request) {
         );
     }
 }
+

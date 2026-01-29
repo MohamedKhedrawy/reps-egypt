@@ -8,37 +8,64 @@ export async function POST(request) {
         const { 
             email, 
             password, 
-            fullName,
+            firstName,
+            lastName,
+            fullName: providedFullName,
             // Extended fields
             phone,
             birthDate,
             age,
             socialMedia,
             specialization,
+            uploadedFiles,
             termsAccepted,
             role
         } = body;
 
+        // Build fullName from firstName + lastName if not provided directly
+        const fullName = providedFullName || `${firstName || ''} ${lastName || ''}`.trim();
+
         // Validate required fields
         if (!email || !password || !fullName) {
             return NextResponse.json(
-                { error: 'Email, password, and full name are required' },
+                { error: 'Email, password, and name are required', field: 'general' },
                 { status: 400 }
             );
         }
 
-        if (password.length < 6) {
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
             return NextResponse.json(
-                { error: 'Password must be at least 6 characters' },
+                { error: 'Invalid email format', field: 'email' },
                 { status: 400 }
             );
+        }
+
+        // Validate password strength
+        if (password.length < 8) {
+            return NextResponse.json(
+                { error: 'Password must be at least 8 characters', field: 'password' },
+                { status: 400 }
+            );
+        }
+
+        // Validate phone if provided
+        if (phone) {
+            const phoneRegex = /^01[0125][0-9]{8}$/;
+            if (!phoneRegex.test(phone)) {
+                return NextResponse.json(
+                    { error: 'Invalid Egyptian phone number format', field: 'phone' },
+                    { status: 400 }
+                );
+            }
         }
 
         // Check if user already exists
         const existingUser = await findUserByEmail(email);
         if (existingUser) {
             return NextResponse.json(
-                { error: 'User with this email already exists' },
+                { error: 'User with this email already exists', field: 'email' },
                 { status: 409 }
             );
         }
@@ -54,6 +81,7 @@ export async function POST(request) {
             age,
             socialMedia,
             specialization,
+            uploadedFiles,
             termsAccepted,
             role: role || 'trainer'
         });

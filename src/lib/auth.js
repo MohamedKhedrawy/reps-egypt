@@ -25,13 +25,14 @@ export async function verifyPassword(password, hashedPassword) {
 /**
  * Create a JWT token for a user
  * @param {object} payload - User data to encode (e.g., { userId, email })
+ * @param {string} expiresIn - Expiration time (default: '7d')
  * @returns {Promise<string>}
  */
-export async function createToken(payload) {
+export async function createToken(payload, expiresIn = '7d') {
     return new SignJWT(payload)
         .setProtectedHeader({ alg: 'HS256' })
         .setIssuedAt()
-        .setExpirationTime('7d')
+        .setExpirationTime(expiresIn)
         .sign(JWT_SECRET);
 }
 

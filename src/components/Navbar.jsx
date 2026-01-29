@@ -4,15 +4,29 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
+import { useToast } from "@/context/ToastContext";
 
 export default function Navbar() {
   const router = useRouter();
   const { user, loading, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme, isDark } = useTheme();
+  const toast = useToast();
 
   const handleLogout = async () => {
     await logout();
     router.push("/");
+  };
+
+  const triggerTestToast = () => {
+    const types = ['success', 'error', 'warning', 'info'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    const messages = {
+      success: "Operation completed successfully!",
+      error: "Something went wrong. Please try again.",
+      warning: "Your session is about to expire.",
+      info: "New updates are available.",
+    };
+    toast[type](messages[type]);
   };
 
   return (
@@ -53,6 +67,13 @@ export default function Navbar() {
 
           {/* Right: Theme Toggle + Auth / Profile */}
           <div className="flex items-center justify-end gap-4 w-auto">
+
+            <button
+               onClick={triggerTestToast}
+               className="text-xs px-2 py-1 bg-gray-500/20 rounded border border-gray-500/30 text-muted hover:text-foreground"
+            >
+              Test Alert
+            </button>
             
             {/* Theme Toggle Switch */}
             <button
