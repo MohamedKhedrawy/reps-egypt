@@ -41,6 +41,7 @@ export async function POST(request) {
         const token = await createToken({
             userId: user._id.toString(),
             email: user.email,
+            role: user.role || 'user',
         }, tokenExpiry);
 
         // Create response with token

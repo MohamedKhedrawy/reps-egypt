@@ -1,245 +1,916 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useToast } from "@/context/ToastContext";
+import { usePageSettings } from "@/context/PageSettingsContext";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("Overview");
+  const [stats, setStats] = useState({ totalUsers: 0, activeTrainers: 0, pendingApprovals: 0, totalNews: 0 });
+  const [pending, setPending] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [news, setNews] = useState([]);
+  const [pageSettings, setPageSettings] = useState({ main: [], footer: [], legal: [] });
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showModal, setShowModal] = useState(null);
+  const [editItem, setEditItem] = useState(null);
+  const [viewItem, setViewItem] = useState(null); // For viewing full details
+  const [userFilter, setUserFilter] = useState("all"); // "all" or "pending"
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+  const fileInputRef = useRef(null);
+  const { showToast } = useToast();
+  const { refreshPages } = usePageSettings();
 
-  // Mock Data
-  const stats = [
-    {
-      label: "Total Users",
-      value: "10,247",
-      growth: "+12%",
-      isPositive: true,
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-red-600">
-          <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clipRule="evenodd" />
-        </svg>
-      ),
-    },
-    {
-      label: "Active Coaches",
-      value: "512",
-      growth: "+8%",
-      isPositive: true,
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-red-600">
-          <path fillRule="evenodd" d="M8.25 6.75a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM15.75 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM2.25 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM6.31 15.117A6.745 6.745 0 0 1 12 12a6.745 6.745 0 0 1 6.709 7.498.75.75 0 0 1-.372.636A16.657 16.657 0 0 1 12 21.75c-2.33 0-4.512-.645-6.374-1.766a.75.75 0 0 1-.371-.636ZM16.611 15.468C18.025 16.59 18.9 18.23 18.9 20.08a16.551 16.551 0 0 1-1.353 3.655.75.75 0 0 1-1.29-.696A15.061 15.061 0 0 1 17.391 20.08c0-1.285-.59-2.452-1.528-3.253a.75.75 0 1 1 .948-1.159ZM5.42 16.927a15.061 15.061 0 0 1 1.133 3.153.75.75 0 1 1-1.291.696 16.553 16.553 0 0 1-1.352-3.655c0-1.85.875-3.49 2.29-4.612a.75.75 0 0 1 .947 1.16Z" clipRule="evenodd" />
-        </svg>
-      ),
-    },
-    {
-      label: "Pending Approvals",
-      value: "23",
-      growth: "Urgent",
-      isPositive: false, // For styling logic
-      isWarning: true,
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-amber-500">
-          <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clipRule="evenodd" />
-        </svg>
-      ),
-    },
-    {
-      label: "Certifications Issued",
-      value: "342",
-      growth: "+15%",
-      isPositive: true,
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-red-600">
-          <path fillRule="evenodd" d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z" clipRule="evenodd" />
-        </svg>
-      ),
-    },
-  ];
+  // Fetch data on mount and tab change
+  useEffect(() => {
+    fetchData();
+  }, [activeTab]);
 
-  const approvals = [
-    {
-      name: "Mohamed Khaled",
-      type: "Coach Application",
-      spec: "CrossFit Training",
-      date: "Jan 25, 2026",
-    },
-    {
-      name: "Nour Ahmed",
-      type: "Program Submission",
-      spec: "Yoga Instructor",
-      date: "Jan 24, 2026",
-    },
-    {
-      name: "Omar Hassan",
-      type: "Certification Renewal",
-      spec: "Sports Nutrition",
-      date: "Jan 23, 2026",
-    },
-  ];
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [statsRes, pendingRes, usersRes, newsRes, pagesRes] = await Promise.all([
+        fetch("/api/admin/stats"),
+        fetch("/api/admin/pending"),
+        fetch("/api/admin/users"),
+        fetch("/api/admin/news"),
+        fetch("/api/admin/pages"),
+      ]);
+      
+      if (statsRes.ok) setStats(await statsRes.json());
+      if (pendingRes.ok) setPending((await pendingRes.json()).pending || []);
+      if (usersRes.ok) setUsers((await usersRes.json()).users || []);
+      if (newsRes.ok) setNews((await newsRes.json()).articles || []);
+      if (pagesRes.ok) {
+        const pagesData = await pagesRes.json();
+        setPageSettings(pagesData.grouped || { main: [], footer: [], legal: [] });
+      }
+    } catch (error) {
+      showToast("Failed to load data", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const activity = [
-    {
-      action: "New coach registration",
-      user: "Ahmed Salem",
-      time: "2 hours ago",
-      icon: "user",
-    },
-    {
-      action: "Program enrollment",
-      user: "Sara Mohamed",
-      time: "4 hours ago",
-      icon: "file",
-    },
-    {
-      action: "Certification issued",
-      user: "Karim Youssef",
-      time: "5 hours ago",
-      icon: "badge",
-    },
-    {
-      action: "Profile updated",
-      user: "Layla Ibrahim",
-      time: "8 hours ago",
-      icon: "edit",
-    },
-  ];
+  // Approve/Reject item (user or qualification) - INSTANT with optimistic update
+  const handleApprovalAction = async (item, status) => {
+    // Optimistic update - immediately remove from pending list
+    setPending(prev => prev.filter(p => p.id !== item.id));
+    
+    // Also update stats optimistically
+    setStats(prev => ({
+      ...prev, 
+      pendingApprovals: Math.max(0, prev.pendingApprovals - 1)
+    }));
+    
+    // Close detail modal if open
+    if (viewItem?.id === item.id) setViewItem(null);
+    
+    showToast(`Request ${status} successfully`, "success");
+
+    try {
+      const endpoint = item.actionType === 'qualification' 
+        ? `/api/admin/qualifications/${item.id}`
+        : `/api/admin/users/${item.id}`;
+
+      const res = await fetch(endpoint, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      
+      if (!res.ok) {
+        // Revert on error
+        fetchData();
+        showToast("Action failed - reverted", "error");
+      }
+    } catch { 
+      fetchData();
+      showToast("Network error - reverted", "error"); 
+    }
+  };
+
+  // Delete user
+  const handleDeleteUser = async (id) => {
+    if (!confirm("Are you sure you want to delete this user?")) return;
+    try {
+      const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        showToast("User deleted", "success");
+        fetchData();
+      }
+    } catch { showToast("Delete failed", "error"); }
+  };
+
+  // Update user details
+  const handleSaveUser = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    
+    try {
+      const res = await fetch(`/api/admin/users/${editItem.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        showToast("User updated successfully", "success");
+        setShowModal(null);
+        setEditItem(null);
+        fetchData();
+      } else {
+        showToast("Update failed", "error");
+      }
+    } catch { showToast("Network error", "error"); }
+  };
+
+  // Create/Update news with image upload
+  const handleSaveNews = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    data.isPublished = formData.get("isPublished") === "on";
+    
+    // Use uploaded image URL if available
+    if (imagePreview) {
+      data.imageUrl = imagePreview;
+    }
+    
+    // Close modal immediately for better UX
+    setShowModal(null);
+    setEditItem(null);
+    setImagePreview(null);
+    
+    showToast(editItem ? "Article updated" : "Article created", "success");
+    
+    try {
+      const url = editItem ? `/api/admin/news/${editItem.id}` : "/api/admin/news";
+      const res = await fetch(url, {
+        method: editItem ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        fetchData();
+      } else {
+        showToast("Save failed", "error");
+      }
+    } catch { showToast("Save failed", "error"); }
+  };
+
+  // Handle image file upload
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // For now, we'll use a data URL (in production, upload to cloud storage)
+    setUploadingImage(true);
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+      setUploadingImage(false);
+    };
+    reader.onerror = () => {
+      showToast("Failed to read image", "error");
+      setUploadingImage(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Delete news
+  const handleDeleteNews = async (id) => {
+    if (!confirm("Delete this article?")) return;
+    try {
+      const res = await fetch(`/api/admin/news/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        showToast("Article deleted", "success");
+        fetchData();
+      }
+    } catch { showToast("Delete failed", "error"); }
+  };
+
+  // Filter users by search and status
+  const filteredUsers = users.filter(u => {
+    const matchesSearch = u.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.email?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = userFilter === "all" || u.status === userFilter;
+    return matchesSearch && matchesFilter;
+  });
+
+  const pendingUsersCount = users.filter(u => u.status === "pending").length;
+
+  // Toggle page visibility
+  const handleTogglePageVisibility = async (pageId, currentVisibility) => {
+    try {
+      const res = await fetch(`/api/admin/pages/${pageId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isVisible: !currentVisibility }),
+      });
+      if (res.ok) {
+        showToast(`Page ${!currentVisibility ? 'shown' : 'hidden'} in navigation`, "success");
+        fetchData();
+        refreshPages(); // Refresh the global page settings context
+      } else {
+        showToast("Failed to update page visibility", "error");
+      }
+    } catch { showToast("Network error", "error"); }
+  };
+
+  const tabs = ["Overview", "Approvals", "Users", "News", "Pages", "Analytics"];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white p-6">
+    <div className="min-h-screen bg-background text-foreground p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-white/60">Manage users, approvals, and platform analytics</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            <p className="text-muted">Manage users, approvals, and content</p>
+          </div>
+          <button onClick={fetchData} className="px-4 py-2 bg-secondary border border-border rounded-lg text-sm hover:bg-tertiary transition-colors flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+            Refresh
+          </button>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, idx) => (
-            <div key={idx} className={`bg-[#121212] border ${stat.isWarning ? 'border-amber-500/30' : 'border-white/5'} rounded-2xl p-6 relative overflow-hidden`}>
+          {[
+            { label: "Total Users", value: stats.totalUsers, icon: "👥", color: "red" },
+            { label: "Active Trainers", value: stats.activeTrainers, icon: "🏋️", color: "green" },
+            { label: "Pending Approvals", value: stats.pendingApprovals, icon: "⏳", color: "amber", urgent: stats.pendingApprovals > 0 },
+            { label: "News Articles", value: stats.totalNews, icon: "📰", color: "blue" },
+          ].map((stat, i) => (
+            <div key={i} className={`bg-secondary border ${stat.urgent ? 'border-amber-500/50' : 'border-border'} rounded-2xl p-6`}>
               <div className="flex justify-between items-start mb-4">
-                <div className={`p-2 rounded-lg ${stat.isWarning ? 'bg-amber-500/10' : 'bg-red-600/10'}`}>
-                  {stat.icon}
-                </div>
-                <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                  stat.isWarning ? 'bg-amber-500/10 text-amber-500' :
-                  stat.isPositive ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
-                }`}>
-                  {stat.growth}
-                </span>
+                <span className="text-2xl">{stat.icon}</span>
+                {stat.urgent && <span className="text-xs font-bold bg-amber-500/20 text-amber-500 px-2 py-1 rounded-full">Action Needed</span>}
               </div>
-              <div className="text-3xl font-bold mb-1">{stat.value}</div>
-              <div className="text-sm text-gray-400">{stat.label}</div>
+              <div className="text-3xl font-bold mb-1">{loading ? "..." : stat.value}</div>
+              <div className="text-sm text-muted">{stat.label}</div>
             </div>
           ))}
         </div>
 
         {/* Navigation Tabs */}
-        <div className="border-b border-white/10">
+        <div className="border-b border-border">
           <div className="flex gap-8">
-            {["Overview", "Approvals", "Users", "Analytics"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`pb-4 text-sm font-bold transition-colors relative ${
-                  activeTab === tab ? "text-red-500" : "text-gray-500 hover:text-white"
-                }`}
-              >
+            {tabs.map((tab) => (
+              <button key={tab} onClick={() => setActiveTab(tab)}
+                className={`pb-4 text-sm font-bold transition-colors relative ${activeTab === tab ? "text-red-500" : "text-muted hover:text-foreground"}`}>
                 {tab}
-                {activeTab === tab && (
-                  <div className="absolute bottom-0 left-0 w-full h-[2px] bg-red-600 rounded-t-full" />
+                {tab === "Approvals" && stats.pendingApprovals > 0 && (
+                  <span className="ml-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{stats.pendingApprovals}</span>
                 )}
+                {activeTab === tab && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-red-600 rounded-t-full" />}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-8">
-          
-          {/* Pending Approvals */}
-          <div className="bg-[#121212] border border-white/5 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold">Pending Approvals</h2>
-              <span className="text-xs font-bold bg-amber-500/10 text-amber-500 px-3 py-1 rounded-full">3 pending</span>
-            </div>
-
-            <div className="space-y-4">
-              {approvals.map((item, idx) => (
-                <div key={idx} className="bg-white/5  border border-white/5 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="font-bold text-white">{item.name}</h3>
-                    <p className="text-xs text-gray-400 mb-1">{item.type}</p>
-                    <div className="flex items-center gap-2 text-[10px] text-gray-500">
-                      <span>{item.spec}</span>
-                      <span>•</span>
-                      <span>{item.date}</span>
+        {/* Tab Content */}
+        {loading ? (
+          <div className="text-center py-20 text-muted">Loading...</div>
+        ) : (
+          <>
+            {/* Overview Tab */}
+            {activeTab === "Overview" && (
+              <div className="grid lg:grid-cols-2 gap-8">
+                {/* Recent Pending */}
+                <div className="bg-secondary border border-border rounded-2xl p-6">
+                  <h2 className="text-xl font-bold mb-6">Recent Pending Approvals</h2>
+                  {pending.length === 0 ? (
+                    <p className="text-muted text-sm">No pending approvals</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {pending.slice(0, 3).map((item) => (
+                        <div key={item.id} className="bg-tertiary rounded-xl p-4 flex justify-between items-center">
+                          <div>
+                            <h3 className="font-bold">{item.name}</h3>
+                            <p className="text-xs text-muted">{item.specialization} • {item.date}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <button onClick={() => handleApprovalAction(item, "approved")} className="px-3 py-1.5 bg-green-500/10 text-green-500 text-xs font-bold rounded-full hover:bg-green-500/20">Approve</button>
+                            <button onClick={() => handleApprovalAction(item, "rejected")} className="px-3 py-1.5 bg-red-500/10 text-red-500 text-xs font-bold rounded-full hover:bg-red-500/20">Reject</button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                  <div className="flex gap-2 w-full sm:w-auto">
-                    <button className="flex-1 sm:flex-none px-4 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-500 text-xs font-bold rounded-full transition-colors flex items-center justify-center gap-1 group">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
-                        <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
-                      </svg>
-                      Approve
-                    </button>
-                    <button className="flex-1 sm:flex-none px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-bold rounded-full transition-colors flex items-center justify-center gap-1 group">
-                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clipRule="evenodd" />
-                      </svg>
-                      Reject
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Recent Activity */}
-          <div className="bg-[#121212] border border-white/5 rounded-2xl p-6">
-            <h2 className="text-xl font-bold mb-6">Recent Activity</h2>
-            <div className="space-y-6">
-              {activity.map((item, idx) => (
-                <div key={idx} className="flex gap-4 relative">
-                  {/* Timeline Line */}
-                  {idx !== activity.length - 1 && (
-                    <div className="absolute top-8 left-4 w-[1px] h-full bg-white/5 -z-0" />
                   )}
-                  
-                  <div className="w-8 h-8 rounded-full bg-white/5 border border-white/5 flex items-center justify-center shrink-0 z-10 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                       <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-5.5-2.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM10 12a5.99 5.99 0 0 0-4.793 2.39A9.916 9.916 0 0 0 10 18c2.314 0 4.438-.784 6.131-2.1.43-.333-.604-2.435-1.338-3.51A5.99 5.99 0 0 0 10 12Z" clipRule="evenodd" />
-                    </svg>
+                </div>
+
+                {/* Quick Stats */}
+                <div className="bg-secondary border border-border rounded-2xl p-6">
+                  <h2 className="text-xl font-bold mb-6">Quick Actions</h2>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button onClick={() => setActiveTab("Approvals")} className="p-4 bg-tertiary rounded-xl text-left hover:bg-background transition-colors">
+                      <span className="text-2xl mb-2 block">✅</span>
+                      <span className="font-bold">Review Approvals</span>
+                    </button>
+                    <button onClick={() => setActiveTab("Users")} className="p-4 bg-tertiary rounded-xl text-left hover:bg-background transition-colors">
+                      <span className="text-2xl mb-2 block">👤</span>
+                      <span className="font-bold">Manage Users</span>
+                    </button>
+                    <button onClick={() => setActiveTab("News")} className="p-4 bg-tertiary rounded-xl text-left hover:bg-background transition-colors">
+                      <span className="text-2xl mb-2 block">📝</span>
+                      <span className="font-bold">Manage News</span>
+                    </button>
+                    <button onClick={fetchData} className="p-4 bg-tertiary rounded-xl text-left hover:bg-background transition-colors">
+                      <span className="text-2xl mb-2 block">🔄</span>
+                      <span className="font-bold">Refresh Data</span>
+                    </button>
                   </div>
-                  
-                  <div className="flex-1 pb-6 border-b border-white/5 last:border-0 last:pb-0">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-bold text-sm text-white">{item.action}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">{item.user}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Approvals Tab */}
+            {activeTab === "Approvals" && (
+              <div className="bg-secondary border border-border rounded-2xl p-6">
+                <h2 className="text-xl font-bold mb-6">Pending Approvals ({pending.length})</h2>
+                {pending.length === 0 ? (
+                  <p className="text-muted">No pending applications</p>
+                ) : (
+                  <div className="space-y-4">
+                    {pending.map((item) => (
+                      <div key={item.id} className="bg-tertiary border border-border rounded-xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div className="flex-1">
+                          <h3 className="font-bold text-lg">{item.name}</h3>
+                          <p className="text-sm text-muted">{item.email}</p>
+                          <div className="flex gap-3 mt-2 text-xs text-muted">
+                            <span className="bg-background px-2 py-1 rounded">{item.type}</span>
+                            <span className="bg-background px-2 py-1 rounded">{item.specialization}</span>
+                            <span>{item.date}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button onClick={() => setViewItem(item)} className="px-4 py-2 bg-blue-500/10 text-blue-400 font-bold rounded-full hover:bg-blue-500/20">
+                            View Details
+                          </button>
+                          <button onClick={() => handleApprovalAction(item, "approved")} className="px-5 py-2 bg-green-500/10 text-green-500 font-bold rounded-full hover:bg-green-500/20 flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                            Approve
+                          </button>
+                          <button onClick={() => handleApprovalAction(item, "rejected")} className="px-5 py-2 bg-red-500/10 text-red-500 font-bold rounded-full hover:bg-red-500/20 flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                            Reject
+                          </button>
+                        </div>
                       </div>
-                      <span className="text-[10px] text-gray-600 font-medium">{item.time}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Users Tab */}
+            {activeTab === "Users" && (
+              <div className="bg-secondary border border-border rounded-2xl p-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                  <div className="flex items-center gap-4">
+                    <h2 className="text-xl font-bold">Users</h2>
+                    {/* Filter Tabs */}
+                    <div className="flex bg-tertiary rounded-lg p-1">
+                      <button
+                        onClick={() => setUserFilter("all")}
+                        className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${userFilter === "all" ? "bg-red-600 text-white" : "text-muted hover:text-foreground"}`}
+                      >
+                        All Users ({users.length})
+                      </button>
+                      <button
+                        onClick={() => setUserFilter("pending")}
+                        className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${userFilter === "pending" ? "bg-amber-500 text-white" : "text-muted hover:text-foreground"}`}
+                      >
+                        Pending ({pendingUsersCount})
+                      </button>
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search users..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-tertiary border border-border rounded-lg px-4 py-2 text-sm w-64 focus:outline-none focus:border-red-500"
+                  />
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border text-left text-muted">
+                        <th className="pb-3 font-medium">Name</th>
+                        <th className="pb-3 font-medium">Email</th>
+                        <th className="pb-3 font-medium">Role</th>
+                        <th className="pb-3 font-medium">Status</th>
+                        <th className="pb-3 font-medium">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredUsers.map((user) => (
+                        <tr key={user.id} className="border-b border-border/50 hover:bg-tertiary/50">
+                          <td className="py-4 font-medium">{user.name}</td>
+                          <td className="py-4 text-muted">{user.email}</td>
+                          <td className="py-4">
+                            <span className={`px-2 py-1 rounded text-xs font-bold ${user.role === 'admin' ? 'bg-purple-500/20 text-purple-400' : user.role === 'trainer' ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                              {user.role}
+                            </span>
+                          </td>
+                          <td className="py-4">
+                            <span className={`px-2 py-1 rounded text-xs font-bold ${user.status === 'approved' ? 'bg-green-500/20 text-green-400' : user.status === 'rejected' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                              {user.status}
+                            </span>
+                          </td>
+                          <td className="py-4">
+                            <div className="flex gap-2">
+                              {user.status === 'pending' && (
+                                <>
+                                  <button onClick={() => handleApprovalAction({ id: user.id, actionType: 'user' }, "approved")} className="text-green-500 hover:underline text-xs">Approve</button>
+                                  <button onClick={() => handleApprovalAction({ id: user.id, actionType: 'user' }, "rejected")} className="text-red-500 hover:underline text-xs">Reject</button>
+                                </>
+                              )}
+                              <button onClick={() => { setEditItem(user); setShowModal("user"); }} className="text-blue-400 hover:underline text-xs">Edit</button>
+                              <button onClick={() => handleDeleteUser(user.id)} className="text-red-500 hover:underline text-xs">Delete</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* News Tab */}
+            {activeTab === "News" && (
+              <div className="bg-secondary border border-border rounded-2xl p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold">News Articles ({news.length})</h2>
+                  <button onClick={() => { setEditItem(null); setShowModal("news"); }} className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                    Add Article
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {news.map((article) => (
+                    <div key={article.id} className="bg-tertiary border border-border rounded-xl p-5 flex justify-between items-center">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-1">
+                          <h3 className="font-bold">{article.title}</h3>
+                          <span className={`px-2 py-0.5 rounded text-xs ${article.isPublished ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                            {article.isPublished ? 'Published' : 'Draft'}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted">{article.category} • {article.description?.slice(0, 80)}...</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => { setEditItem(article); setShowModal("news"); }} className="px-3 py-1.5 bg-blue-500/10 text-blue-400 text-xs font-bold rounded-full hover:bg-blue-500/20">Edit</button>
+                        <button onClick={() => handleDeleteNews(article.id)} className="px-3 py-1.5 bg-red-500/10 text-red-400 text-xs font-bold rounded-full hover:bg-red-500/20">Delete</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Analytics Tab */}
+            {activeTab === "Analytics" && (
+              <div className="space-y-8">
+                {/* Analytics Header */}
+                <div className="bg-secondary border border-border rounded-2xl p-6">
+                  <h2 className="text-xl font-bold mb-2">Platform Analytics</h2>
+                  <p className="text-muted text-sm">Insights and metrics for your platform performance</p>
+                </div>
+
+                {/* Metrics Grid */}
+                <div className="grid lg:grid-cols-2 gap-8">
+                  {/* User Growth Chart Placeholder */}
+                  <div className="bg-secondary border border-border rounded-2xl p-6">
+                    <h3 className="font-bold mb-4">User Growth</h3>
+                    <div className="h-64 bg-tertiary rounded-xl flex items-center justify-center border border-border">
+                      <div className="text-center">
+                        <div className="text-4xl mb-2">📈</div>
+                        <p className="text-muted text-sm">Chart visualization coming soon</p>
+                        <p className="text-xs text-muted mt-1">Integrate Chart.js or Recharts</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mt-4">
+                      <div className="text-center p-3 bg-tertiary rounded-lg">
+                        <div className="text-2xl font-bold text-green-400">+12%</div>
+                        <div className="text-xs text-muted">This Month</div>
+                      </div>
+                      <div className="text-center p-3 bg-tertiary rounded-lg">
+                        <div className="text-2xl font-bold text-blue-400">{stats.totalUsers}</div>
+                        <div className="text-xs text-muted">Total Users</div>
+                      </div>
+                      <div className="text-center p-3 bg-tertiary rounded-lg">
+                        <div className="text-2xl font-bold text-purple-400">{stats.activeTrainers}</div>
+                        <div className="text-xs text-muted">Active Trainers</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Approval Metrics */}
+                  <div className="bg-secondary border border-border rounded-2xl p-6">
+                    <h3 className="font-bold mb-4">Approval Rate</h3>
+                    <div className="h-64 bg-tertiary rounded-xl flex items-center justify-center border border-border">
+                      <div className="text-center">
+                        <div className="text-6xl font-bold text-green-400">87%</div>
+                        <p className="text-muted text-sm mt-2">Approval Rate</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                        <div className="text-xl font-bold text-green-400">156</div>
+                        <div className="text-xs text-muted">Approved</div>
+                      </div>
+                      <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                        <div className="text-xl font-bold text-red-400">23</div>
+                        <div className="text-xs text-muted">Rejected</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Content Stats */}
+                  <div className="bg-secondary border border-border rounded-2xl p-6">
+                    <h3 className="font-bold mb-4">Content Overview</h3>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center p-4 bg-tertiary rounded-xl">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">📰</span>
+                          <span>News Articles</span>
+                        </div>
+                        <span className="text-2xl font-bold">{stats.totalNews}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-4 bg-tertiary rounded-xl">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">✅</span>
+                          <span>Published</span>
+                        </div>
+                        <span className="text-2xl font-bold text-green-400">{news.filter(n => n.isPublished).length}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-4 bg-tertiary rounded-xl">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">📝</span>
+                          <span>Drafts</span>
+                        </div>
+                        <span className="text-2xl font-bold text-amber-400">{news.filter(n => !n.isPublished).length}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Recent Activity */}
+                  <div className="bg-secondary border border-border rounded-2xl p-6">
+                    <h3 className="font-bold mb-4">Quick Insights</h3>
+                    <div className="space-y-3">
+                      <div className="p-4 bg-tertiary rounded-xl border-l-4 border-green-500">
+                        <p className="font-medium">Registration Trend</p>
+                        <p className="text-sm text-muted">User sign-ups are up 15% from last week</p>
+                      </div>
+                      <div className="p-4 bg-tertiary rounded-xl border-l-4 border-blue-500">
+                        <p className="font-medium">Active Sessions</p>
+                        <p className="text-sm text-muted">Peak activity at 6PM - 9PM daily</p>
+                      </div>
+                      <div className="p-4 bg-tertiary rounded-xl border-l-4 border-amber-500">
+                        <p className="font-medium">Pending Queue</p>
+                        <p className="text-sm text-muted">{stats.pendingApprovals} items awaiting review</p>
+                      </div>
+                      <div className="p-4 bg-tertiary rounded-xl border-l-4 border-purple-500">
+                        <p className="font-medium">Top Category</p>
+                        <p className="text-sm text-muted">Personal Training certifications most requested</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              ))}
+              </div>
+            )}
+
+            {/* Pages Tab */}
+            {activeTab === "Pages" && (
+              <div className="space-y-8">
+                {/* Pages Header */}
+                <div className="bg-secondary border border-border rounded-2xl p-6">
+                  <h2 className="text-xl font-bold mb-2">Pages Control</h2>
+                  <p className="text-muted text-sm">Show or hide pages from the website navigation. Hidden pages are still accessible via direct URL.</p>
+                </div>
+
+                {/* Main Navigation Pages */}
+                <div className="bg-secondary border border-border rounded-2xl p-6">
+                  <h3 className="font-bold mb-4 flex items-center gap-2">
+                    <span className="text-xl">🗺️</span> Main Navigation
+                    <span className="text-xs text-muted font-normal">Navbar links</span>
+                  </h3>
+                  <div className="space-y-3">
+                    {pageSettings.main.map((page) => (
+                      <div key={page.pageId} className="flex items-center justify-between p-4 bg-tertiary rounded-xl border border-border">
+                        <div className="flex items-center gap-4">
+                          <span className="text-xl">{page.icon || '📄'}</span>
+                          <div>
+                            <p className="font-medium">{page.name}</p>
+                            <p className="text-xs text-muted">{page.path}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleTogglePageVisibility(page.pageId, page.isVisible)}
+                          className={`relative w-14 h-8 rounded-full transition-colors duration-300 ${page.isVisible ? 'bg-green-500' : 'bg-gray-600'}`}
+                        >
+                          <div
+                            className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow transition-all duration-300 ${page.isVisible ? 'left-7' : 'left-1'}`}
+                          />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Footer Pages */}
+                <div className="bg-secondary border border-border rounded-2xl p-6">
+                  <h3 className="font-bold mb-4 flex items-center gap-2">
+                    <span className="text-xl">📋</span> Footer Quick Links
+                    <span className="text-xs text-muted font-normal">Footer section links</span>
+                  </h3>
+                  <div className="space-y-3">
+                    {pageSettings.footer.map((page) => (
+                      <div key={page.pageId} className="flex items-center justify-between p-4 bg-tertiary rounded-xl border border-border">
+                        <div className="flex items-center gap-4">
+                          <span className="text-xl">{page.icon || '📄'}</span>
+                          <div>
+                            <p className="font-medium">{page.name}</p>
+                            <p className="text-xs text-muted">{page.path}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleTogglePageVisibility(page.pageId, page.isVisible)}
+                          className={`relative w-14 h-8 rounded-full transition-colors duration-300 ${page.isVisible ? 'bg-green-500' : 'bg-gray-600'}`}
+                        >
+                          <div
+                            className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow transition-all duration-300 ${page.isVisible ? 'left-7' : 'left-1'}`}
+                          />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Legal Pages */}
+                <div className="bg-secondary border border-border rounded-2xl p-6">
+                  <h3 className="font-bold mb-4 flex items-center gap-2">
+                    <span className="text-xl">⚖️</span> Legal Pages
+                    <span className="text-xs text-muted font-normal">Footer legal section</span>
+                  </h3>
+                  <div className="space-y-3">
+                    {pageSettings.legal.map((page) => (
+                      <div key={page.pageId} className="flex items-center justify-between p-4 bg-tertiary rounded-xl border border-border">
+                        <div className="flex items-center gap-4">
+                          <span className="text-xl">{page.icon || '📄'}</span>
+                          <div>
+                            <p className="font-medium">{page.name}</p>
+                            <p className="text-xs text-muted">{page.path}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleTogglePageVisibility(page.pageId, page.isVisible)}
+                          className={`relative w-14 h-8 rounded-full transition-colors duration-300 ${page.isVisible ? 'bg-green-500' : 'bg-gray-600'}`}
+                        >
+                          <div
+                            className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow transition-all duration-300 ${page.isVisible ? 'left-7' : 'left-1'}`}
+                          />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Information Note */}
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-6 flex items-start gap-4">
+                  <span className="text-2xl">💡</span>
+                  <div>
+                    <p className="font-medium text-amber-400">Note about hidden pages</p>
+                    <p className="text-sm text-muted mt-1">Hidden pages are only removed from the navigation menus. Users can still access them directly via URL. Use this to temporarily hide pages without affecting direct links.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* News Modal */}
+        {showModal === "news" && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-secondary border border-border rounded-2xl w-full max-w-lg p-6">
+              <h3 className="text-xl font-bold mb-6">{editItem ? "Edit Article" : "New Article"}</h3>
+              <form onSubmit={handleSaveNews} className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">Title</label>
+                  <input name="title" defaultValue={editItem?.title} required className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">Category</label>
+                  <select name="category" defaultValue={editItem?.category} required className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500">
+                    <option value="">Select category</option>
+                    <option value="Announcement">Announcement</option>
+                    <option value="Article">Article</option>
+                    <option value="Community">Community</option>
+                    <option value="Events">Events</option>
+                    <option value="Partnership">Partnership</option>
+                    <option value="Trends">Trends</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">Description</label>
+                  <textarea name="description" defaultValue={editItem?.description} required rows={3} className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500 resize-none" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">Image</label>
+                  <div className="mt-2 space-y-3">
+                    {/* Image Preview */}
+                    {(imagePreview || editItem?.imageUrl) && (
+                      <div className="relative w-full h-32 rounded-lg overflow-hidden bg-tertiary border border-border">
+                        <img 
+                          src={imagePreview || editItem?.imageUrl} 
+                          alt="Preview" 
+                          className="w-full h-full object-cover"
+                        />
+                        <button 
+                          type="button" 
+                          onClick={() => setImagePreview(null)} 
+                          className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+                    {/* Upload Button */}
+                    <div className="flex gap-2">
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageUpload}
+                        accept="image/*"
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingImage}
+                        className="flex-1 py-2.5 bg-tertiary border border-border rounded-lg font-medium hover:bg-background flex items-center justify-center gap-2"
+                      >
+                        {uploadingImage ? (
+                          <>
+                            <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            Upload Image
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    {/* Hidden input to keep URL as fallback */}
+                    <input name="imageUrl" type="hidden" defaultValue={editItem?.imageUrl} />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input type="checkbox" name="isPublished" id="isPublished" defaultChecked={editItem?.isPublished ?? true} className="rounded" />
+                  <label htmlFor="isPublished" className="text-sm">Publish immediately</label>
+                </div>
+                <div className="flex gap-3 pt-4">
+                  <button type="button" onClick={() => { setShowModal(null); setEditItem(null); setImagePreview(null); }} className="flex-1 py-2.5 bg-tertiary border border-border rounded-lg font-bold hover:bg-background">Cancel</button>
+                  <button type="submit" className="flex-1 py-2.5 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700">{editItem ? "Update" : "Create"}</button>
+                </div>
+              </form>
             </div>
           </div>
+        )}
 
-        </div>
-
-        {/* System Alerts */}
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex items-start gap-4">
-          <div className="p-2 bg-amber-500/10 rounded-lg shrink-0 text-amber-500">
-             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-               <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
-             </svg>
+        {/* User Modal */}
+        {showModal === "user" && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-secondary border border-border rounded-2xl w-full max-w-lg p-6">
+              <h3 className="text-xl font-bold mb-6">Edit User</h3>
+              <form onSubmit={handleSaveUser} className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">Full Name</label>
+                  <input name="fullName" defaultValue={editItem?.name} required className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">Email</label>
+                  <input name="email" defaultValue={editItem?.email} required type="email" className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-muted uppercase">Role</label>
+                    <select name="role" defaultValue={editItem?.role} className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500">
+                      <option value="user">User</option>
+                      <option value="trainer">Trainer</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-muted uppercase">Status</label>
+                    <select name="status" defaultValue={editItem?.status} className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500">
+                      <option value="pending">Pending</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">Specialization (Trainers only)</label>
+                  <input name="specialization" defaultValue={editItem?.specialization} className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" />
+                </div>
+                <div className="flex gap-3 pt-4">
+                  <button type="button" onClick={() => { setShowModal(null); setEditItem(null); }} className="flex-1 py-2.5 bg-tertiary border border-border rounded-lg font-bold hover:bg-background">Cancel</button>
+                  <button type="submit" className="flex-1 py-2.5 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700">Save Changes</button>
+                </div>
+              </form>
+            </div>
           </div>
-          <div>
-            <h3 className="text-sm font-bold text-amber-500 mb-1">System Alerts</h3>
-            <p className="text-xs text-amber-200/60 leading-relaxed">23 pending approvals require attention. Review and process applications to maintain platform quality.</p>
-          </div>
-        </div>
+        )}
 
+        {/* View Details Modal */}
+        {viewItem && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setViewItem(null)}>
+            <div className="bg-secondary border border-border rounded-2xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h3 className="text-xl font-bold">{viewItem.name}</h3>
+                  <p className="text-muted text-sm">{viewItem.email}</p>
+                </div>
+                <button onClick={() => setViewItem(null)} className="text-muted hover:text-foreground text-xl">✕</button>
+              </div>
+              
+              {/* Details Grid */}
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-tertiary rounded-xl p-4">
+                  <p className="text-xs text-muted uppercase font-bold mb-1">Type</p>
+                  <p className="font-medium">{viewItem.type || "User Registration"}</p>
+                </div>
+                <div className="bg-tertiary rounded-xl p-4">
+                  <p className="text-xs text-muted uppercase font-bold mb-1">Specialization</p>
+                  <p className="font-medium">{viewItem.specialization || "N/A"}</p>
+                </div>
+                <div className="bg-tertiary rounded-xl p-4">
+                  <p className="text-xs text-muted uppercase font-bold mb-1">Request Date</p>
+                  <p className="font-medium">{viewItem.date || "N/A"}</p>
+                </div>
+                <div className="bg-tertiary rounded-xl p-4">
+                  <p className="text-xs text-muted uppercase font-bold mb-1">Action Type</p>
+                  <span className={`px-2 py-1 rounded text-xs font-bold ${viewItem.actionType === 'qualification' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                    {viewItem.actionType === 'qualification' ? 'Qualification Change' : 'New Registration'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Additional Details */}
+              {viewItem.details && (
+                <div className="bg-tertiary rounded-xl p-4 mb-6">
+                  <p className="text-xs text-muted uppercase font-bold mb-2">Additional Details</p>
+                  <p className="text-sm">{typeof viewItem.details === 'string' ? viewItem.details : JSON.stringify(viewItem.details, null, 2)}</p>
+                </div>
+              )}
+
+              {/* Uploaded Files */}
+              {viewItem.uploadedFiles && viewItem.uploadedFiles.length > 0 && (
+                <div className="bg-tertiary rounded-xl p-4 mb-6">
+                  <p className="text-xs text-muted uppercase font-bold mb-2">Uploaded Documents</p>
+                  <div className="space-y-2">
+                    {viewItem.uploadedFiles.map((file, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm">
+                        <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        <span>{typeof file === 'string' ? file : file.name || 'Document'}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4 border-t border-border">
+                <button
+                  onClick={() => handleApprovalAction(viewItem, "approved")}
+                  className="flex-1 py-3 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  Approve
+                </button>
+                <button
+                  onClick={() => handleApprovalAction(viewItem, "rejected")}
+                  className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                  Reject
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

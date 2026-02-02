@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useToast } from "@/context/ToastContext";
+import { usePageSettings } from "@/context/PageSettingsContext";
 
 export default function Navbar() {
   const router = useRouter();
   const { user, loading, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme, isDark } = useTheme();
   const toast = useToast();
+  const { pages, loading: pagesLoading } = usePageSettings();
 
   const handleLogout = async () => {
     await logout();
@@ -29,6 +31,9 @@ export default function Navbar() {
     toast[type](messages[type]);
   };
 
+  // Get main navigation links from page settings
+  const navLinks = pages.main || [];
+
   return (
     <nav 
       className={`fixed top-0 w-full z-50 backdrop-blur-md border-b transition-colors duration-300 ${isDark ? 'bg-background/95 border-border' : 'bg-[#b91c1c] border-transparent text-white'}`}
@@ -46,18 +51,10 @@ export default function Navbar() {
 
           {/* Center: Navigation Links (Absolutely Centered) */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:flex items-center gap-8">
-              {[
-                { name: "Home", href: "/" },
-                { name: "Coaches", href: "/coaches" },
-                { name: "Programs", href: "/programs" },
-                { name: "Gallery", href: "/gallery" },
-                { name: "News", href: "/news" },
-                { name: "Benefits", href: "/member-benefits" },
-                { name: "Standards", href: "/standards" },
-              ].map((item) => (
+              {navLinks.map((item) => (
                 <Link 
-                  key={item.name}
-                  href={item.href}
+                  key={item.pageId}
+                  href={item.path}
                   className={`text-[15px] font-medium transition-colors hover:text-red-600 ${isDark ? 'text-muted hover:text-foreground' : 'text-white/80 hover:text-white'}`}
                 >
                   {item.name}

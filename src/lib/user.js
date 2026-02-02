@@ -107,3 +107,83 @@ export async function getUsers(filter = {}) {
     const users = await getUsersCollection();
     return users.find(filter).toArray();
 }
+
+/**
+ * Get paginated users with search
+ */
+export async function getUsersPaginated(filter = {}, options = {}) {
+    const users = await getUsersCollection();
+    const { limit = 20, skip = 0, sort = { createdAt: -1 } } = options;
+    return users.find(filter)
+        .project({ password: 0 }) // Exclude password
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .toArray();
+}
+
+/**
+ * Get users with pending status
+ */
+export async function getPendingUsers() {
+    return getUsersPaginated({ status: 'pending' });
+}
+
+/**
+ * Update user status (approve/reject)
+ */
+export async function updateUserStatus(id, status, reviewedBy = null) {
+    const { ObjectId } = await import('mongodb');
+    const users = await getUsersCollection();
+    return users.updateOne(
+        { _id: new ObjectId(id) },
+        { 
+            $set: { 
+                status,
+                reviewedAt: new Date(),
+                reviewedBy,
+                updatedAt: new Date()
+            }
+        }
+    );
+}
+
+/**
+ * Delete a user by ID
+ */
+export async function deleteUser(id) {
+    const { ObjectId } = await import('mongodb');
+    const users = await getUsersCollection();
+    return users.deleteOne({ _id: new ObjectId(id) });
+}
+
+/**
+ * Get user counts for stats
+ */
+export async function getUserStats() {
+    const users = await getUsersCollection();
+    const [totalUsers, pendingApprovals, activeTrainers] = await Promise.all([
+        users.countDocuments(),
+        users.countDocuments({ status: 'pending' }),
+        users.countDocuments({ status: 'approved', role: 'trainer' }),
+    ]);
+    return { totalUsers, pendingApprovals, activeTrainers };
+}
+
+/**
+ * Search users by name or email
+ */
+export async function searchUsers(query, filter = {}) {
+    const users = await getUsersCollection();
+    const searchFilter = {
+        ...filter,
+        $or: [
+            { fullName: { $regex: query, $options: 'i' } },
+            { email: { $regex: query, $options: 'i' } },
+        ]
+    };
+    return users.find(searchFilter)
+        .project({ password: 0 })
+        .limit(50)
+        .toArray();
+}

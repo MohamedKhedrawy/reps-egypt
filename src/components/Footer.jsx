@@ -1,6 +1,15 @@
+"use client";
+
 import Link from "next/link";
+import { usePageSettings } from "@/context/PageSettingsContext";
 
 export default function Footer() {
+  const { pages } = usePageSettings();
+  
+  // Get footer and legal pages from settings
+  const footerLinks = pages.footer || [];
+  const legalLinks = pages.legal || [];
+
   return (
     <footer className="group relative bg-secondary pt-20 pb-10 overflow-hidden border-t border-border">
         {/* Decorative Top Line Gradient */}
@@ -28,11 +37,16 @@ export default function Footer() {
             <div className="md:col-span-2 md:col-start-6">
               <h4 className="font-bold text-foreground mb-6">Quick Links</h4>
               <ul className="space-y-4 text-sm text-muted">
-                <li><Link href="#" className="hover:text-red-500 transition-colors">Find a Coach</Link></li>
-                <li><Link href="#" className="hover:text-red-500 transition-colors">Training Programs</Link></li>
+                <li><Link href="/coaches" className="hover:text-red-500 transition-colors">Find a Coach</Link></li>
+                <li><Link href="/programs" className="hover:text-red-500 transition-colors">Training Programs</Link></li>
                 <li><Link href="/standards" className="hover:text-red-500 transition-colors">Standards</Link></li>
-                <li><Link href="#" className="hover:text-red-500 transition-colors">Member Benefits</Link></li>
-                <li><Link href="#" className="hover:text-red-500 transition-colors">FAQ</Link></li>
+                {footerLinks.map((page) => (
+                  <li key={page.pageId}>
+                    <Link href={page.path} className="hover:text-red-500 transition-colors">
+                      {page.name}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -40,10 +54,13 @@ export default function Footer() {
             <div className="md:col-span-2">
               <h4 className="font-bold text-foreground mb-6">Legal</h4>
               <ul className="space-y-4 text-sm text-muted">
-                <li><Link href="code-of-ethics" className="hover:text-red-500 transition-colors">Code of Ethics</Link></li>
-                <li><Link href="privacy-policy" className="hover:text-red-500 transition-colors">Privacy Policy</Link></li>
-                <li><Link href="terms-of-service" className="hover:text-red-500 transition-colors">Terms of Service</Link></li>
-                {/* <li><Link href="admin-portal" className="hover:text-red-500 transition-colors">Admin Portal</Link></li> */}
+                {legalLinks.map((page) => (
+                  <li key={page.pageId}>
+                    <Link href={page.path} className="hover:text-red-500 transition-colors">
+                      {page.name}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
 
