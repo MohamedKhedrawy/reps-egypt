@@ -39,6 +39,7 @@ export async function GET(request) {
                 socialMedia: user.socialMedia || {},
                 profilePhoto: user.profilePhoto || null,
                 createdAt: user.createdAt,
+                repsId: user.repsId || null,
             },
         });
     } catch (error) {

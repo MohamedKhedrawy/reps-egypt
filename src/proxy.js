@@ -4,7 +4,7 @@ import { jwtVerify } from 'jose';
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'default-secret-change-me');
 
 // Routes that require authentication
-const protectedRoutes = ['/api/auth/me'];
+const protectedRoutes = ['/api/auth/me', '/api/messages/send'];
 
 // Routes that require admin role
 const adminRoutes = ['/admin', '/api/admin'];
@@ -82,6 +82,6 @@ export async function proxy(request) {
 }
 
 export const config = {
-    matcher: ['/api/auth/me/:path*', '/admin/:path*', '/api/admin/:path*'],
+    matcher: ['/api/auth/me/:path*', '/admin/:path*', '/api/admin/:path*', '/api/messages/send'],
 };
 

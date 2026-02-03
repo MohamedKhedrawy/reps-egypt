@@ -30,7 +30,7 @@ export function PageSettingsProvider({ children }) {
                 }
             }
 
-            const res = await fetch('/api/pages');
+            const res = await fetch('/api/pages', { cache: 'no-store' });
             if (!res.ok) throw new Error('Failed to fetch pages');
             
             const data = await res.json();

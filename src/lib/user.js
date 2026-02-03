@@ -130,21 +130,49 @@ export async function getPendingUsers() {
 }
 
 /**
+ * Get the next available REPS ID (starts at 1000)
+ * @returns {Promise<number>}
+ */
+export async function getNextRepsId() {
+    const users = await getUsersCollection();
+    const result = await users.find({ repsId: { $exists: true } })
+        .sort({ repsId: -1 })
+        .limit(1)
+        .toArray();
+    
+    if (result.length === 0) {
+        return 1000; // Start from 1000
+    }
+    return result[0].repsId + 1;
+}
+
+/**
  * Update user status (approve/reject)
+ * When approving a trainer, assign a REPS ID
  */
 export async function updateUserStatus(id, status, reviewedBy = null) {
     const { ObjectId } = await import('mongodb');
     const users = await getUsersCollection();
+    
+    // Prepare update data
+    const updateData = { 
+        status,
+        reviewedAt: new Date(),
+        reviewedBy,
+        updatedAt: new Date()
+    };
+    
+    // If approving, check if user is a trainer and assign REPS ID
+    if (status === 'approved') {
+        const user = await users.findOne({ _id: new ObjectId(id) });
+        if (user && user.role === 'trainer' && !user.repsId) {
+            updateData.repsId = await getNextRepsId();
+        }
+    }
+    
     return users.updateOne(
         { _id: new ObjectId(id) },
-        { 
-            $set: { 
-                status,
-                reviewedAt: new Date(),
-                reviewedBy,
-                updatedAt: new Date()
-            }
-        }
+        { $set: updateData }
     );
 }
 

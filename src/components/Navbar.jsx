@@ -17,17 +17,6 @@ export default function Navbar() {
     router.push("/");
   };
 
-  const triggerTestToast = () => {
-    const types = ['success', 'error', 'warning', 'info'];
-    const type = types[Math.floor(Math.random() * types.length)];
-    const messages = {
-      success: "Operation completed successfully!",
-      error: "Something went wrong. Please try again.",
-      warning: "Your session is about to expire.",
-      info: "New updates are available.",
-    };
-    toast[type](messages[type]);
-  };
 
   // Get main navigation links from page settings
   const navLinks = pages.main || [];

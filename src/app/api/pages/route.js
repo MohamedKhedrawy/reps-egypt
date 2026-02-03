@@ -14,8 +14,8 @@ export async function GET() {
         
         return NextResponse.json(pages, {
             headers: {
-                // Cache for 1 minute for performance
-                'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+                // No caching - always return fresh data for real-time updates
+                'Cache-Control': 'no-store, no-cache, must-revalidate',
             },
         });
     } catch (error) {

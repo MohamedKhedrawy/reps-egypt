@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { usePageSettings } from "@/context/PageSettingsContext";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("Overview");
@@ -11,6 +12,13 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [news, setNews] = useState([]);
   const [pageSettings, setPageSettings] = useState({ main: [], footer: [], legal: [] });
+  const [analytics, setAnalytics] = useState({
+    userGrowth: [],
+    approvalStats: { approved: 0, rejected: 0, pending: 0, approvalRate: 0 },
+    growthPercentage: 0,
+    registrationsByRole: { trainers: 0, trainees: 0 },
+    recentRegistrations: []
+  });
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(null);
@@ -30,12 +38,13 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [statsRes, pendingRes, usersRes, newsRes, pagesRes] = await Promise.all([
+      const [statsRes, pendingRes, usersRes, newsRes, pagesRes, analyticsRes] = await Promise.all([
         fetch("/api/admin/stats"),
         fetch("/api/admin/pending"),
         fetch("/api/admin/users"),
         fetch("/api/admin/news"),
         fetch("/api/admin/pages"),
+        fetch("/api/admin/analytics"),
       ]);
       
       if (statsRes.ok) setStats(await statsRes.json());
@@ -46,8 +55,9 @@ export default function AdminDashboard() {
         const pagesData = await pagesRes.json();
         setPageSettings(pagesData.grouped || { main: [], footer: [], legal: [] });
       }
+      if (analyticsRes.ok) setAnalytics(await analyticsRes.json());
     } catch (error) {
-      showToast("Failed to load data", "error");
+      toast.error("Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -202,22 +212,39 @@ export default function AdminDashboard() {
 
   const pendingUsersCount = users.filter(u => u.status === "pending").length;
 
-  // Toggle page visibility
+  // Toggle page visibility with OPTIMISTIC UPDATE
   const handleTogglePageVisibility = async (pageId, currentVisibility) => {
+    const newVisibility = !currentVisibility;
+    
+    // OPTIMISTIC UPDATE: Update local state immediately for instant UI feedback
+    setPageSettings(prev => ({
+      main: prev.main.map(p => p.pageId === pageId ? { ...p, isVisible: newVisibility } : p),
+      footer: prev.footer.map(p => p.pageId === pageId ? { ...p, isVisible: newVisibility } : p),
+      legal: prev.legal.map(p => p.pageId === pageId ? { ...p, isVisible: newVisibility } : p),
+    }));
+    
+    toast.success(`Page ${newVisibility ? 'shown' : 'hidden'} in navigation`);
+
     try {
       const res = await fetch(`/api/admin/pages/${pageId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isVisible: !currentVisibility }),
+        body: JSON.stringify({ isVisible: newVisibility }),
       });
+      
       if (res.ok) {
-        toast.success(`Page ${!currentVisibility ? 'shown' : 'hidden'} in navigation`);
-        fetchData();
-        refreshPages(); // Refresh the global page settings context
+        // Refresh navbar/footer context
+        await refreshPages();
       } else {
-        toast.error("Failed to update page visibility");
+        // Revert on error
+        toast.error("Failed to update - reverted");
+        fetchData();
       }
-    } catch { toast.error("Network error"); }
+    } catch {
+      // Revert on network error
+      toast.error("Network error - reverted");
+      fetchData();
+    }
   };
 
   const tabs = ["Overview", "Approvals", "Users", "News", "Pages", "Analytics"];
@@ -482,24 +509,39 @@ export default function AdminDashboard() {
                 {/* Analytics Header */}
                 <div className="bg-secondary border border-border rounded-2xl p-6">
                   <h2 className="text-xl font-bold mb-2">Platform Analytics</h2>
-                  <p className="text-muted text-sm">Insights and metrics for your platform performance</p>
+                  <p className="text-muted text-sm">Real-time insights and metrics for your platform performance</p>
                 </div>
 
                 {/* Metrics Grid */}
                 <div className="grid lg:grid-cols-2 gap-8">
-                  {/* User Growth Chart Placeholder */}
+                  {/* User Growth Chart */}
                   <div className="bg-secondary border border-border rounded-2xl p-6">
-                    <h3 className="font-bold mb-4">User Growth</h3>
-                    <div className="h-64 bg-tertiary rounded-xl flex items-center justify-center border border-border">
-                      <div className="text-center">
-                        <div className="text-4xl mb-2">📈</div>
-                        <p className="text-muted text-sm">Chart visualization coming soon</p>
-                        <p className="text-xs text-muted mt-1">Integrate Chart.js or Recharts</p>
-                      </div>
+                    <h3 className="font-bold mb-4">User Growth (Last 6 Months)</h3>
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={analytics.userGrowth} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                          <defs>
+                            <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
+                              <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                          <XAxis dataKey="month" stroke="#888" tick={{ fill: '#888', fontSize: 12 }} />
+                          <YAxis stroke="#888" tick={{ fill: '#888', fontSize: 12 }} />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '8px' }}
+                            labelStyle={{ color: '#fff' }}
+                          />
+                          <Area type="monotone" dataKey="users" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorUsers)" />
+                        </AreaChart>
+                      </ResponsiveContainer>
                     </div>
                     <div className="grid grid-cols-3 gap-4 mt-4">
                       <div className="text-center p-3 bg-tertiary rounded-lg">
-                        <div className="text-2xl font-bold text-green-400">+12%</div>
+                        <div className={`text-2xl font-bold ${analytics.growthPercentage >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          {analytics.growthPercentage >= 0 ? '+' : ''}{analytics.growthPercentage}%
+                        </div>
                         <div className="text-xs text-muted">This Month</div>
                       </div>
                       <div className="text-center p-3 bg-tertiary rounded-lg">
@@ -513,23 +555,48 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  {/* Approval Metrics */}
+                  {/* Approval Metrics with Circular Progress */}
                   <div className="bg-secondary border border-border rounded-2xl p-6">
                     <h3 className="font-bold mb-4">Approval Rate</h3>
-                    <div className="h-64 bg-tertiary rounded-xl flex items-center justify-center border border-border">
-                      <div className="text-center">
-                        <div className="text-6xl font-bold text-green-400">87%</div>
-                        <p className="text-muted text-sm mt-2">Approval Rate</p>
+                    <div className="h-64 flex items-center justify-center">
+                      <div className="relative">
+                        {/* Circular Progress */}
+                        <svg className="w-48 h-48 transform -rotate-90">
+                          <circle 
+                            cx="96" cy="96" r="80" 
+                            fill="none" 
+                            stroke="#333" 
+                            strokeWidth="12"
+                          />
+                          <circle 
+                            cx="96" cy="96" r="80" 
+                            fill="none" 
+                            stroke="#22c55e" 
+                            strokeWidth="12"
+                            strokeDasharray={`${analytics.approvalStats.approvalRate * 5.03} 503`}
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center">
+                            <div className="text-5xl font-bold text-green-400">{analytics.approvalStats.approvalRate}%</div>
+                            <p className="text-muted text-sm mt-1">Approval Rate</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 mt-4">
-                      <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-                        <div className="text-xl font-bold text-green-400">156</div>
+                    <div className="grid grid-cols-3 gap-4 mt-4">
+                      <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg text-center">
+                        <div className="text-xl font-bold text-green-400">{analytics.approvalStats.approved}</div>
                         <div className="text-xs text-muted">Approved</div>
                       </div>
-                      <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                        <div className="text-xl font-bold text-red-400">23</div>
+                      <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-center">
+                        <div className="text-xl font-bold text-red-400">{analytics.approvalStats.rejected}</div>
                         <div className="text-xs text-muted">Rejected</div>
+                      </div>
+                      <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg text-center">
+                        <div className="text-xl font-bold text-amber-400">{analytics.approvalStats.pending}</div>
+                        <div className="text-xs text-muted">Pending</div>
                       </div>
                     </div>
                   </div>
@@ -559,29 +626,49 @@ export default function AdminDashboard() {
                         </div>
                         <span className="text-2xl font-bold text-amber-400">{news.filter(n => !n.isPublished).length}</span>
                       </div>
+                      <div className="flex justify-between items-center p-4 bg-tertiary rounded-xl">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">🏋️</span>
+                          <span>Trainers</span>
+                        </div>
+                        <span className="text-2xl font-bold text-blue-400">{analytics.registrationsByRole.trainers}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-4 bg-tertiary rounded-xl">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">👤</span>
+                          <span>Trainees</span>
+                        </div>
+                        <span className="text-2xl font-bold text-purple-400">{analytics.registrationsByRole.trainees}</span>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Recent Activity */}
+                  {/* Recent Registrations */}
                   <div className="bg-secondary border border-border rounded-2xl p-6">
-                    <h3 className="font-bold mb-4">Quick Insights</h3>
+                    <h3 className="font-bold mb-4">Recent Registrations</h3>
                     <div className="space-y-3">
-                      <div className="p-4 bg-tertiary rounded-xl border-l-4 border-green-500">
-                        <p className="font-medium">Registration Trend</p>
-                        <p className="text-sm text-muted">User sign-ups are up 15% from last week</p>
-                      </div>
-                      <div className="p-4 bg-tertiary rounded-xl border-l-4 border-blue-500">
-                        <p className="font-medium">Active Sessions</p>
-                        <p className="text-sm text-muted">Peak activity at 6PM - 9PM daily</p>
-                      </div>
-                      <div className="p-4 bg-tertiary rounded-xl border-l-4 border-amber-500">
-                        <p className="font-medium">Pending Queue</p>
-                        <p className="text-sm text-muted">{stats.pendingApprovals} items awaiting review</p>
-                      </div>
-                      <div className="p-4 bg-tertiary rounded-xl border-l-4 border-purple-500">
-                        <p className="font-medium">Top Category</p>
-                        <p className="text-sm text-muted">Personal Training certifications most requested</p>
-                      </div>
+                      {analytics.recentRegistrations.length === 0 ? (
+                        <p className="text-muted text-sm text-center py-8">No recent registrations</p>
+                      ) : (
+                        analytics.recentRegistrations.map((reg) => (
+                          <div key={reg.id} className="p-4 bg-tertiary rounded-xl flex justify-between items-center">
+                            <div>
+                              <p className="font-medium">{reg.name}</p>
+                              <p className="text-sm text-muted">{reg.email}</p>
+                            </div>
+                            <div className="text-right">
+                              <span className={`px-2 py-1 rounded text-xs capitalize ${
+                                reg.status === 'approved' ? 'bg-green-500/20 text-green-400' :
+                                reg.status === 'rejected' ? 'bg-red-500/20 text-red-400' :
+                                'bg-amber-500/20 text-amber-400'
+                              }`}>
+                                {reg.status}
+                              </span>
+                              <p className="text-xs text-muted mt-1">{reg.role}</p>
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>

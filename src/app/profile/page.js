@@ -117,6 +117,11 @@ export default function ProfilePage() {
                 <div className="flex-1 mb-2">
                     <div className="flex flex-col md:flex-row md:items-center gap-3 mb-1">
                         <h1 className="text-3xl md:text-4xl font-bold text-white">{user.fullName}</h1>
+                        {user.repsId && (
+                            <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg">
+                                REPS ID: {user.repsId}
+                            </span>
+                        )}
                         <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide w-fit ${user.role === 'trainer' ? 'bg-red-600/20 text-red-500 border border-red-600/30' : 'bg-blue-600/20 text-blue-500 border border-blue-600/30'}`}>
                             {user.role}
                         </span>
@@ -186,8 +191,76 @@ export default function ProfilePage() {
                                 <span className="text-sm font-medium">Facebook</span>
                             </a>
                         )}
-                         {!user.socialMedia?.instagram && !user.socialMedia?.facebook && (
+                        {user.socialMedia?.linkedin && (
+                            <a href={user.socialMedia.linkedin} target="_blank" className="flex items-center gap-3 p-3 bg-tertiary rounded-xl hover:bg-white/5 transition-colors">
+                                <span className="text-blue-400">in</span>
+                                <span className="text-sm font-medium">LinkedIn</span>
+                            </a>
+                        )}
+                         {!user.socialMedia?.instagram && !user.socialMedia?.facebook && !user.socialMedia?.linkedin && (
                             <p className="text-sm text-muted italic">No social links added.</p>
+                        )}
+                    </div>
+                </div>
+
+                {/* Contact Info */}
+                <div className="bg-secondary border border-border rounded-2xl p-6">
+                     <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                        <span className="text-green-400">📋</span> Contact Info
+                    </h3>
+                    <div className="space-y-3">
+                        {/* REPS ID (Moved to top) */}
+                        {user.repsId && (
+                            <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-red-600/20 to-red-500/10 border border-red-600/30 rounded-xl">
+                                <span className="text-red-500">🆔</span>
+                                <div>
+                                    <div className="text-xs text-muted uppercase font-bold">REPS ID</div>
+                                    <div className="text-lg font-bold text-red-500">{user.repsId}</div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Email with mailto link */}
+                        <a href={`mailto:${user.email}`} className="flex items-center gap-3 p-3 bg-tertiary rounded-xl hover:bg-red-600/20 transition-colors group">
+                            <span className="text-red-500">✉️</span>
+                            <div className="flex-1">
+                                <div className="text-xs text-muted uppercase font-bold">Email</div>
+                                <div className="text-sm font-medium group-hover:text-red-400 transition-colors">{user.email}</div>
+                            </div>
+                            <span className="text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                        </a>
+                        
+                        {/* Phone */}
+                        {user.phone && (
+                            <a href={`tel:${user.phone}`} className="flex items-center gap-3 p-3 bg-tertiary rounded-xl hover:bg-green-600/20 transition-colors group">
+                                <span className="text-green-500">📱</span>
+                                <div className="flex-1">
+                                    <div className="text-xs text-muted uppercase font-bold">Phone</div>
+                                    <div className="text-sm font-medium">{user.phone}</div>
+                                </div>
+                            </a>
+                        )}
+
+                        {/* Birth Date */}
+                        {user.birthDate && (
+                            <div className="flex items-center gap-3 p-3 bg-tertiary rounded-xl">
+                                <span className="text-purple-400">🎂</span>
+                                <div>
+                                    <div className="text-xs text-muted uppercase font-bold">Birth Date</div>
+                                    <div className="text-sm font-medium">{new Date(user.birthDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Specialization */}
+                        {user.specialization && (
+                            <div className="flex items-center gap-3 p-3 bg-tertiary rounded-xl">
+                                <span className="text-amber-400">🏋️</span>
+                                <div>
+                                    <div className="text-xs text-muted uppercase font-bold">Specialization</div>
+                                    <div className="text-sm font-medium">{user.specialization}</div>
+                                </div>
+                            </div>
                         )}
                     </div>
                 </div>

@@ -1,19 +1,14 @@
+import { getUsers } from "@/lib/user";
+import Link from "next/link";
+
 export const metadata = {
   title: "Find a Coach | Reps Egypt",
   description: "Connect with certified elite personal trainers and coaches in Egypt.",
 };
 
-export default function CoachesPage() {
-  const coaches = [
-    { name: "Ahmed Ali", role: "Strength & Conditioning", tag: "Lvl 4 Certified", exp: "8 Years", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1470&auto=format&fit=crop" },
-    { name: "Sara Mahmoud", role: "Yoga & Flexibility", tag: "Yoga Master", exp: "5 Years", img: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=1470&auto=format&fit=crop" },
-    { name: "Omar Hassan", role: "CrossFit Specialist", tag: "Elite Trainer", exp: "6 Years", img: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=1470&auto=format&fit=crop" },
-    { name: "Nour El-Sherif", role: "Sports Nutrition", tag: "PhD Nutrition", exp: "10 Years", img: "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=1470&auto=format&fit=crop" },
-    { name: "Mahmoud Gamal", role: "Bodybuilding", tag: "Pro Card", exp: "12 Years", img: "https://images.unsplash.com/photo-1611672585731-fa10603fb9e0?q=80&w=1374&auto=format&fit=crop" },
-    { name: "Laila Youssef", role: "Pilates Instructor", tag: "Certified", exp: "4 Years", img: "https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=1470&auto=format&fit=crop" },
-    { name: "Sherif Adel", role: "Boxing Coach", tag: "National Champ", exp: "15 Years", img: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?q=80&w=1374&auto=format&fit=crop" },
-    { name: "Rana Ezzat", role: "HIIT Specialist", tag: "Group Fitness", exp: "3 Years", img: "https://images.unsplash.com/photo-1574680096141-983200526388?q=80&w=1469&auto=format&fit=crop" },
-  ];
+export default async function CoachesPage() {
+  // Fetch approved trainers
+  const coaches = await getUsers({ role: 'trainer', status: 'approved' });
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -62,47 +57,67 @@ export default function CoachesPage() {
 
       {/* Grid */}
       <section className="py-12 px-6 max-w-7xl mx-auto">
-         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {coaches.map((trainer, idx) => (
-              <div key={idx} className="group relative bg-secondary rounded-xl overflow-hidden border border-border hover:border-red-600/50 transition-all duration-300 shadow-xl shadow-black/10 hover:shadow-red-600/5">
-                <div className="aspect-[4/5] w-full overflow-hidden relative">
-                   {/* Badge */}
-                   <div className="absolute top-3 left-3 z-10 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded border border-white/10 flex items-center gap-1">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                      Available
-                   </div>
+         {coaches.length === 0 ? (
+             <div className="text-center py-20 text-muted">
+                 <h3 className="text-2xl font-bold mb-2">No Coaches Found</h3>
+                 <p>Be the first to join our elite team of trainers!</p>
+             </div>
+         ) : (
+             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {coaches.map((trainer) => (
+                  <div key={trainer._id.toString()} className="group relative bg-secondary rounded-xl overflow-hidden border border-border hover:border-red-600/50 transition-all duration-300 shadow-xl shadow-black/10 hover:shadow-red-600/5">
+                    <div className="aspect-[4/5] w-full overflow-hidden relative">
+                       {/* Badge */}
+                       <div className="absolute top-3 left-3 z-10 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded border border-white/10 flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                          Available
+                       </div>
 
-                   <img src={trainer.img} alt={trainer.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                   
-                   {/* Gradient Overlay */}
-                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-90" />
-                </div>
-                
-                {/* Content */}
-                <div className="absolute bottom-0 w-full p-5">
-                   {/* Experience Badge */}
-                   <div className="inline-block mb-2 px-2 py-1 rounded bg-red-600/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">{trainer.tag}</div>
-                   
-                   <h3 className="text-lg font-bold text-white mb-1">{trainer.name}</h3>
-                   <p className="text-gray-300 text-sm mb-4 flex items-center justify-between">
-                     {trainer.role}
-                     <span className="text-xs text-gray-400 font-medium">{trainer.exp} Exp</span>
-                   </p>
-                   
-                   <button className="w-full py-2.5 bg-white/10 hover:bg-red-600 text-xs text-white font-bold uppercase rounded-lg transition-colors flex items-center justify-center gap-2">
-                      View Profile
-                   </button>
-                </div>
-              </div>
-            ))}
-         </div>
+                       <img 
+                            src={trainer.profilePhoto || `https://ui-avatars.com/api/?name=${trainer.fullName}&background=dc2626&color=fff`} 
+                            alt={trainer.fullName} 
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                       />
+                       
+                       {/* Gradient Overlay */}
+                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-90" />
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="absolute bottom-0 w-full p-5">
+                       {/* Specialization Badge */}
+                       {trainer.repsId && (
+                           <div className="inline-block mb-2 px-2 py-1 rounded bg-red-600/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">REPS #{trainer.repsId}</div>
+                       )}
+                       
+                       <h3 className="text-lg font-bold text-white mb-1">{trainer.fullName}</h3>
+                       <p className="text-gray-300 text-sm mb-4 flex items-center justify-between">
+                         {trainer.specialization || "Certified Coach"}
+                         {trainer.experience && (
+                             <span className="text-xs text-gray-400 font-medium">{trainer.experience} Exp</span>
+                         )}
+                       </p>
+                       
+                       <Link 
+                            href={`/coaches/${trainer._id.toString()}`}
+                            className="w-full py-2.5 bg-white/10 hover:bg-red-600 text-xs text-white font-bold uppercase rounded-lg transition-colors flex items-center justify-center gap-2"
+                        >
+                          View Profile
+                       </Link>
+                    </div>
+                  </div>
+                ))}
+             </div>
+         )}
          
-         {/* Load More */}
-         <div className="mt-16 text-center">
-             <button className="px-8 py-3 rounded-full border border-border text-sm font-medium hover:bg-secondary transition-colors text-muted hover:text-foreground">
-                Load More Coaches
-             </button>
-         </div>
+         {/* Load More (Visual only for now, would strictly need pagination logic) */}
+         {coaches.length > 12 && (
+             <div className="mt-16 text-center">
+                 <button className="px-8 py-3 rounded-full border border-border text-sm font-medium hover:bg-secondary transition-colors text-muted hover:text-foreground">
+                    Load More Coaches
+                 </button>
+             </div>
+         )}
       </section>
 
     </div>
