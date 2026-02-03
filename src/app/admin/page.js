@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useToast } from "@/context/ToastContext";
+import { toast } from "sonner";
 import { usePageSettings } from "@/context/PageSettingsContext";
 
 export default function AdminDashboard() {
@@ -20,7 +20,6 @@ export default function AdminDashboard() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-  const { showToast } = useToast();
   const { refreshPages } = usePageSettings();
 
   // Fetch data on mount and tab change
@@ -68,7 +67,7 @@ export default function AdminDashboard() {
     // Close detail modal if open
     if (viewItem?.id === item.id) setViewItem(null);
     
-    showToast(`Request ${status} successfully`, "success");
+    toast.success(`Request ${status} successfully`);
 
     try {
       const endpoint = item.actionType === 'qualification' 
@@ -84,11 +83,11 @@ export default function AdminDashboard() {
       if (!res.ok) {
         // Revert on error
         fetchData();
-        showToast("Action failed - reverted", "error");
+        toast.error("Action failed - reverted");
       }
     } catch { 
       fetchData();
-      showToast("Network error - reverted", "error"); 
+      toast.error("Network error - reverted"); 
     }
   };
 
@@ -98,10 +97,10 @@ export default function AdminDashboard() {
     try {
       const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
       if (res.ok) {
-        showToast("User deleted", "success");
+        toast.success("User deleted");
         fetchData();
       }
-    } catch { showToast("Delete failed", "error"); }
+    } catch { toast.error("Delete failed"); }
   };
 
   // Update user details
@@ -117,14 +116,14 @@ export default function AdminDashboard() {
         body: JSON.stringify(data),
       });
       if (res.ok) {
-        showToast("User updated successfully", "success");
+        toast.success("User updated successfully");
         setShowModal(null);
         setEditItem(null);
         fetchData();
       } else {
-        showToast("Update failed", "error");
+        toast.error("Update failed");
       }
-    } catch { showToast("Network error", "error"); }
+    } catch { toast.error("Network error"); }
   };
 
   // Create/Update news with image upload
@@ -144,7 +143,7 @@ export default function AdminDashboard() {
     setEditItem(null);
     setImagePreview(null);
     
-    showToast(editItem ? "Article updated" : "Article created", "success");
+    toast.success(editItem ? "Article updated" : "Article created");
     
     try {
       const url = editItem ? `/api/admin/news/${editItem.id}` : "/api/admin/news";
@@ -156,9 +155,9 @@ export default function AdminDashboard() {
       if (res.ok) {
         fetchData();
       } else {
-        showToast("Save failed", "error");
+        toast.error("Save failed");
       }
-    } catch { showToast("Save failed", "error"); }
+    } catch { toast.error("Save failed"); }
   };
 
   // Handle image file upload
@@ -175,7 +174,7 @@ export default function AdminDashboard() {
       setUploadingImage(false);
     };
     reader.onerror = () => {
-      showToast("Failed to read image", "error");
+      toast.error("Failed to read image");
       setUploadingImage(false);
     };
     reader.readAsDataURL(file);
@@ -187,10 +186,10 @@ export default function AdminDashboard() {
     try {
       const res = await fetch(`/api/admin/news/${id}`, { method: "DELETE" });
       if (res.ok) {
-        showToast("Article deleted", "success");
+        toast.success("Article deleted");
         fetchData();
       }
-    } catch { showToast("Delete failed", "error"); }
+    } catch { toast.error("Delete failed"); }
   };
 
   // Filter users by search and status
@@ -212,13 +211,13 @@ export default function AdminDashboard() {
         body: JSON.stringify({ isVisible: !currentVisibility }),
       });
       if (res.ok) {
-        showToast(`Page ${!currentVisibility ? 'shown' : 'hidden'} in navigation`, "success");
+        toast.success(`Page ${!currentVisibility ? 'shown' : 'hidden'} in navigation`);
         fetchData();
         refreshPages(); // Refresh the global page settings context
       } else {
-        showToast("Failed to update page visibility", "error");
+        toast.error("Failed to update page visibility");
       }
-    } catch { showToast("Network error", "error"); }
+    } catch { toast.error("Network error"); }
   };
 
   const tabs = ["Overview", "Approvals", "Users", "News", "Pages", "Analytics"];
