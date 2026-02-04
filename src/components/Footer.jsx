@@ -37,9 +37,6 @@ export default function Footer() {
             <div className="md:col-span-2 md:col-start-6">
               <h4 className="font-bold text-foreground mb-6">Quick Links</h4>
               <ul className="space-y-4 text-sm text-muted">
-                <li><Link href="/coaches" className="hover:text-red-500 transition-colors">Find a Coach</Link></li>
-                <li><Link href="/programs" className="hover:text-red-500 transition-colors">Training Programs</Link></li>
-                <li><Link href="/standards" className="hover:text-red-500 transition-colors">Standards</Link></li>
                 {footerLinks.map((page) => (
                   <li key={page.pageId}>
                     <Link href={page.path} className="hover:text-red-500 transition-colors">

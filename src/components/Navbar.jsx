@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { usePageSettings } from "@/context/PageSettingsContext";
+import LanguageSwitcher from "./LanguageSwitcher";
 
-export default function Navbar() {
+import { getNavLinksForRole, ROLES } from "@/config/roles";
+
+export default function Navbar({ dictionary, lang }) {
   const router = useRouter();
   const { user, loading, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme, isDark } = useTheme();
@@ -14,30 +17,33 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     await logout();
-    router.push("/");
+    router.push(`/${lang}`);
   };
 
+  // Determine current user role
+  const userRole = user?.role || ROLES.GUEST;
 
-  // Get main navigation links from page settings
-  const navLinks = pages.main || [];
+  // Get main navigation links from page settings and filter by role
+  // We need to map dynamic names from settings to translated names if available in dictionary
+  const navLinks = getNavLinksForRole(pages.main || [], userRole);
+
+  const getLocalizedPath = (path) => `/${lang}${path === '/' ? '' : path}`;
 
   return (
     <nav 
       className={`fixed top-0 w-full z-50 backdrop-blur-md border-b transition-colors duration-300 ${isDark ? 'bg-background/95 border-border' : 'bg-[#b91c1c] border-transparent text-white'}`}
-      // PREVIOUS MONOTONE LOGIC (Commented out):
-      // className="fixed top-0 w-full z-50 backdrop-blur-md border-b transition-colors duration-300 bg-background/95 border-border"
     >
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           
-          {/* Left: Logo + Theme Toggle */}
+          {/* Left: Logo + Theme Toggle + Lang Switch */}
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex-shrink-0 flex items-center gap-2">
+            <Link href={`/${lang}`} className="flex-shrink-0 flex items-center gap-2">
               <span className={`text-2xl font-extrabold tracking-tighter transition-colors duration-300 ${isDark ? 'text-foreground' : 'text-black'}`}>
                 REPS <span className={isDark ? "text-red-600" : "text-white"}>Egypt</span> <sup>®</sup>
               </span>
             </Link>
 
-            {/* Theme Toggle Switch (Moved Loop) */}
+            {/* Theme Toggle Switch */}
             <button
               onClick={toggleTheme}
               className="relative w-12 h-7 rounded-full p-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 bg-tertiary shadow-inner"
@@ -46,7 +52,7 @@ export default function Navbar() {
               <div
                 className="absolute top-1 w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300 shadow-md bg-background"
                 style={{
-                  left: isDark ? '4px' : 'calc(100% - 24px)',
+                  left: isDark ? '4px' : 'calc(100% - 24px)', // Need RTL logic check but flex direction usually handles layout reversed
                 }}
               >
                 {isDark ? (
@@ -60,6 +66,9 @@ export default function Navbar() {
                 )}
               </div>
             </button>
+
+            {/* Language Switcher */}
+            <LanguageSwitcher lang={lang} />
           </div>
 
           {/* Center: Navigation Links (Absolutely Centered) */}
@@ -67,12 +76,23 @@ export default function Navbar() {
               {navLinks.map((item) => (
                 <Link 
                   key={item.pageId}
-                  href={item.path}
+                  href={getLocalizedPath(item.path)}
                   className={`text-[15px] font-medium transition-colors hover:text-red-600 ${isDark ? 'text-muted hover:text-foreground' : 'text-white/80 hover:text-white'}`}
                 >
-                  {item.name}
+                  {dictionary?.[item.name.toLowerCase()] || item.name}
                 </Link>
               ))}
+              
+              {/* Admin Dashboard Link (Explicit) */}
+              {userRole === 'admin' && (
+                 <Link 
+                   href={getLocalizedPath("/admin")}
+                   className="text-[15px] font-bold text-red-500 hover:text-red-400 transition-colors flex items-center gap-1"
+                 >
+                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                   {dictionary?.admin || "Dashboard"}
+                 </Link>
+              )}
           </div>
 
           {/* Right: Auth / Profile */}
@@ -84,13 +104,13 @@ export default function Navbar() {
               // Logged in - show Profile and Logout buttons
               <>
                 <Link 
-                  href="/profile" 
+                  href={getLocalizedPath("/profile")}
                   className="flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-red-600 text-red-600 hover:text-white text-sm font-bold rounded-lg shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-[0_0_30px_rgba(220,38,38,0.5)] transition-all hover:-translate-y-0.5"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                     <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clipRule="evenodd" />
                   </svg>
-                  Profile
+                  {dictionary?.profile || "Profile"}
                 </Link>
                 <button 
                   onClick={handleLogout}
@@ -99,26 +119,26 @@ export default function Navbar() {
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
                   </svg>
-                  Logout
+                  {dictionary?.logout || "Logout"}
                 </button>
               </>
             ) : (
               // Not logged in - show Login and Register
               <>
                 <Link 
-                  href="/login" 
+                  href={getLocalizedPath("/login")}
                   className={`flex items-center gap-2 text-sm font-medium transition-colors group ${isDark ? 'text-muted hover:text-foreground' : 'text-white/80 hover:text-white'}`}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 group-hover:translate-x-0.5 transition-transform">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
                   </svg>
-                  Login
+                  {dictionary?.login || "Login"}
                 </Link>
                 <Link 
-                  href="/register" 
+                  href={getLocalizedPath("/register")}
                   className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-lg shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-[0_0_30px_rgba(220,38,38,0.5)] transition-all hover:-translate-y-0.5"
                 >
-                  Register
+                  {dictionary?.register || "Register"}
                 </Link>
               </>
             )}

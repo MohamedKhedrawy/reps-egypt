@@ -1,4 +1,4 @@
-import clientPromise from './mongodb';
+import clientPromise from './mongodb.js';
 
 const DB_NAME = process.env.MONGODB_DB || 'reps-egypt';
 
@@ -190,12 +190,13 @@ export async function deleteUser(id) {
  */
 export async function getUserStats() {
     const users = await getUsersCollection();
-    const [totalUsers, pendingApprovals, activeTrainers] = await Promise.all([
+    const [totalUsers, pendingApprovals, activeTrainers, activeTrainees] = await Promise.all([
         users.countDocuments(),
         users.countDocuments({ status: 'pending' }),
         users.countDocuments({ status: 'approved', role: 'trainer' }),
+        users.countDocuments({ role: 'trainee' }),
     ]);
-    return { totalUsers, pendingApprovals, activeTrainers };
+    return { totalUsers, pendingApprovals, activeTrainers, activeTrainees };
 }
 
 /**

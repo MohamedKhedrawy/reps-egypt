@@ -12,8 +12,8 @@ const DEFAULT_PAGES = [
     { pageId: 'programs', name: 'Programs', path: '/programs', category: 'main', order: 2, icon: '📚' },
     { pageId: 'gallery', name: 'Gallery', path: '/gallery', category: 'main', order: 3, icon: '🖼️' },
     { pageId: 'news', name: 'News', path: '/news', category: 'main', order: 4, icon: '📰' },
-    { pageId: 'member-benefits', name: 'Benefits', path: '/member-benefits', category: 'main', order: 5, icon: '⭐' },
-    { pageId: 'standards', name: 'Standards', path: '/standards', category: 'main', order: 6, icon: '📋' },
+    { pageId: 'member-benefits', name: 'Benefits', path: '/member-benefits', category: 'footer', order: 4, icon: '⭐' },
+    { pageId: 'standards', name: 'Standards', path: '/standards', category: 'footer', order: 5, icon: '📋' },
     
     // Footer Links
     { pageId: 'faq', name: 'FAQ', path: '/faq', category: 'footer', order: 0, icon: '❓' },
@@ -25,6 +25,9 @@ const DEFAULT_PAGES = [
     { pageId: 'code-of-ethics', name: 'Code of Ethics', path: '/code-of-ethics', category: 'legal', order: 0, icon: '⚖️' },
     { pageId: 'privacy-policy', name: 'Privacy Policy', path: '/privacy-policy', category: 'legal', order: 1, icon: '🔒' },
     { pageId: 'terms-of-service', name: 'Terms of Service', path: '/terms-of-service', category: 'legal', order: 2, icon: '📄' },
+    
+    // Pricing
+    { pageId: 'pricing', name: 'Pricing', path: '/pricing', category: 'main', order: 1.5, icon: '💎' },
 ];
 
 /**

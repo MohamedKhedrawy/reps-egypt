@@ -1,0 +1,290 @@
+{
+  "navbar": {
+    "home": "Home",
+    "programs": "Specializations",
+    "coaches": "Coaches",
+    "community": "Community",
+    "jobs": "Jobs",
+    "admin": "Dashboard",
+    "login": "Login",
+    "register": "Register",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "footer": {
+    "about": "About Reps Egypt",
+    "about_desc": "Empowering fitness professionals with world-class education and certification.",
+    "links": "Quick Links",
+    "contact": "Contact Us",
+    "rights": "All rights reserved."
+  },
+  "home": {
+    "hero_badge": "Egypt's Premier Fitness Certification",
+    "hero_title_prefix": "Transform Your",
+    "hero_title_highlight": "Fitness Career",
+    "hero_subtitle": "Join Egypt's most trusted fitness certification organization. Get accredited, connect with professionals, and elevate your coaching to world-class standards.",
+    "search_placeholder": "Search for training programs or coaches...",
+    "cta_get_certified": "Get Certified",
+    "cta_explore_programs": "Explore Programs",
+    "stats_coaches": "Certified Coaches",
+    "stats_trainees": "Active Trainees",
+    "stats_programs": "Specializations",
+    "stats_excellence": "Excellence",
+    "section_trainers_badge": "World Class Talent",
+    "section_trainers_title": "Meet Our Elite Trainers",
+    "section_trainers_view_all": "View All Coaches",
+    "section_programs_badge": "Start Your Journey",
+    "section_programs_title": "Explore Specializations",
+    "section_programs_view_all": "Browse All Specializations",
+    "section_why_title": "Why Choose Reps Egypt?",
+    "section_why_subtitle": "The leading choice for fitness professionals across Egypt",
+    "why_standards_title": "Accredited Standards",
+    "why_standards_desc": "Internationally recognized certification programs that meet the highest industry standards.",
+    "why_community_title": "Expert Community",
+    "why_community_desc": "Connect with top coaches and trainers in Egypt's most active fitness community.",
+    "why_growth_title": "Career Growth",
+    "why_growth_desc": "Access exclusive opportunities and resources to advance your fitness career.",
+    "footer_cta_title": "Ready to Elevate Your Fitness Journey?",
+    "footer_cta_subtitle": "Join thousands of certified professionals who trust Reps Egypt for their career development.",
+    "footer_cta_apply": "Apply for Certification",
+    "footer_cta_contact": "Contact Us",
+    "card_view_profile": "View Profile"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "back": "Go Back"
+  },
+  "about_page": {
+    "title_prefix": "About",
+    "title_highlight": "Us",
+    "mission_title": "Our Mission",
+    "mission_desc": "We are dedicated to building innovative solutions that empower businesses and individuals to achieve their goals. Our platform combines cutting-edge technology with user-centric design.",
+    "vision_title": "Our Vision",
+    "vision_desc": "To be the leading platform for digital transformation, enabling seamless connections and driving innovation across industries.",
+    "values_title": "Our Values",
+    "values_innovation": "Innovation at the core of everything we do",
+    "values_user": "User experience as our top priority",
+    "values_trust": "Transparency and trust in all relationships",
+    "back_home": "Back to Home"
+  },
+  "terms_page": {
+    "title": "Terms of Service",
+    "subtitle": "Please read these terms carefully before using our platform",
+    "effective_date": "Effective Date: January 1, 2026",
+    "section1_title": "1. Acceptance of Terms",
+    "section1_text": "By accessing or using the Reps Egypt website and services, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site.",
+    "section1_text2": "We reserve the right to modify these terms at any time. Your continued use of the platform after any such changes constitutes your acceptance of the new Terms of Service.",
+    "section2_title": "2. User Responsibilities",
+    "section2_intro": "As a user of Reps Egypt, you agree to:",
+    "section2_list": [
+      "Provide accurate and complete registration information.",
+      "Maintain the security of your account credentials.",
+      "Use the platform only for lawful professional purposes.",
+      "Not engage in any activity that disrupts or interferes with our services."
+    ],
+    "section2_outro": "Failure to adhere to these responsibilities may result in the immediate suspension or termination of your account.",
+    "section3_title": "3. Certification & Accreditation",
+    "section3_text": "Reps Egypt provides certification and accreditation services. While we strive to maintain the highest standards, the granting of certification does not guarantee employment or specific career outcomes.",
+    "section3_text2_pre_link": "All certified professionals must adhere to the Reps Egypt ",
+    "section3_link_text": "Code of Ethics",
+    "section3_text2_post_link": ". Violation of these ethical standards is grounds for revocation of certification.",
+    "section4_title": "4. Intellectual Property",
+    "section4_text": "All content, features, and functionality of the Service (including but not limited to all information, software, text, look and feel, and logos) are owned by Reps Egypt and are protected by international copyright, trademark, and other intellectual property laws.",
+    "section5_title": "5. Limitation of Liability",
+    "section5_text": "In no event shall Reps Egypt be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the service.",
+    "contact_title": "Questions about the Terms of Service?"
+  },
+  "privacy_page": {
+     "title": "Privacy Policy",
+     "subtitle": "Values that drive our commitment to your privacy",
+     "updated_date": "Last Updated: January 28, 2026",
+     "section1_title": "Information We Collect",
+     "section1_text": "We collect information you provide directly to us when you create an account, register for certification, or communicate with us. This may include:",
+     "section1_list": [
+       "Personal identification (Name, email address, phone number)",
+       "Professional credentials and certification history",
+       "Payment information (processed securely by third-party providers)",
+       "Profile photographs and verification documents"
+     ],
+     "section2_title": "How We Use Your Information",
+     "section2_text": "We use the information we collect to operate, maintain, and provide the features of the Reps Egypt platform. Specifically, we use your data to:",
+     "section2_list": [
+       "Verify your professional status and certifications",
+       "Process applications and renewals",
+       "Send important administrative notifications",
+       "Maintain the public directory of certified professionals (with your consent)"
+     ],
+     "section3_title": "Data Security",
+     "section3_text": "We implement industry-standard security measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the Internet is 100% secure, and we cannot guarantee absolute security.",
+     "section3_note_label": "Note:",
+     "section3_note_text": " We never sell your personal data to third-party advertisers. Your data is yours.",
+     "section4_title": "Your Rights",
+     "section4_text": "You have the right to access, correct, or delete your personal information. You can manage most of your data directly through your account settings. For other requests, please contact our support team.",
+     "contact_title": "Have questions about our privacy practices?"
+  },
+  "ethics_page": {
+    "title": "Code of Ethics",
+    "subtitle": "Professional standards and ethical guidelines for Reps Egypt members",
+    "commitment_title": "Our Commitment",
+    "commitment_text1": "The Reps Egypt Code of Ethics establishes the professional standards expected of all certified coaches and members. These guidelines ensure the safety, dignity, and well-being of clients while maintaining the integrity of the fitness profession.",
+    "commitment_text2": "By maintaining certification with Reps Egypt, you agree to uphold these ethical standards and understand that violations may result in disciplinary action, including suspension or revocation of certification.",
+    "principles_title": "Core Ethical Principles",
+    "principles": [
+        {
+            "title": "Professional Integrity",
+            "desc": "Maintain the highest standards of professional conduct and honesty in all interactions with clients, colleagues, and the fitness community.",
+            "points": ["Practice within the scope of your certification and expertise", "Provide accurate information about your qualifications and experience", "Maintain professional boundaries with all clients", "Avoid conflicts of interest and disclose any potential conflicts"]
+        },
+         {
+            "title": "Client Welfare",
+            "desc": "Prioritize the health, safety, and well-being of clients above all other considerations.",
+            "points": ["Conduct thorough health screenings before beginning training", "Respect medical advice and work within client limitations", "Create safe and effective training programs", "Recognize when to refer clients to medical professionals"]
+        },
+        {
+            "title": "Respect and Inclusivity",
+            "desc": "Treat all individuals with respect and dignity, fostering an inclusive environment free from discrimination.",
+            "points": ["Respect diversity in age, gender, race, religion, and ability", "Use inclusive language and avoid discriminatory behavior", "Accommodate individual needs and preferences"]
+        },
+        {
+            "title": "Professional Development",
+            "desc": "Commit to continuous learning and staying current with industry best practices and research.",
+            "points": ["Maintain and update professional certifications", "Participate in continuing education opportunities", "Stay informed about new research and training methodologies", "Share knowledge with colleagues and the fitness community"]
+        }
+    ],
+    "violations_title": "Violations and Consequences",
+    "violations_examples_label": "Examples:",
+    "violations_consequences_label": "Consequences:",
+    "violation_minor": { "title": "Minor Violations", "examples": "Late to sessions, Dress code violations, Unprofessional communication", "consequences": "Written warning and mandatory ethics training" },
+    "violation_moderate": { "title": "Moderate Violations", "examples": "Practicing outside scope of certification, Inadequate supervision, Breach of confidentiality", "consequences": "Suspension of certification for 30-90 days and remedial training" },
+    "violation_severe": { "title": "Severe Violations", "examples": "Sexual harassment, Fraudulent claims, Endangering client safety", "consequences": "Permanent revocation of certification and legal action" },
+    "reporting_title": "Reporting Ethical Violations",
+    "reporting_text": "If you witness or experience unethical behavior by a Reps Egypt certified professional, you have a responsibility to report it. All reports are treated confidentially and investigated thoroughly.",
+    "reporting_btn": "Report Violation",
+    "contact_btn": "Contact Ethics Committee",
+    "footer_title": "Ethical Commitment",
+    "footer_text": "All Reps Egypt members must acknowledge and commit to upholding this Code of Ethics. Your adherence to these standards ensures the integrity and reputation of the fitness profession in Egypt.",
+    "updated_date": "Last updated: January 2026"
+  },
+  "faq_page": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Find answers to common questions about Reps Egypt",
+    "search_placeholder": "Search for answers...",
+    "support_title": "Still have questions?",
+    "support_text": "Our support team is here to help you with any inquiries",
+    "support_btn": "Contact Support",
+    "categories": [
+      {
+        "category": "Certification",
+        "questions": [
+           { "q": "How do I become an accredited coach with Reps Egypt?", "a": "To become an accredited coach, you need to complete our certification program which includes theoretical coursework, practical assessments, and a final examination. The process typically takes 12-16 weeks depending on the program you choose. You must also meet prerequisite educational requirements and maintain professional liability insurance." },
+           { "q": "What are the certification requirements?", "a": "Requirements vary by level but generally include a high school diploma, valid CPR/AED certification, and completion of specific anatomy and physiology courses." },
+           { "q": "How long is the certification valid?", "a": "Certifications are valid for 2 years. To renew, you must complete 20 Continuing Education Units (CEUs) and pay the renewal fee." },
+           { "q": "Can I transfer certifications from other organizations?", "a": "Yes, we accept transfers from recognized bodies like NASM, ACE, and ISSA. You will need to submit proof of your current certification and pass a bridging exam." }
+        ]
+      },
+      {
+        "category": "Membership",
+        "questions": [
+           { "q": "What are the benefits of membership?", "a": "Membership includes access to our job board, discounted insurance rates, networking events, and continuing education resources." },
+           { "q": "How much does membership cost?", "a": "Membership fees depend on your tier. Student membership is free, while Pro membership is 1,200 EGP/year." },
+           { "q": "Can I cancel my membership?", "a": "Yes, you can cancel your membership at any time through your account settings. Refunds are provided on a pro-rata basis if cancelled within the first 30 days." }
+        ]
+      },
+       {
+        "category": "Training Programs",
+        "questions": [
+           { "q": "Are training programs available online?", "a": "Yes, we offer hybrid programs with online theory modules and in-person practical workshops." },
+           { "q": "What is the success rate of your programs?", "a": "Our graduates have a 92% pass rate on international accreditation exams and 85% find employment within 3 months." },
+           { "q": "Do you offer payment plans?", "a": "We offer flexible installment plans for all our major certification programs to make education accessible." }
+        ]
+      },
+       {
+        "category": "Technical Support",
+        "questions": [
+           { "q": "How do I access the online learning platform?", "a": "Once enrolled, you will receive login credentials via email. You can access the portal from the 'Login' button on our homepage." },
+           { "q": "Who do I contact for technical issues?", "a": "For any technical difficulties, please email support@repsegypt.com or use the contact form below." }
+        ]
+      }
+    ]
+  },
+  "benefits_page": {
+    "title_prefix": "Member",
+    "title_highlight": "Benefits",
+    "subtitle": "Join a network of over 5,000 certified professionals and unlock tools to accelerate your career.",
+    "cta_certified": "Get Certified Now",
+    "benefits_list": [
+      { "title": "Global Recognition", "desc": "Your certification is recognized internationally, allowing you to work in UAE, KSA, UK, Australia, and more." },
+      { "title": "Career Opportunities", "desc": "Access our exclusive job board featuring premium listings from top gyms, wellness centers, and sports clubs." },
+      { "title": "Continuing Education", "desc": "Get discounted access to workshops and seminars to keep your skills sharp and earn your CEUs." },
+      { "title": "Legal & Insurance", "desc": "Protection for you and your business with group liability insurance rates designed for fitness professionals." },
+      { "title": "Networking Events", "desc": "Connect with the best coaches in the industry at our exclusive quarterly meetups and social events." },
+      { "title": "Digital Resources", "desc": "Access our library of program templates, assessment forms, and client management tools." }
+    ],
+    "tiers_title": "Membership Tiers",
+    "tiers_subtitle": "Choose the level that suits your professional goals",
+    "tier_student": { "name": "Student", "price": "Free", "btn": "Register", "features": ["Study Resources", "Community Access", "Event Discounts"] },
+    "tier_pro": { "name": "Pro Member", "price": "1,200 EGP", "price_period": "/yr", "btn": "Upgrade Now", "features": ["Everything in Student", "Professional Liability", "Job Board Access", "Partner Discounts"] },
+    "tier_master": { "name": "Master Coach", "price": "2,500 EGP", "price_period": "/yr", "btn": "Contact Us", "features": ["Everything in Pro", "Priority Listing", "Exclusive Mentorship"] }
+  },
+  "partners_page": {
+    "title_prefix": "Our Trusted",
+    "title_highlight": "Partners",
+    "subtitle": "Collaborating with industry leaders, government bodies, and educational institutions to elevate fitness standards in Egypt.",
+    "tier_strategic": { "name": "Strategic Partners", "description": "Government bodies and international organizations driving the industry forward." },
+    "tier_gold": { "name": "Gold Partners", "description": "Leading equipment suppliers and national gym chains." },
+    "tier_educational": { "name": "Educational Partners", "description": "Accredited training providers and academic institutions." },
+    "cta_title": "Become a Partner",
+    "cta_text": "Join our network and help shape the future of fitness in Egypt. We offer exclusive benefits for corporate and educational partners.",
+    "cta_btn_apply": "Apply for Partnership",
+    "cta_btn_guidelines": "View Guidelines"
+  },
+  "standards_page": {
+    "title_prefix": "Our Commitment to",
+    "title_highlight": "Professional Standards",
+    "subtitle": "Reps Egypt is dedicated to raising the bar for fitness professionals. We ensure that every certified coach adheres to a strict code of ethics and practice.",
+    "badge_text": "Integrity & Excellence",
+    "standards_list": [
+      { "title": "Code of Ethical Practice", "desc": "All members must adhere to our rigorous code of ethics, ensuring client safety, respect, and professional integrity at all times." },
+      { "title": "Professional Competence", "desc": "Members are required to maintain their skills and knowledge through continuous professional development (CPD) and regular re-accreditation." },
+      { "title": "Client Safety & Welfare", "desc": "The physical and mental well-being of training clients is paramount. Strict guidelines are in place for risk assessment and injury prevention." },
+      { "title": "Insurance & Liability", "desc": "Correct professional indemnity and public liability insurance is a mandatory requirement for all practicing members." },
+      { "title": "Transparancy", "desc": "We believe in complete transparency regarding qualifications, fees, and service deliverables. Misrepresentation is strictly prohibited." },
+      { "title": "Complaint Resolution", "desc": "A formal and impartial process is available for addressing complaints against members to maintain public trust in the registry." }
+    ],
+    "docs_title": "Documentation & Guidelines",
+    "docs_text": "Review the official documents that govern the standards of fitness practice in Egypt.",
+    "btn_download_code": "Download Code of Ethics",
+    "btn_download_manual": "Full Standards Manual"
+  },
+  "jobs_page": {
+    "title_prefix": "Build Your",
+    "title_highlight": "Career",
+    "subtitle": "Connect with top gyms, studios, and wellness centers across Egypt. Find opportunities that match your qualifications.",
+    "btn_upload_cv": "Upload CV",
+    "btn_post_job": "Post a Job",
+    "search_placeholder": "Search job titles or companies...",
+    "filters": {
+      "all": "All",
+      "full_time": "Full-time",
+      "part_time": "Part-time",
+      "contract": "Contract"
+    },
+    "job_card": {
+      "featured": "Featured",
+      "apply_btn": "Apply Now"
+    },
+    "no_jobs": {
+      "title": "No jobs found",
+      "desc": "Try adjusting your filters or check back later.",
+      "clear_btn": "Clear Filters"
+    },
+    "jobs_list": [
+      { "id": 1, "title": "Senior Personal Trainer", "company": "Gold's Gym Elite", "location": "New Cairo", "type": "Full-time", "type_key": "full_time", "salary": "15,000 - 20,000 EGP", "posted": "2 days ago", "featured": true, "logo": "https://ui-avatars.com/api/?name=GG&background=fbbf24&color=000" },
+      { "id": 2, "title": "Yoga Instructor", "company": "Flow Studio", "location": "Zamalek", "type": "Part-time", "type_key": "part_time", "salary": "Negotiable", "posted": "1 day ago", "featured": false, "logo": "https://ui-avatars.com/api/?name=FS&background=a8a29e&color=fff" },
+      { "id": 3, "title": "Fitness Manager", "company": "Club 7", "location": "Maadi", "type": "Full-time", "type_key": "full_time", "salary": "25,000+ EGP", "posted": "5 days ago", "featured": true, "logo": "https://ui-avatars.com/api/?name=C7&background=000&color=fff" },
+      { "id": 4, "title": "CrossFit Coach", "company": "Ignite Egypt", "location": "Sheikh Zayed", "type": "Contract", "type_key": "contract", "salary": "Per Class", "posted": "1 week ago", "featured": false, "logo": "https://ui-avatars.com/api/?name=IE&background=ef4444&color=fff" },
+      { "id": 5, "title": "Sales Representative", "company": "PowerGym Equip", "location": "Nasr City", "type": "Full-time", "type_key": "full_time", "salary": "8,000 + Commission", "posted": "3 days ago", "featured": false, "logo": "https://ui-avatars.com/api/?name=PG&background=1f2937&color=fff" }
+    ]
+  }
+}
