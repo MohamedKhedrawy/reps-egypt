@@ -65,7 +65,7 @@ export default async function ProgramsPage({ params }) {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
            {programs.map((program, idx) => {
              // Look up translation or fallback to database value
-             const translatedProgram = dictionary.program_content?.programs?.[program.title] || {};
+             const translatedProgram = dictionary.program_content?.programs?.[program.title?.trim()] || {};
              const title = translatedProgram.title || program.title;
              const desc = translatedProgram.desc || program.desc;
              const category = dictionary.program_content?.categories?.[program.category] || program.category;

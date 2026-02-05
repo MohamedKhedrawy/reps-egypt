@@ -201,7 +201,7 @@ export default async function LandingPage({ params }) {
           <div className="grid md:grid-cols-3 gap-8">
             {featuredPrograms.map((program, idx) => {
               // Translation lookup
-              const translatedProgram = dictionary.program_content?.programs?.[program.title] || {};
+              const translatedProgram = dictionary.program_content?.programs?.[program.title?.trim()] || {};
               const title = translatedProgram.title || program.title;
               const desc = translatedProgram.desc || program.desc;
               const category = dictionary.program_content?.categories?.[program.category] || program.category;

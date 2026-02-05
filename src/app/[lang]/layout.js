@@ -33,6 +33,9 @@ export const metadata = {
     template: "%s | Reps Egypt",
   },
   description: "Reps Egypt is a cutting-edge digital solutions platform empowering businesses with innovative technology and seamless user experiences.",
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 export default async function RootLayout({ children, params }) {

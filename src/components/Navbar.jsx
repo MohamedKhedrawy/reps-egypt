@@ -38,6 +38,7 @@ export default function Navbar({ dictionary, lang }) {
           {/* Left: Logo + Theme Toggle + Lang Switch */}
           <div className="flex items-center gap-4">
             <Link href={`/${lang}`} className="flex-shrink-0 flex items-center gap-2">
+              <img src="/logo.png" alt="Reps Egypt Logo" className="w-14 h-14 object-contain" />
               <span className={`text-2xl font-extrabold tracking-tighter transition-colors duration-300 ${isDark ? 'text-foreground' : 'text-black'}`}>
                 REPS <span className={isDark ? "text-red-600" : "text-white"}>Egypt</span> <sup>®</sup>
               </span>

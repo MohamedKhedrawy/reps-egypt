@@ -741,6 +741,22 @@
       "Master Yoga Flow": {
         "title": "إتقان تدفق اليوغا",
         "desc": "منهج معتمد 200 ساعة يركز على الانتقالات وتقنيات التنفس."
+      },
+      "Personal Trainer": { "title": "مدرب شخصي", "desc": "كن مدرباً شخصياً معتمداً." },
+      "Gym Instructor": { "title": "مدرب جيم", "desc": "ابدأ مسيرتك المهنية كمدرب جيم." },
+      "Group Fitness Instructor": { "title": "مدرب لياقة جماعية", "desc": "قُد حصص اللياقة الجماعية بثقة." },
+      "Yoga Teacher": { "title": "مدرب يوجا", "desc": "كن معلماً معتمداً لليوجا." },
+      "Pilates Teacher": { "title": "مدرب بيلاتس", "desc": "كن معلماً معتمداً للبيلاتس." },
+      "Aqua Fitness Instructor": { "title": "مدرب لياقة مائية", "desc": "تخصص في تدريبات اللياقة المائية." },
+      "Children's Fitness Instructor": { "title": "مدرب لياقة أطفال", "desc": "تخصص في اللياقة البدنية للأطفال." },
+      "Advanced Exercise Specialist": { "title": "أخصائي تمرين متقدم", "desc": "طور مسيرتك المهنية بتدريب متخصص." },
+      "Group Fitness Instructor Freestyle": {
+        "title": "مدرب لياقة جماعية (فري ستايل)",
+        "desc": "تصميم وتدريس حصص اللياقة الجماعية الحرة مع الموسيقى"
+      },
+      "Pilates Instructor Comprehensive": {
+        "title": "مدرب بيلاتس شامل",
+        "desc": "شهادة بيلاتس شاملة تغطي جميع الأجهزة والتمارين الأرضية بمستوى متقدم"
       }
     }
   },

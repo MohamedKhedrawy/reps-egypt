@@ -741,6 +741,22 @@
       "Master Yoga Flow": {
         "title": "Master Yoga Flow",
         "desc": "200-hour RYT aligned curriculum focusing on transitions and breathwork."
+      },
+      "Personal Trainer": { "title": "Personal Trainer", "desc": "Become a certified Personal Trainer." },
+      "Gym Instructor": { "title": "Gym Instructor", "desc": "Start your career as a Gym Instructor." },
+      "Group Fitness Instructor": { "title": "Group Fitness Instructor", "desc": "Lead group classes with confidence." },
+      "Yoga Teacher": { "title": "Yoga Teacher", "desc": "Become a certified Yoga Teacher." },
+      "Pilates Teacher": { "title": "Pilates Teacher", "desc": "Become a certified Pilates Teacher." },
+      "Aqua Fitness Instructor": { "title": "Aqua Fitness Instructor", "desc": "Specialize in Aqua Fitness training." },
+      "Children's Fitness Instructor": { "title": "Children's Fitness Instructor", "desc": "Specialize in fitness for children." },
+      "Advanced Exercise Specialist": { "title": "Advanced Exercise Specialist", "desc": "Advance your career with specialized training." },
+      "Group Fitness Instructor Freestyle": {
+        "title": "Group Fitness Instructor Freestyle",
+        "desc": "Choreograph and instruct freestyle group fitness classes to music"
+      },
+      "Pilates Instructor Comprehensive": {
+        "title": "Pilates Instructor Comprehensive",
+        "desc": "Full comprehensive Pilates certification covering all apparatus and matwork at an advanced level"
       }
     }
   },

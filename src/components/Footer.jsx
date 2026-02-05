@@ -18,15 +18,12 @@ export default function Footer({ dictionary, lang }) {
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid md:grid-cols-12 gap-12 lg:gap-8 mb-16">
             
-            {/* Column 1: Brand (4 cols) */}
             <div className="md:col-span-4">
               <div className="flex items-center gap-3 mb-6">
-                 <div className="w-8 h-8 bg-background-primary rounded-lg flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-white">
-                      <path d="M12.378 1.602a.75.75 0 0 0-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03ZM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 0 0 .372-.648V7.93ZM11.25 22.18v-9l-9-5.25v8.57a.75.75 0 0 0 .372.648l8.628 5.033Z" />
-                    </svg>
+                 <div className="w-16 h-16 flex items-center justify-center">
+                    <img src="/logo.png" alt="Reps Egypt" className="w-full h-full object-contain" />
                  </div>
-                 <span className="text-xl font-bold text-foreground-primary tracking-tight">REPS EGYPT</span>
+                 <span className="text-2xl font-extrabold text-foreground-primary tracking-tight">REPS EGYPT</span>
               </div>
               <p className="text-muted text-sm leading-7 max-w-sm">
                 {dictionary?.about_desc || "Empowering fitness professionals with world-class education and certification."}
