@@ -370,8 +370,13 @@ export default function AdminDashboard({ dictionary }) {
                           <h3 className="font-bold text-lg">{item.name}</h3>
                           <p className="text-sm text-muted">{item.email}</p>
                           <div className="flex gap-3 mt-2 text-xs text-muted">
-                            <span className="bg-background px-2 py-1 rounded">{item.type}</span>
-                            <span className="bg-background px-2 py-1 rounded">{item.specialization}</span>
+                            <span className="bg-background px-2 py-1 rounded">{item.type || (item.newSpecialization ? 'Specialization Request' : 'Qualification Request')}</span>
+                            {item.newSpecialization && (
+                                <span className="bg-amber-500/20 text-amber-500 px-2 py-1 rounded border border-amber-500/30">
+                                    Target: {item.newSpecialization}
+                                </span>
+                            )}
+                            <span className="bg-background px-2 py-1 rounded">{item.specialization || "Trainer"}</span>
                             <span>{item.date}</span>
                           </div>
                         </div>

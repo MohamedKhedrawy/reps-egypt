@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { sendCoachMessage } from '@/lib/email';
 import { findUserById } from '@/lib/user';
+import { messageSchema } from '@/lib/schemas';
 
 export async function POST(request) {
     try {
@@ -17,21 +18,17 @@ export async function POST(request) {
 
         // 2. Validate Input
         const body = await request.json();
-        const { coachId, message } = body;
-
-        if (!coachId || !message) {
+        
+        const validation = messageSchema.safeParse(body);
+        if (!validation.success) {
+            const firstError = validation.error.errors[0];
             return NextResponse.json(
-                { error: 'Coach ID and message are required' },
+                { error: firstError.message },
                 { status: 400 }
             );
         }
 
-        if (message.length > 2000) {
-            return NextResponse.json(
-                { error: 'Message cannot exceed 2000 characters' },
-                { status: 400 }
-            );
-        }
+        const { coachId, message } = validation.data;
 
         // 3. Resolve Coach Email (Server-Side)
         const coach = await findUserById(coachId);

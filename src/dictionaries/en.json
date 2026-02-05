@@ -468,6 +468,18 @@
     "phone": "Phone",
     "birth_date": "Birth Date",
     "specialization": "Specialization",
+    "upload_photo": "Upload Photo",
+    "remove_photo": "Remove Photo",
+    "profile_strength": "Profile Strength",
+    "complete_profile": "Complete your profile",
+    "security": {
+      "title": "Security",
+      "change_password": "Change Password",
+      "current_password": "Current Password",
+      "new_password": "New Password",
+      "confirm_password": "Confirm New Password",
+      "update_btn": "Update Password"
+    },
     "tabs": {
       "overview": "Overview",
       "settings": "Settings",

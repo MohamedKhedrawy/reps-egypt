@@ -587,6 +587,18 @@
     "phone": "الهاتف",
     "birth_date": "تاريخ الميلاد",
     "specialization": "التخصص",
+    "upload_photo": "رفع صورة",
+    "remove_photo": "حذف الصورة",
+    "profile_strength": "قوة الملف الشخصي",
+    "complete_profile": "أكمل ملفك الشخصي",
+    "security": {
+      "title": "الأمان",
+      "change_password": "تغيير كلمة المرور",
+      "current_password": "كلمة المرور الحالية",
+      "new_password": "كلمة المرور الجديدة",
+      "confirm_password": "تأكيد كلمة المرور الجديدة",
+      "update_btn": "تحديث كلمة المرور"
+    },
     "tabs": {
       "overview": "نظرة عامة",
       "settings": "الإعدادات",

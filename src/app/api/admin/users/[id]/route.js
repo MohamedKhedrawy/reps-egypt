@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { findUserById, updateUser, updateUserStatus, deleteUser } from '@/lib/user';
+import { verifyPassword, hashPassword } from '@/lib/auth';
+import { userUpdateSchema, passwordChangeSchema } from '@/lib/schemas';
 
 export async function GET(request, { params }) {
     try {
@@ -23,18 +25,74 @@ export async function PATCH(request, { params }) {
         const { id } = await params;
         const body = await request.json();
         const adminId = request.headers.get('x-user-id');
+        const userRole = request.headers.get('x-user-role');
+
+        // Defense in Depth: Role Check
+        // Allow if admin OR if mapping to same user (self-update)
+        // Note: Proxy handles this generally, but explicit check is safer.
+        if (userRole !== 'admin' && adminId !== id) {
+             return NextResponse.json({ error: 'Unauthorized: Access denied' }, { status: 403 });
+        }
 
         // Check if this is a status update
         if (body.status && ['approved', 'rejected', 'pending'].includes(body.status)) {
+            // Only admins can change status
+            if (userRole !== 'admin') {
+                return NextResponse.json({ error: 'Unauthorized: Only admins can change status' }, { status: 403 });
+            }
             await updateUserStatus(id, body.status, adminId);
             return NextResponse.json({ message: `User ${body.status} successfully` });
         }
 
+        // Check if this is a password update request
+        if (body.newPassword) {
+             const user = await findUserById(id);
+             if (!user) {
+                 return NextResponse.json({ error: 'User not found' }, { status: 404 });
+             }
+
+             // Validate password change payload
+             const passwordValidation = passwordChangeSchema.safeParse(body);
+             if (!passwordValidation.success) {
+                 const firstError = passwordValidation.error.errors[0];
+                 return NextResponse.json({ error: firstError.message }, { status: 400 });
+             }
+
+             // Scenario A: User updating their own password (requires currentPassword)
+             if (body.currentPassword) {
+                 const isValid = await verifyPassword(body.currentPassword, user.password);
+                 if (!isValid) {
+                     return NextResponse.json({ error: 'Incorrect current password' }, { status: 400 });
+                 }
+             } 
+             
+             const hashedPassword = await hashPassword(body.newPassword);
+             await updateUser(id, { password: hashedPassword });
+             
+             return NextResponse.json({ message: 'Password updated successfully' });
+        }
+
         // Otherwise update user data
-        const { status, ...updateData } = body;
-        if (status) updateData.status = status;
+        // Validate with userUpdateSchema
+        // For simplicity and safety: 
+        // 1. Strip sensitive fields (status, password, role) from body manually
+        // 2. Validate the rest
         
-        await updateUser(id, updateData);
+        const { status, password, role, ...potentialUpdateData } = body;
+        
+        // Run schema validation on safeUpdateData
+        // We use safeParse to check validity of known fields
+        const updateValidation = userUpdateSchema.safeParse(potentialUpdateData);
+        
+        if (!updateValidation.success) {
+             const firstError = updateValidation.error.errors[0];
+             return NextResponse.json({ error: `Invalid ${firstError.path[0]}: ${firstError.message}` }, { status: 400 });
+        }
+
+        // Use the validated data from Zod to ensure only whitelisted fields are updated
+        const safeUpdateData = updateValidation.data;
+        
+        await updateUser(id, safeUpdateData);
         return NextResponse.json({ message: 'User updated successfully' });
     } catch (error) {
         console.error('Update user error:', error);

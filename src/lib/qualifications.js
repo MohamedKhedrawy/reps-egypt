@@ -73,16 +73,23 @@ export async function updateQualificationChangeStatus(id, status, adminId) {
         const client = await clientPromise;
         const users = client.db(DB_NAME).collection('users');
         
-        // Assuming newQualifications contains the array of file names or data
+        const updateFields = {
+            updatedAt: new Date()
+        };
+
+        // Apply new qualifications if present
+        if (change.newQualifications) {
+            updateFields.uploadedFiles = change.newQualifications;
+        }
+
+        // Apply new specialization if present
+        if (change.newSpecialization) {
+            updateFields.specialization = change.newSpecialization;
+        }
+
         await users.updateOne(
             { _id: new ObjectId(change.trainerId) },
-            { 
-                $set: { 
-                    uploadedFiles: change.newQualifications, // or qualifications: ... depending on schema
-                    // You might merge or replace depending on business logic
-                    updatedAt: new Date()
-                }
-            }
+            { $set: updateFields }
         );
     }
     
@@ -92,12 +99,13 @@ export async function updateQualificationChangeStatus(id, status, adminId) {
 /**
  * Create a new qualification change request
  */
-export async function createQualificationChange(trainerId, previousQualifications, newQualifications) {
+export async function createQualificationChange(trainerId, previousQualifications, newQualifications, newSpecialization) {
     const collection = await getQualificationChangesCollection();
     return collection.insertOne({
         trainerId,
         previousQualifications,
         newQualifications,
+        newSpecialization, // Optional
         status: 'pending',
         createdAt: new Date(),
     });

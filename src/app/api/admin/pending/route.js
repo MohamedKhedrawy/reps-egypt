@@ -29,6 +29,7 @@ export async function GET() {
             email: change.trainerEmail,
             type: 'Qualification Update', // Distinguisher
             info: `${change.previousQualifications?.length || 0} → ${change.newQualifications?.length || 0} certs`,
+            newSpecialization: change.newSpecialization, // Pass specifically for UI
             date: change.createdAt,
             rawDate: change.createdAt,
             // Action needed is 'approve_qualification'

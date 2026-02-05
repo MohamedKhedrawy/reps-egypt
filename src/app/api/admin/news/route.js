@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getNewsArticles, createNewsArticle } from '@/lib/news';
+import { newsSchema } from '@/lib/schemas';
 
 export async function GET() {
     try {
@@ -26,14 +27,24 @@ export async function GET() {
 export async function POST(request) {
     try {
         const body = await request.json();
-        const { title, category, description, imageUrl, isPublished } = body;
+        const userRole = request.headers.get('x-user-role');
 
-        if (!title || !category || !description) {
+        // Security: Explicit Role Check
+        if (userRole !== 'admin') {
+            return NextResponse.json({ error: 'Unauthorized: Admins only' }, { status: 403 });
+        }
+
+        // Validate with Zod
+        const validation = newsSchema.safeParse(body);
+        if (!validation.success) {
+            const firstError = validation.error.errors[0];
             return NextResponse.json(
-                { error: 'Title, category, and description are required' },
+                { error: `Invalid ${firstError.path[0]}: ${firstError.message}` },
                 { status: 400 }
             );
         }
+
+        const { title, category, description, imageUrl, isPublished } = validation.data;
 
         const result = await createNewsArticle({
             title,

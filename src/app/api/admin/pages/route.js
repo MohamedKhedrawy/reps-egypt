@@ -35,8 +35,15 @@ export async function GET() {
 /**
  * POST: Initialize default pages (can be called to reset)
  */
-export async function POST() {
+export async function POST(request) {
     try {
+        const userRole = request.headers.get('x-user-role');
+
+        // Security: Explicit Role Check
+        if (userRole !== 'admin') {
+            return NextResponse.json({ error: 'Unauthorized: Admins only' }, { status: 403 });
+        }
+
         const result = await initializeDefaultPages();
         return NextResponse.json(result);
     } catch (error) {

@@ -1,65 +1,52 @@
 import { NextResponse } from 'next/server';
 import { hashPassword, createToken } from '@/lib/auth';
 import { findUserByEmail, createUser } from '@/lib/user';
+import { registerSchema } from '@/lib/schemas';
 
 export async function POST(request) {
     try {
         const body = await request.json();
+        // We will validate 'body' directly with Zod below
+        
+        // Parse and validate with Zod
+        // We pass the raw body to the schema. 
+        // Note: The schema handles 'role' validation (enums: trainer, trainee)
+        const validation = registerSchema.safeParse(body);
+
+        if (!validation.success) {
+            // Return the first error message
+            const firstError = validation.error.errors[0];
+            return NextResponse.json(
+                { error: firstError.message, field: firstError.path[0] },
+                { status: 400 }
+            );
+        }
+
+        const validData = validation.data;
+        
+        // Destructure validated data
         const { 
             email, 
             password, 
             firstName,
             lastName,
             fullName: providedFullName,
-            // Extended fields
             phone,
             birthDate,
             age,
             socialMedia,
             specialization,
-            uploadedFiles,
-            termsAccepted,
-            role
-        } = body;
+            role, // This is now guaranteed to be 'trainer' or 'trainee' by Zod
+            termsAccepted
+        } = validData;
 
-        // Build fullName from firstName + lastName if not provided directly
+        // Build fullName if needed
         const fullName = providedFullName || `${firstName || ''} ${lastName || ''}`.trim();
-
-        // Validate required fields
-        if (!email || !password || !fullName) {
-            return NextResponse.json(
-                { error: 'Email, password, and name are required', field: 'general' },
-                { status: 400 }
-            );
+        if (!fullName) {
+             return NextResponse.json({ error: "Full name is required", field: "fullName" }, { status: 400 });
         }
 
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return NextResponse.json(
-                { error: 'Invalid email format', field: 'email' },
-                { status: 400 }
-            );
-        }
-
-        // Validate password strength
-        if (password.length < 8) {
-            return NextResponse.json(
-                { error: 'Password must be at least 8 characters', field: 'password' },
-                { status: 400 }
-            );
-        }
-
-        // Validate phone if provided
-        if (phone) {
-            const phoneRegex = /^01[0125][0-9]{8}$/;
-            if (!phoneRegex.test(phone)) {
-                return NextResponse.json(
-                    { error: 'Invalid Egyptian phone number format', field: 'phone' },
-                    { status: 400 }
-                );
-            }
-        }
+        // Additional Logic: Check if user exists (Zod doesn't check DB)
 
         // Check if user already exists
         const existingUser = await findUserByEmail(email);
@@ -70,7 +57,7 @@ export async function POST(request) {
             );
         }
 
-        // Hash password and create user with all fields
+        // Create user
         const hashedPassword = await hashPassword(password);
         const result = await createUser({
             email,
@@ -81,9 +68,9 @@ export async function POST(request) {
             age,
             socialMedia,
             specialization,
-            uploadedFiles,
+            uploadedFiles: body.uploadedFiles, // Files not in schema yet, pass through
             termsAccepted,
-            role: role || 'trainer'
+            role // Already sanitized by Zod
         });
 
         // Create JWT token

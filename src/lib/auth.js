@@ -1,7 +1,13 @@
 import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'default-secret-change-me');
+const secret = process.env.JWT_SECRET || 'default-secret-change-me';
+
+if (process.env.NODE_ENV === 'production' && (secret === 'default-secret-change-me' || !process.env.JWT_SECRET)) {
+    throw new Error('FATAL: JWT_SECRET is not defined or is set to default in PRODUCTION. Please set a strong secret.');
+}
+
+const JWT_SECRET = new TextEncoder().encode(secret);
 
 /**
  * Hash a plaintext password

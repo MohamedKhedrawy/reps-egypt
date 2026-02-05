@@ -94,7 +94,11 @@ export async function proxy(request) {
         
         // Check admin role for admin routes
         if (isAdminRoute) {
-            if (payload.role !== 'admin') {
+            // Exception: Allow users to update their own profile via /api/admin/users/[id]
+            const userProfileMatch = pathname.match(/\/api\/admin\/users\/([a-zA-Z0-9]+)$/);
+            const isSelfUpdate = userProfileMatch && userProfileMatch[1] === payload.userId;
+
+            if (payload.role !== 'admin' && !isSelfUpdate) {
                 // For page routes, redirect to home
                 if (!pathname.startsWith('/api/')) {
                     const locale = pathname.match(/^\/(en|ar)/)?.[1] || i18n.defaultLocale;
