@@ -1,19 +1,28 @@
 import Link from "next/link";
 import { getPublishedNews } from "@/lib/news";
+import { getDictionary } from '@/lib/get-dictionary';
 
-export const metadata = {
-  title: "Latest News & Updates | Reps Egypt",
-  description: "Stay updated with the latest in the fitness industry, Reps Egypt announcements, and expert articles.",
-};
+export async function generateMetadata({ params }) {
+    const { lang } = await params;
+    const dictionary = await getDictionary(lang);
+
+    return {
+        title: `${dictionary.news_page.title_prefix} ${dictionary.news_page.title_highlight} | Reps Egypt`,
+        description: dictionary.news_page.subtitle,
+    };
+}
 
 export const dynamic = 'force-dynamic';
 
-export default async function NewsPage() {
+export default async function NewsPage({ params }) {
+  const { lang } = await params;
+  const dictionary = await getDictionary(lang);
+  const content = dictionary.news_page;
+
   let articles = [];
   
   try {
     articles = await getPublishedNews();
-    // Convert _id to string for serialization
     articles = articles.map(a => ({
       ...a,
       id: a._id.toString(),
@@ -21,7 +30,6 @@ export default async function NewsPage() {
     }));
   } catch (error) {
     console.error("Failed to fetch news:", error);
-    // Fallback to empty if DB fails
   }
 
   // Default articles if none in database
@@ -52,7 +60,7 @@ export default async function NewsPage() {
   }
 
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return new Date(date).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   return (
@@ -61,8 +69,8 @@ export default async function NewsPage() {
       {/* Header */}
       <section className="pt-32 pb-12 px-6 border-b border-border">
         <div className="max-w-7xl mx-auto">
-           <h1 className="text-4xl lg:text-5xl font-bold mb-6">Latest <span className="text-red-600">News</span></h1>
-           <p className="text-muted max-w-2xl text-lg mb-10">Insights, updates, and stories from the heart of Egypt's fitness community.</p>
+           <h1 className="text-4xl lg:text-5xl font-bold mb-6">{content.title_prefix} <span className="text-red-600">{content.title_highlight}</span></h1>
+           <p className="text-muted max-w-2xl text-lg mb-10">{content.subtitle}</p>
         </div>
       </section>
 
@@ -84,7 +92,7 @@ export default async function NewsPage() {
                    <div className="flex items-center gap-3 text-xs text-red-500 font-bold mb-3 uppercase tracking-wider">
                       <span>{formatDate(article.createdAt)}</span>
                       <span className="w-1 h-1 rounded-full bg-background-muted"></span>
-                      <span className="text-muted font-normal">5 min read</span>
+                      <span className="text-muted font-normal">5 {content.min_read}</span>
                    </div>
                    <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-red-500 transition-colors leading-tight">
                      <Link href="#">{article.title}</Link>
@@ -93,7 +101,7 @@ export default async function NewsPage() {
                      {article.description}
                    </p>
                    <Link href="#" className="mt-auto inline-flex items-center gap-2 text-sm font-bold text-foreground hover:text-red-500 transition-colors">
-                     Read Article
+                     {content.read_article}
                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                      </svg>
@@ -108,14 +116,14 @@ export default async function NewsPage() {
            <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/10 blur-[100px] -z-10" />
            
            <div className="max-w-xl">
-             <h2 className="text-3xl font-bold mb-4 text-foreground">Subscribe to our newsletter</h2>
-             <p className="text-muted">Get the latest news and specialized fitness articles delivered directly to your inbox every week.</p>
+             <h2 className="text-3xl font-bold mb-4 text-foreground">{content.newsletter_title}</h2>
+             <p className="text-muted">{content.newsletter_desc}</p>
            </div>
            
            <div className="flex w-full md:w-auto flex-col sm:flex-row gap-3">
-              <input type="email" placeholder="Email address" className="w-full sm:w-80 bg-tertiary border border-border rounded-xl px-5 py-3.5 text-sm focus:outline-none focus:border-red-600 transition-colors text-foreground" />
+              <input type="email" placeholder={content.email_placeholder} className="w-full sm:w-80 bg-tertiary border border-border rounded-xl px-5 py-3.5 text-sm focus:outline-none focus:border-red-600 transition-colors text-foreground" />
               <button className="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-red-900/20 whitespace-nowrap">
-                Subscribe
+                {content.btn_subscribe}
               </button>
            </div>
         </div>

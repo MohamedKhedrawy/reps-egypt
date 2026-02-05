@@ -3,17 +3,29 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
-export default function MessageCoachForm({ coachId, coachName }) {
+export default function MessageCoachForm({ coachId, coachName, dictionary }) {
     const [message, setMessage] = useState("");
     const [isSending, setIsSending] = useState(false);
     const [isOpen, setIsOpen] = useState(false); // Collapsible state
+
+    // Defaults for fallback
+    const t = dictionary || {
+        title: "Send a Message to",
+        email_note: "Your email address will be shared with the coach so they can reply to you directly.",
+        placeholder: "Hi {name}, I'm interested in your training programs...",
+        send_btn: "Send Message",
+        sending: "Sending...",
+        success: "Message sent successfully!",
+        error_login: "Please log in to send a message.",
+        error_long: "Message is too long (max 2000 characters)"
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         
         if (!message.trim()) return;
         if (message.length > 2000) {
-            toast.error("Message is too long (max 2000 characters)");
+            toast.error(t.error_long);
             return;
         }
 
@@ -29,12 +41,12 @@ export default function MessageCoachForm({ coachId, coachName }) {
             const data = await res.json();
 
             if (res.ok) {
-                toast.success("Message sent successfully!");
+                toast.success(t.success);
                 setMessage("");
                 setIsOpen(false);
             } else {
                 if (res.status === 401) {
-                    toast.error("Please log in to send a message.");
+                    toast.error(t.error_login);
                     // Optional: redirect to login
                 } else {
                     toast.error(data.error || "Failed to send message");
@@ -50,20 +62,20 @@ export default function MessageCoachForm({ coachId, coachName }) {
     return (
         <div className="bg-secondary border border-border rounded-2xl p-6 mt-8">
             <h3 className="text-xl font-bold mb-4 flex items-center justify-between cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
-                <span>📧 Send a Message to {coachName}</span>
+                <span>📧 {t.title} {coachName}</span>
                 <span className="text-muted text-sm">{isOpen ? "▲" : "▼"}</span>
             </h3>
 
             {isOpen && (
                 <form onSubmit={handleSubmit} className="animate-in fade-in slide-in-from-top-2 duration-300">
                     <p className="text-sm text-muted mb-4">
-                       Your email address will be shared with the coach so they can reply to you directly.
+                       {t.email_note}
                     </p>
                     
                     <textarea
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        placeholder={`Hi ${coachName}, I'm interested in your training programs...`}
+                        placeholder={t.placeholder.replace("{name}", coachName)}
                         className="w-full bg-background border border-border rounded-xl p-4 text-foreground focus:border-red-600 focus:outline-none min-h-[150px] mb-4"
                         disabled={isSending}
                     />
@@ -80,10 +92,10 @@ export default function MessageCoachForm({ coachId, coachName }) {
                             {isSending ? (
                                 <>
                                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    Sending...
+                                    {t.sending}
                                 </>
                             ) : (
-                                "Send Message"
+                                t.send_btn
                             )}
                         </button>
                     </div>

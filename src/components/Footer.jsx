@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePageSettings } from "@/context/PageSettingsContext";
 
-export default function Footer() {
+export default function Footer({ dictionary, lang }) {
   const { pages } = usePageSettings();
   
   // Get footer and legal pages from settings
@@ -29,18 +29,18 @@ export default function Footer() {
                  <span className="text-xl font-bold text-foreground-primary tracking-tight">REPS EGYPT</span>
               </div>
               <p className="text-muted text-sm leading-7 max-w-sm">
-                Egypt's premier fitness and training certification organization. Empowering coaches and athletes to reach their full potential through accredited programs and professional standards.
+                {dictionary?.about_desc || "Empowering fitness professionals with world-class education and certification."}
               </p>
             </div>
 
             {/* Column 2: Quick Links (2 or 3 cols) */}
             <div className="md:col-span-2 md:col-start-6">
-              <h4 className="font-bold text-foreground mb-6">Quick Links</h4>
+              <h4 className="font-bold text-foreground mb-6">{dictionary?.links || "Quick Links"}</h4>
               <ul className="space-y-4 text-sm text-muted">
                 {footerLinks.map((page) => (
                   <li key={page.pageId}>
-                    <Link href={page.path} className="hover:text-red-500 transition-colors">
-                      {page.name}
+                    <Link href={`/${lang}${page.path}`} className="hover:text-red-500 transition-colors">
+                      {dictionary?.[page.pageId] || dictionary?.[page.name.toLowerCase()] || page.name}
                     </Link>
                   </li>
                 ))}
@@ -49,12 +49,12 @@ export default function Footer() {
 
             {/* Column 3: Legal (2 or 3 cols) */}
             <div className="md:col-span-2">
-              <h4 className="font-bold text-foreground mb-6">Legal</h4>
+              <h4 className="font-bold text-foreground mb-6">{dictionary?.legal || "Legal"}</h4>
               <ul className="space-y-4 text-sm text-muted">
                 {legalLinks.map((page) => (
                   <li key={page.pageId}>
-                    <Link href={page.path} className="hover:text-red-500 transition-colors">
-                      {page.name}
+                    <Link href={`/${lang}${page.path}`} className="hover:text-red-500 transition-colors">
+                      {dictionary?.[page.pageId] || dictionary?.[page.name.toLowerCase()] || page.name}
                     </Link>
                   </li>
                 ))}
@@ -63,7 +63,7 @@ export default function Footer() {
 
             {/* Column 4: Contact (3 cols) */}
             <div className="md:col-span-3">
-               <h4 className="font-bold text-foreground mb-6">Contact Us</h4>
+               <h4 className="font-bold text-foreground mb-6">{dictionary?.contact || "Contact Us"}</h4>
                <ul className="space-y-4 text-sm text-muted mb-8">
                  <li className="flex items-center gap-3">
                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-red-600">
@@ -82,7 +82,7 @@ export default function Footer() {
                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-red-600">
                      <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                    </svg>
-                   Cairo, Egypt
+                   {dictionary?.address || (lang === 'ar' ? "القاهرة، مصر" : "Cairo, Egypt")}
                  </li>
                </ul>
 
@@ -120,7 +120,7 @@ export default function Footer() {
           </div>
 
           <div className="pt-8 border-t border-border text-center">
-             <span className="text-xs text-muted">© 2026 Reps Egypt. All rights reserved. Empowering fitness professionals across Egypt.</span>
+             <span className="text-xs text-muted">© 2026 Reps Egypt. {dictionary?.rights || "All rights reserved."}</span>
           </div>
         </div>
       </footer>

@@ -79,7 +79,7 @@ export default function Navbar({ dictionary, lang }) {
                   href={getLocalizedPath(item.path)}
                   className={`text-[15px] font-medium transition-colors hover:text-red-600 ${isDark ? 'text-muted hover:text-foreground' : 'text-white/80 hover:text-white'}`}
                 >
-                  {dictionary?.[item.name.toLowerCase()] || item.name}
+                  {dictionary?.[item.pageId] || dictionary?.[item.name.toLowerCase()] || item.name}
                 </Link>
               ))}
               

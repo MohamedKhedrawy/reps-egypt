@@ -9,14 +9,49 @@
     "login": "دخول",
     "register": "تسجيل",
     "profile": "الملف الشخصي",
-    "logout": "خروج"
+    "logout": "خروج",
+    "gallery": "المعرض",
+    "news": "الأخبار",
+    "pricing": "الأسعار",
+    "member-benefits": "المزايا",
+    "standards": "المعايير"
+  },
+  "coach_profile": {
+    "reps_id": "رقم التسجيل",
+    "certified_coach": "مدرب معتمد",
+    "default_location": "مصر",
+    "about_title": "عن المدرب",
+    "label_specialization": "التخصص",
+    "label_experience": "الخبرة",
+    "label_years": "سنوات",
+    "label_social": "حسابات التواصل",
+    "no_social": "لا يوجد",
+    "bio_title": "السيرة الذاتية",
+    "no_bio": "لم يتم إضافة سيرة ذاتية.",
+    "form": {
+        "title": "أرسل رسالة إلى",
+        "email_note": "سيتم مشاركة بريدك الإلكتروني مع المدرب ليتمكن من الرد عليك مباشرة.",
+        "placeholder": "مرحباً، أنا مهتم ببرامج التدريب الخاصة بك...",
+        "send_btn": "إرسال الرسالة",
+        "sending": "جاري الإرسال...",
+        "success": "تم إرسال الرسالة بنجاح!",
+        "error_login": "يرجى تسجيل الدخول لإرسال رسالة.",
+        "error_long": "الرسالة طويلة جداً (الحد الأقصى 2000 حرف)"
+    }
   },
   "footer": {
     "about": "عن ريبس مصر",
     "about_desc": "تمكين محترفي اللياقة البدنية من خلال التعليم والشهادات العالمية.",
     "links": "روابط سريعة",
+    "legal": "صفحات قانونية",
     "contact": "تواصل معنا",
-    "rights": "جميع الحقوق محفوظة."
+    "rights": "جميع الحقوق محفوظة.",
+    "faq": "الأسئلة الشائعة",
+    "partners": "الشركاء",
+    "jobs": "وظائف",
+    "code-of-ethics": "ميثاق الأخلاقيات",
+    "privacy-policy": "سياسة الخصوصية",
+    "terms-of-service": "شروط الخدمة"
   },
   "home": {
     "hero_badge": "أفضل شهادة للياقة البدنية في مصر",
@@ -30,6 +65,7 @@
     "stats_trainees": "متدرب نشط",
     "stats_programs": "تخصصات",
     "stats_excellence": "سنوات من التميز",
+    "stats_years": "سنوات",
     "section_trainers_badge": "مواهب عالمية",
     "section_trainers_title": "قابل نخبة المدربين",
     "section_trainers_view_all": "عرض كل المدربين",
@@ -48,8 +84,15 @@
     "footer_cta_subtitle": "انضم إلى الآلاف من المحترفين المعتمدين الذين يثقون في ريبس مصر لتطوير مسيرتهم المهنية.",
     "footer_cta_apply": "تقدم للحصول على الشهادة",
     "footer_cta_contact": "تواصل معنا",
-    "card_view_profile": "عرض الملف الشخصي"
+    "card_view_profile": "عرض الملف الشخصي",
+    "no_coaches_msg": "لا يوجد مدربين مميزين حالياً. كن أول من ينضم!",
+    "register_now": "سجل الآن",
+    "certified": "معتمد",
+    "reps_certified": "معتمد من ريبس",
+    "meta_title": "الرئيسية | ريبس مصر",
+    "meta_description": "مرحباً بكم في ريبس مصر - منظمة شهادات اللياقة البدنية الأولى في مصر."
   },
+
   "common": {
     "loading": "جاري التحميل...",
     "error": "حدث خطأ ما",
@@ -286,5 +329,433 @@
       { "id": 4, "title": "مدرب كروس فيت", "company": "إيجنايت مصر", "location": "الشيخ زايد", "type": "عقد", "type_key": "contract", "salary": "لكل حصة", "posted": "منذ أسبوع", "featured": false, "logo": "https://ui-avatars.com/api/?name=IE&background=ef4444&color=fff" },
       { "id": 5, "title": "مندوب مبيعات", "company": "باور جيم للمعدات", "location": "مدينة نصر", "type": "دوام كامل", "type_key": "full_time", "salary": "8,000 + عمولة", "posted": "منذ 3 أيام", "featured": false, "logo": "https://ui-avatars.com/api/?name=PG&background=1f2937&color=fff" }
     ]
+  },
+  "login_page": {
+    "title": "أهلاً بعودتك",
+    "subtitle": "سجل الدخول للوصول إلى لوحة التحكم الخاصة بك",
+    "email_label": "البريد الإلكتروني",
+    "email_placeholder": "you@example.com",
+    "password_label": "كلمة المرور",
+    "password_placeholder": "••••••••",
+    "forgot_password": "نسيت كلمة المرور؟",
+    "remember_me": "تذكرني لمدة 30 يومًا",
+    "btn_submit": "تسجيل الدخول",
+    "btn_submitting": "جاري تسجيل الدخول...",
+    "no_account": "ليس لديك حساب؟",
+    "register_now": "سجل الآن",
+    "errors": {
+      "email_required": "البريد الإلكتروني مطلوب",
+      "email_invalid": "صيغة البريد الإلكتروني غير صالحة",
+      "password_required": "كلمة المرور مطلوبة",
+      "credentials_invalid": "بيانات الاعتماد غير صالحة. يرجى المحاولة مرة أخرى."
+    }
+  },
+  "register_page": {
+    "title": "إنشاء حسابك",
+    "subtitle": "انضم إلى ريبس مصر وابدأ رحلة اللياقة البدنية الخاصة بك اليوم. اختر نوع الحساب الذي يناسبك.",
+    "trainee_title": "متدرب",
+    "trainee_desc": "انضم للعثور على مدربين معتمدين والوصول إلى البرامج ومتابعة رحلة لياقتك البدنية.",
+    "trainee_features": ["تصفح المدربين المعتمدين", "الالتحاق بالبرامج", "تتبع التقدم", "الوصول للموارد"],
+    "trainer_title": "مدرب",
+    "trainer_desc": "احصل على الاعتماد وتواصل مع العملاء ونمِّ عملك في تدريب اللياقة البدنية.",
+    "trainer_features": ["احصل على الاعتماد", "قم ببناء ملفك الشخصي", "تواصل مع العملاء", "أدوات التدريب"],
+    "have_account": "لديك حساب بالفعل؟",
+    "sign_in": "تسجيل الدخول"
+  },
+  "admin": {
+    "header_title": "لوحة المعلومات",
+    "header_subtitle": "إدارة المستخدمين والموافقات والمحتوى",
+    "refresh": "تحديث",
+    "stats": {
+      "total_users": "إجمالي المستخدمين",
+      "active_trainers": "المدربين النشطين",
+      "pending_approvals": "الموافقات المعلقة",
+      "news_articles": "المقالات الإخبارية",
+      "action_needed": "إجراء مطلوب"
+    },
+    "tabs": {
+      "overview": "نظرة عامة",
+      "approvals": "الموافقات",
+      "users": "المستخدمين",
+      "news": "الأخبار",
+      "pages": "الصفحات",
+      "analytics": "التحليلات"
+    },
+    "overview": {
+      "recent_pending": "الموافقات المعلقة مؤخرًا",
+      "no_pending": "لا توجد موافقات معلقة",
+      "approve": "قبول",
+      "reject": "رفض",
+      "quick_actions": "إجراءات سريعة",
+      "review_approvals": "مراجعة الموافقات",
+      "manage_users": "إدارة المستخدمين",
+      "manage_news": "إدارة الأخبار",
+      "refresh_data": "تحديث البيانات"
+    },
+    "users": {
+        "title": "المستخدمين",
+        "all_users": "كل المستخدمين",
+        "pending": "معلق",
+        "search_placeholder": "بحث عن مستخدم...",
+        "table": {
+            "name": "الاسم",
+            "email": "البريد الإلكتروني",
+            "role": "الدور",
+            "status": "الحالة",
+            "actions": "الإجراءات"
+        },
+        "roles": {
+            "trainee": "متدرب",
+            "trainer": "مدرب",
+            "admin": "مسؤول"
+        },
+        "status": {
+            "pending": "معلق",
+            "approved": "مقبول",
+            "rejected": "مرفوض"
+        },
+        "actions": {
+            "approve": "قبول",
+            "reject": "رفض",
+            "edit": "تعديل",
+            "delete": "حذف"
+        }
+    },
+    "analytics": {
+        "title": "تحليلات المنصة",
+        "subtitle": "رؤى وقياسات فورية لأداء منصتك",
+        "user_growth": "نمو المستخدمين (آخر 6 أشهر)",
+        "this_month": "هذا الشهر",
+        "approval_rate": "معدل القبول",
+        "approved": "مقبول",
+        "rejected": "مرفوض",
+        "pending": "معلق",
+        "content_overview": "نظرة عامة على المحتوى",
+        "recent_registrations": "التسجيلات الحديثة",
+        "no_recent": "لا توجد تسجيلات حديثة",
+        "labels": {
+            "news_articles": "مقالات إخبارية",
+            "published": "منشور",
+            "drafts": "مسودات",
+            "trainers": "مدربين",
+            "trainees": "متدربين"
+        }
+    },
+    "news": {
+      "title": "مقالات الأخبار",
+      "add_article": "إضافة مقال",
+      "published": "منشور",
+      "draft": "مسودة",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "modal": {
+        "new_title": "مقال جديد",
+        "edit_title": "تعديل المقال",
+        "title_label": "العنوان",
+        "category_label": "الفئة",
+        "desc_label": "الوصف",
+        "image_label": "الصورة",
+        "upload_btn": "رفع صورة",
+        "uploading": "جاري الرفع...",
+        "publish_immediate": "نشر فوراً",
+        "cancel": "إلغاء",
+        "create": "إنشاء",
+        "update": "تحديث",
+        "categories": {
+            "Announcement": "إعلان",
+            "Article": "مقال",
+            "Community": "مجتمع",
+            "Events": "فعاليات",
+            "Partnership": "شراكة",
+            "Trends": "اتجاهات"
+        }
+      }
+    },
+    "pages": {
+      "title": "التحكم في الصفحات",
+      "subtitle": "إظهار أو إخفاء الصفحات من القائمة.",
+      "main_nav": "القائمة الرئيسية",
+      "footer_nav": "روابط التذييل",
+      "legal_nav": "صفحات قانونية",
+      "note_title": "ملاحظة حول الصفحات المخفية",
+      "note_desc": "الصفحات المخفية تُزال فقط من القوائم ولكن يمكن الوصول إليها عبر الرابط المباشر."
+    }
+  },
+  "survey_page": {
+    "title": "استطلاع رأي الأعضاء",
+    "subtitle": "ساعدنا في تحسين تجربتك من خلال الإجابة على بعض الأسئلة السريعة.",
+    "q1_label": "ما مدى رضاك عن خدماتنا الحالية؟",
+    "q1_options": ["راضٍ جدًا", "راضٍ", "محايد", "غير راضٍ", "غير راضٍ جدًا"],
+    "q2_label": "ما المجالات التي تود أن نحسّنها؟ (اختر كل ما ينطبق)",
+    "q2_options": ["أداء المنصة", "دعم العملاء", "موارد التدريب", "فعاليات التواصل", "فرص العمل", "تجربة الهاتف المحمول"],
+    "q3_label": "هل لديك أي تعليقات أو اقتراحات إضافية؟",
+    "q3_placeholder": "أخبرنا بما يدور في ذهنك...",
+    "btn_submit": "إرسال الملاحظات",
+    "btn_back": "← العودة للصفحة الرئيسية"
+  },
+  "register_trainee_page": {
+    "step1_title": "تسجيل المتدرب",
+    "step1_subtitle": "ابدأ رحلة اللياقة البدنية مع ريبس",
+    "step2_title": "المعلومات الشخصية",
+    "step2_subtitle": "أخبرنا المزيد عنك",
+    "step_labels": ["الحساب", "الشخصية"],
+    "profile_picture": "صورة الملف الشخصي",
+    "first_name": "الاسم الأول",
+    "last_name": "اسم العائلة",
+    "email": "البريد الإلكتروني",
+    "confirm_email": "تأكيد البريد الإلكتروني",
+    "phone": "الهاتف",
+    "password": "كلمة المرور",
+    "confirm_password": "تأكيد كلمة المرور",
+    "birth_date": "تاريخ الميلاد",
+    "age": "العمر",
+    "age_auto": "محسوب تلقائيًا",
+    "social_media": "وسائل التواصل الاجتماعي",
+    "optional": "(اختياري)",
+    "terms_agree": "أوافق على",
+    "terms_link": "الشروط والأحكام",
+    "btn_back": "رجوع",
+    "btn_next": "الخطوة التالية",
+    "btn_submit": "إكمال التسجيل",
+    "btn_submitting": "جاري التسجيل...",
+    "btn_upload": "رفع",
+    "btn_change": "تغيير",
+    "have_account": "لديك حساب بالفعل؟",
+    "sign_in": "تسجيل الدخول",
+    "terms_modal_title": "الشروط والأحكام",
+    "terms_modal_items": [
+      "أُقر بموافقتي على جمع ومعالجة بياناتي الشخصية.",
+      "أُقر بانضمامي إلى جمعية ريبس مصر.",
+      "أوافق على تلقي المعلومات من ريبس مصر."
+    ],
+    "terms_modal_accept": "أوافق",
+    "errors": {
+      "first_name_required": "الاسم الأول مطلوب",
+      "first_name_min": "حرفان على الأقل",
+      "first_name_max": "الحد الأقصى 50 حرفًا",
+      "first_name_letters": "أحرف فقط",
+      "last_name_required": "اسم العائلة مطلوب",
+      "email_required": "البريد الإلكتروني مطلوب",
+      "email_invalid": "صيغة البريد الإلكتروني غير صالحة",
+      "email_exists": "البريد الإلكتروني مسجل بالفعل",
+      "email_mismatch": "البريد الإلكتروني غير متطابق",
+      "phone_required": "الهاتف مطلوب",
+      "phone_invalid": "رقم هاتف مصري غير صالح (01xxxxxxxxx)",
+      "password_required": "كلمة المرور مطلوبة",
+      "password_min": "8 أحرف على الأقل",
+      "password_uppercase": "يلزم حرف كبير",
+      "password_lowercase": "يلزم حرف صغير",
+      "password_number": "يلزم رقم",
+      "password_mismatch": "كلمات المرور غير متطابقة",
+      "birth_date_required": "تاريخ الميلاد مطلوب",
+      "age_min": "يجب أن يكون العمر 13+",
+      "age_max": "عمر غير صالح",
+      "terms_required": "يجب الموافقة على الشروط",
+      "network_error": "خطأ في الشبكة. يرجى المحاولة مرة أخرى."
+    }
+  },
+  "register_trainer_page": {
+    "step1_title": "طلب انضمام مدرب",
+    "step1_subtitle": "انضم إلى شبكة النخبة من محترفي اللياقة البدنية",
+    "step2_title": "المعلومات الشخصية",
+    "step2_subtitle": "أخبرنا المزيد عنك",
+    "step3_title": "المعلومات المهنية",
+    "step3_subtitle": "الخطوة الأخيرة لإكمال التسجيل",
+    "step_labels": ["الدور", "التواصل", "الشخصية", "المهنية"],
+    "specialization": "التخصص",
+    "specialization_placeholder": "اختر المجال الأساسي",
+    "specialization_options": ["مدرب شخصي", "مدرب جيم", "مدرب لياقة جماعية", "مدرب يوجا", "مدرب بيلاتس", "مدرب لياقة مائية", "مدرب لياقة أطفال", "أخصائي تمرين متقدم"],
+    "upload_certs": "رفع الشهادات",
+    "upload_drop": "اسحب الملفات أو",
+    "upload_browse": "تصفح"
+  },
+  "profile_page": {
+    "loading": "جاري التحميل...",
+    "edit_profile": "تعديل الملف الشخصي",
+    "cancel_editing": "إلغاء التعديل",
+    "verification_pending": "بانتظار التحقق",
+    "fitness_enthusiast": "عاشق اللياقة البدنية",
+    "impact_stats": "إحصائيات التأثير",
+    "courses": "الدورات",
+    "students": "الطلاب",
+    "member_since": "عضو منذ",
+    "connect": "تواصل",
+    "no_social": "لم تتم إضافة روابط اجتماعية.",
+    "contact_info": "معلومات الاتصال",
+    "reps_id": "معرف ريبس",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "birth_date": "تاريخ الميلاد",
+    "specialization": "التخصص",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "settings": "الإعدادات",
+      "certificates": "الشهادات",
+      "membership": "العضوية"
+    },
+    "about_me": "نبذة عني",
+    "no_bio": "لم تتم إضافة نبذة بعد. انقر على 'تعديل الملف الشخصي' لإضافة قصتك.",
+    "edit_details": "تعديل التفاصيل",
+    "saving": "جاري الحفظ...",
+    "full_name": "الاسم الكامل",
+    "location": "الموقع",
+    "location_placeholder": "مثال: القاهرة، مصر",
+    "specialization_select": "اختر...",
+    "bio": "نبذة",
+    "bio_placeholder": "أخبرنا عن نفسك...",
+    "social_media": "وسائل التواصل الاجتماعي",
+    "btn_save": "حفظ التغييرات",
+    "btn_cancel": "إلغاء",
+    "current_plan": "الخطة الحالية",
+    "pro_member": "عضو محترف",
+    "student": "طالب",
+    "active": "نشط",
+    "pro_desc": "لديك وصول كامل لجميع الميزات المهنية بما في ذلك التأمين ولوحة الوظائف.",
+    "student_desc": "قم بالترقية إلى العضوية المهنية لفتح الشهادات والتأمين والمزيد.",
+    "manage_subscription": "إدارة الاشتراك",
+    "upgrade_plan": "ترقية الخطة",
+    "profile_status": "حالة الملف",
+    "public": "عام",
+    "insurance": "التأمين",
+    "job_board": "لوحة الوظائف",
+    "unlimited": "غير محدود",
+    "locked": "مقفل",
+    "inactive": "غير نشط",
+    "next_billing": "الفاتورة التالية",
+    "my_certificates": "شهاداتي",
+    "manage_qualifications": "إدارة مؤهلاتك واعتماداتك.",
+    "add_new": "+ إضافة جديد",
+    "verified": "موثق"
+  },
+  "checkout_page": {
+    "title": "الدفع الآمن",
+    "subtitle": "اختر طريقة الدفع المفضلة لديك.",
+    "methods": {
+      "card": "بطاقة ائتمان / خصم",
+      "wallet": "المحفظة الإلكترونية",
+      "fawry": "فوري باي",
+      "valu": "أقساط ڤاليو"
+    },
+    "processing": "جاري معالجة الدفع...",
+    "card_name": "الاسم على البطاقة",
+    "card_number": "رقم البطاقة",
+    "expiry": "تاريخ الانتهاء",
+    "cvc": "CVC",
+    "wallet_info": "ندعم فودافون كاش، أورانج كاش، اتصالات كاش، و WE Pay.",
+    "wallet_number": "رقم المحفظة",
+    "fawry_title": "ادفع في أي منفذ فوري",
+    "fawry_desc": "انقر أدناه للحصول على رقم مرجعي. لديك 24 ساعة لإكمال الدفع في أي نقطة فوري.",
+    "valu_phone": "رقم هاتف ڤاليو",
+    "valu_plan": "اختر خطة التقسيط",
+    "valu_months": "أشهر",
+    "valu_interest": "0% فائدة",
+    "btn_get_code": "الحصول على الرمز المرجعي",
+    "btn_verify": "التحقق من الحساب",
+    "btn_pay": "ادفع",
+    "order_summary": "ملخص الطلب",
+    "membership": "العضوية",
+    "billed": "تُفوتر",
+    "subtotal": "المجموع الفرعي",
+    "tax": "الضريبة (14%)",
+    "total": "الإجمالي",
+    "secure_payment": "دفع آمن بواسطة",
+    "fawry_success_title": "ادفع عبر فوري",
+    "fawry_success_desc": "استخدم الرقم المرجعي أدناه للدفع في أي كشك فوري.",
+    "reference_number": "الرقم المرجعي",
+    "expires_in": "ينتهي في",
+    "return_profile": "العودة للملف الشخصي"
+  },
+  "coaches_page": {
+    "title_prefix": "ابحث عن",
+    "title_highlight": "المدرب المثالي",
+    "subtitle": "تصفح دليلنا من المحترفين المعتمدين النخبة. فلتر حسب التخصص والخبرة والشهادات للعثور على الخيار الأمثل لأهدافك.",
+    "search_placeholder": "البحث بالاسم...",
+    "filter_specialty": "جميع التخصصات",
+    "filter_specialty_options": ["القوة", "اليوجا", "التغذية"],
+    "filter_experience": "مستوى الخبرة",
+    "filter_experience_options": ["1-3 سنوات", "3-5 سنوات", "5+ سنوات"],
+    "btn_search": "بحث",
+    "no_coaches_title": "لم يتم العثور على مدربين",
+    "no_coaches_desc": "كن أول من ينضم إلى فريقنا النخبوي من المدربين!",
+    "available": "متاح",
+    "certified_coach": "مدرب معتمد",
+    "view_profile": "عرض الملف الشخصي",
+    "load_more": "تحميل المزيد من المدربين"
+  },
+  "programs_page": {
+    "title_prefix": "تخصصات",
+    "title_highlight": "اللياقة البدنية",
+    "subtitle": "تعليم لياقة بدنية عالمي المستوى مصمم للسوق المصري. اختر مسارك واحصل على الاعتماد.",
+    "search_placeholder": "البحث في التخصصات...",
+    "filter_category": "جميع الفئات",
+    "filter_category_options": ["شهادة", "ورشة عمل", "دبلوم"],
+    "filter_price": "نطاق السعر",
+    "filter_price_options": ["أقل من $100", "$100 - $500", "$500+"],
+    "btn_filter": "فلتر",
+    "reps_certified": "معتمد من ريبس",
+    "btn_enroll": "سجل الآن",
+    "newsletter_title": "لا تفوت أي جديد",
+    "newsletter_desc": "اشترك في نشرتنا الإخبارية لتلقي التحديثات حول البرامج الجديدة وورش العمل والخصومات الحصرية للحجز المبكر.",
+    "email_placeholder": "البريد الإلكتروني",
+    "btn_join": "انضم الآن"
+  },
+  "program_content": {
+    "categories": {
+      "Certification": "شهادة",
+      "Workshop": "ورشة عمل",
+      "Diploma": "دبلوم"
+    },
+    "programs": {
+      "Advanced Hypertrophy": {
+        "title": "التضخم العضلي المتقدم",
+        "desc": "أتقن علم نمو العضلات من خلال شهادتنا الشاملة من المستوى الثالث."
+      },
+      "Calisthenics Basics": {
+        "title": "أساسيات الكاليسثنيكس",
+        "desc": "تعلم التحكم بوزن جسمك وبناء قوة وظيفية من الصفر."
+      },
+      "Personal Trainer L4": {
+        "title": "مدرب شخصي المستوى 4",
+        "desc": "المعيار الذهبي للمدربين الشخصيين الطموحين. احصل على اعتماد دولي."
+      },
+      "Sports Nutritionist": {
+        "title": "أخصائي تغذية رياضية",
+        "desc": "تعمق في التغذية الرياضية واستراتيجيات المكملات للرياضيين المحترفين."
+      },
+      "Powerlifting Coach": {
+        "title": "مدرب رفع الأثقال",
+        "desc": "أتقن الحركات الثلاث الكبرى. تعلم التقنية والبرمجة والتحضير للمنافسات."
+      },
+      "Master Yoga Flow": {
+        "title": "إتقان تدفق اليوغا",
+        "desc": "منهج معتمد 200 ساعة يركز على الانتقالات وتقنيات التنفس."
+      }
+    }
+  },
+  "news_page": {
+    "title_prefix": "آخر",
+    "title_highlight": "الأخبار",
+    "subtitle": "رؤى وتحديثات وقصص من قلب مجتمع اللياقة البدنية في مصر.",
+    "min_read": "دقيقة قراءة",
+    "read_article": "اقرأ المقال",
+    "newsletter_title": "اشترك في نشرتنا الإخبارية",
+    "newsletter_desc": "احصل على آخر الأخبار ومقالات اللياقة المتخصصة مباشرة إلى بريدك الإلكتروني كل أسبوع.",
+    "email_placeholder": "البريد الإلكتروني",
+    "btn_subscribe": "اشترك"
+  },
+  "blogs_page": {
+    "title": "مدونتنا",
+    "subtitle": "رؤى وقصص وتحديثات من فريقنا",
+    "read_article": "اقرأ المقال",
+    "load_more": "تحميل المزيد من المقالات",
+    "back_home": "← العودة للرئيسية"
+  },
+  "gallery_page": {
+    "title_prefix": "معرض",
+    "title_highlight": "الصور",
+    "subtitle": "شاهد أبطالنا في العمل. أبرز اللحظات من برامج الاعتماد وورش العمل وفعاليات المجتمع في جميع أنحاء مصر.",
+    "filter_tags": ["الكل", "الشهادات", "ورش العمل", "الفعاليات", "المجتمع"],
+    "event": "فعالية",
+    "load_more": "تحميل المزيد من الصور"
   }
 }

@@ -3,10 +3,15 @@ import { getUsersPaginated, getUserStats } from "@/lib/user";
 import { getFeaturedPrograms, getProgramsCount } from "@/lib/programs";
 import { getDictionary } from "@/lib/get-dictionary";
 
-export const metadata = {
-  title: "Home",
-  description: "Welcome to Reps Egypt - Your premier digital solutions platform for innovative technology and seamless user experiences.",
-};
+export async function generateMetadata({ params }) {
+  const { lang } = await params;
+  const dictionary = await getDictionary(lang);
+
+  return {
+    title: dictionary.home.meta_title,
+    description: dictionary.home.meta_description,
+  };
+}
 
 // Inline Icons for Portability
 const ArrowRight = () => (
@@ -116,7 +121,7 @@ export default async function LandingPage({ params }) {
               { number: `${stats.activeTrainers}+`, label: home.stats_coaches },
               { number: `${stats.activeTrainees}+`, label: home.stats_trainees },
               { number: `${programsCount}+`, label: home.stats_programs },
-              { number: "10 Years", label: home.stats_excellence },
+              { number: `10 ${home.stats_years}`, label: home.stats_excellence },
             ].map((stat, idx) => (
               <div key={idx} className="flex flex-col items-center">
                 <span className="text-3xl lg:text-4xl font-bold text-foreground mb-1 tracking-tight">{stat.number}</span>
@@ -155,13 +160,13 @@ export default async function LandingPage({ params }) {
 
               {/* Tag */}
               <div className="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">
-                {trainer.repsId ? `REPS #${trainer.repsId}` : 'Certified'}
+                {trainer.repsId ? `REPS #${trainer.repsId}` : home.certified}
               </div>
 
               {/* Content */}
               <div className="absolute bottom-0 w-full p-4">
                 <h3 className="text-lg font-bold text-white mb-1 group-hover:text-red-500 transition-colors">{trainer.fullName}</h3>
-                <p className="text-sm text-gray-300 mb-4">{trainer.specialization || "Certified Coach"}</p>
+                <p className="text-sm text-gray-300 mb-4">{trainer.specialization || home.certified}</p>
                 
                 <Link 
                   href={`/${lang}/coaches/${trainer._id.toString()}`}
@@ -173,8 +178,8 @@ export default async function LandingPage({ params }) {
             </div>
           )) : (
             <div className="col-span-full text-center py-10 text-muted">
-              <p>No featured coaches at the moment. Be the first to join!</p>
-              <Link href={`/${lang}/register`} className="text-red-600 hover:underline mt-2 inline-block">Register Now</Link>
+              <p>{home.no_coaches_msg}</p>
+              <Link href={`/${lang}/register`} className="text-red-600 hover:underline mt-2 inline-block">{home.register_now}</Link>
             </div>
           )}
         </div>
@@ -194,32 +199,40 @@ export default async function LandingPage({ params }) {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {featuredPrograms.map((program, idx) => (
+            {featuredPrograms.map((program, idx) => {
+              // Translation lookup
+              const translatedProgram = dictionary.program_content?.programs?.[program.title] || {};
+              const title = translatedProgram.title || program.title;
+              const desc = translatedProgram.desc || program.desc;
+              const category = dictionary.program_content?.categories?.[program.category] || program.category;
+
+              return (
               <div key={idx} className="group bg-background border border-border rounded-2xl overflow-hidden hover:border-red-600/30 hover:shadow-2xl hover:shadow-red-900/10 transition-all duration-300">
                 {/* Image Area */}
                 <div className="h-48 overflow-hidden relative">
                    <div className="absolute top-4 left-4 z-10 bg-red-600 text-[10px] font-bold px-2 py-1 rounded uppercase">
-                     {program.category}
+                     {category}
                    </div>
                    <img src={program.img} alt={program.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                 </div>
                 
                 {/* Content Area */}
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-foreground mb-2">{program.title}</h3>
-                  <p className="text-sm text-muted mb-6 line-clamp-2">{program.desc}</p>
+                  <h3 className="text-xl font-bold text-foreground mb-2">{title}</h3>
+                  <p className="text-sm text-muted mb-6 line-clamp-2">{desc}</p>
                   
                   <div className="flex items-center justify-between pt-4 border-t border-border">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-gray-700 overflow-hidden">
                         <img src={`https://i.pravatar.cc/100?u=${program.instructor}`} alt="" />
                       </div>
-                      <span className="text-xs font-medium text-muted">REPS Certified</span>
+                      <span className="text-xs font-medium text-muted">{home.reps_certified}</span>
                     </div>
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

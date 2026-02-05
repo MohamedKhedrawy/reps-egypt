@@ -1,11 +1,21 @@
 import Link from "next/link";
+import { getDictionary } from '@/lib/get-dictionary';
 
-export const metadata = {
-  title: "Gallery | Reps Egypt",
-  description: "A glimpse into our training sessions, events, and community.",
-};
+export async function generateMetadata({ params }) {
+    const { lang } = await params;
+    const dictionary = await getDictionary(lang);
 
-export default function GalleryPage() {
+    return {
+        title: `${dictionary.gallery_page.title_prefix} ${dictionary.gallery_page.title_highlight} | Reps Egypt`,
+        description: dictionary.gallery_page.subtitle,
+    };
+}
+
+export default async function GalleryPage({ params }) {
+  const { lang } = await params;
+  const dictionary = await getDictionary(lang);
+  const content = dictionary.gallery_page;
+
   const media = [
     { type: "image", src: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop", caption: "Advanced Strength Workshop" },
     { type: "image", src: "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=1469&auto=format&fit=crop", caption: "Calisthenics Certification" },
@@ -21,12 +31,12 @@ export default function GalleryPage() {
       {/* Search Header */}
        <section className="pt-32 pb-12 px-6 border-b border-border">
         <div className="max-w-7xl mx-auto text-center">
-           <h1 className="text-4xl lg:text-5xl font-bold mb-6">Our <span className="text-red-600">Gallery</span></h1>
-           <p className="text-muted max-w-2xl mx-auto text-lg mb-10">See our champions in action. Highlights from our certification programs, workshops, and community events across Egypt.</p>
+           <h1 className="text-4xl lg:text-5xl font-bold mb-6">{content.title_prefix} <span className="text-red-600">{content.title_highlight}</span></h1>
+           <p className="text-muted max-w-2xl mx-auto text-lg mb-10">{content.subtitle}</p>
            
            {/* Filters */}
             <div className="flex justify-center flex-wrap gap-4">
-               {['All', 'Certifications', 'Workshops', 'Events', 'Community'].map((tag, i) => (
+               {content.filter_tags.map((tag, i) => (
                  <button key={i} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${i === 0 ? 'bg-red-600 text-white shadow-[0_0_20px_rgba(220,38,38,0.4)]' : 'bg-tertiary text-muted hover:bg-background border border-transparent hover:border-border hover:text-foreground'}`}>
                    {tag}
                  </button>
@@ -45,7 +55,7 @@ export default function GalleryPage() {
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
                    <div>
-                     <span className="text-red-500 text-xs font-bold uppercase tracking-wider mb-2 block">Event</span>
+                     <span className="text-red-500 text-xs font-bold uppercase tracking-wider mb-2 block">{content.event}</span>
                      <h3 className="text-xl font-bold text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-300">{item.caption}</h3>
                    </div>
                 </div>
@@ -56,7 +66,7 @@ export default function GalleryPage() {
         {/* Load More */}
          <div className="mt-16 text-center">
             <button className="px-8 py-3.5 border border-border rounded-xl text-sm font-bold text-muted hover:text-foreground hover:border-border-border transition-colors">
-             Load More Photos
+             {content.load_more}
            </button>
         </div>
       </section>

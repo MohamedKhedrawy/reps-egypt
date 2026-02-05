@@ -1,24 +1,30 @@
-export const metadata = {
-    title: 'Survey',
-    description: 'Participate in our surveys to help us improve our services and better understand your needs.',
-    openGraph: {
-        title: 'Survey | Reps Egypt',
-        description: 'Participate in our surveys to help us improve our services and better understand your needs.',
-        type: 'website',
-    },
-};
+import Link from "next/link";
+import { getDictionary } from '@/lib/get-dictionary';
 
-export default function SurveyPage() {
+export async function generateMetadata({ params }) {
+    const { lang } = await params;
+    const dictionary = await getDictionary(lang);
+
+    return {
+        title: dictionary.survey_page.title + ' | Reps Egypt',
+        description: dictionary.survey_page.subtitle,
+    };
+}
+
+export default async function SurveyPage({ params }) {
+    const { lang } = await params;
+    const dictionary = await getDictionary(lang);
+
     return (
         <main className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
             <div className="max-w-3xl mx-auto px-6 py-20">
                 <header className="text-center mb-12">
                     <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-6">
-                        Member Feedback Survey
+                        {dictionary.survey_page.title}
                     </h1>
                     <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto rounded-full" />
                     <p className="mt-4 text-gray-300 text-lg">
-                        Help us improve your experience by answering a few quick questions.
+                        {dictionary.survey_page.subtitle}
                     </p>
                 </header>
 
@@ -27,10 +33,10 @@ export default function SurveyPage() {
                         
                         <div>
                             <label className="block text-lg font-medium text-white mb-4">
-                                How satisfied are you with our current services?
+                                {dictionary.survey_page.q1_label}
                             </label>
                             <div className="space-y-3">
-                                {['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied'].map((option) => (
+                                {dictionary.survey_page.q1_options.map((option) => (
                                     <label key={option} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-colors">
                                         <input type="radio" name="satisfaction" className="w-5 h-5 text-purple-600 focus:ring-purple-500 bg-white/10 border-white/20" />
                                         <span className="text-gray-300">{option}</span>
@@ -43,10 +49,10 @@ export default function SurveyPage() {
 
                         <div>
                             <label className="block text-lg font-medium text-white mb-4">
-                                Which areas would you like to see us improve? (Select all that apply)
+                                {dictionary.survey_page.q2_label}
                             </label>
                             <div className="grid md:grid-cols-2 gap-3">
-                                {['Platform Performance', 'Customer Support', 'Training Resources', 'Networking Events', 'Job Opportunities', 'Mobile Experience'].map((option) => (
+                                {dictionary.survey_page.q2_options.map((option) => (
                                     <label key={option} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-colors">
                                         <input type="checkbox" className="w-5 h-5 text-purple-600 rounded focus:ring-purple-500 bg-white/10 border-white/20" />
                                         <span className="text-gray-300">{option}</span>
@@ -59,13 +65,13 @@ export default function SurveyPage() {
 
                         <div>
                             <label htmlFor="feedback" className="block text-lg font-medium text-white mb-4">
-                                Any additional comments or suggestions?
+                                {dictionary.survey_page.q3_label}
                             </label>
                             <textarea
                                 id="feedback"
                                 rows="4"
                                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all resize-none"
-                                placeholder="Tell us what's on your mind..."
+                                placeholder={dictionary.survey_page.q3_placeholder}
                             ></textarea>
                         </div>
 
@@ -74,7 +80,7 @@ export default function SurveyPage() {
                                 type="submit"
                                 className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-lg hover:from-purple-500 hover:to-pink-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25 transform hover:-translate-y-0.5"
                             >
-                                Submit Feedback
+                                {dictionary.survey_page.btn_submit}
                             </button>
                         </div>
 
@@ -82,12 +88,12 @@ export default function SurveyPage() {
                 </form>
 
                 <footer className="mt-16 text-center">
-                    <a
-                        href="/"
+                    <Link
+                        href={`/${lang}`}
                         className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-medium hover:from-purple-500 hover:to-pink-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25"
                     >
-                        ← Back to Home
-                    </a>
+                        {dictionary.survey_page.btn_back}
+                    </Link>
                 </footer>
             </div>
         </main>

@@ -1,12 +1,15 @@
-export const metadata = {
-    title: 'Blogs',
-    description: 'Insights, updates, and articles from the Reps Egypt team and community.',
-    openGraph: {
-        title: 'Blogs | Reps Egypt',
-        description: 'Insights, updates, and articles from the Reps Egypt team and community.',
-        type: 'website',
-    },
-};
+import Link from "next/link";
+import { getDictionary } from '@/lib/get-dictionary';
+
+export async function generateMetadata({ params }) {
+    const { lang } = await params;
+    const dictionary = await getDictionary(lang);
+
+    return {
+        title: dictionary.blogs_page.title + ' | Reps Egypt',
+        description: dictionary.blogs_page.subtitle,
+    };
+}
 
 const blogPosts = [
     {
@@ -51,16 +54,20 @@ const blogPosts = [
     }
 ];
 
-export default function BlogsPage() {
+export default async function BlogsPage({ params }) {
+    const { lang } = await params;
+    const dictionary = await getDictionary(lang);
+    const content = dictionary.blogs_page;
+
     return (
         <main className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
             <div className="max-w-7xl mx-auto px-6 py-20">
                 <header className="text-center mb-16">
                     <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-6">
-                        Our Blog
+                        {content.title}
                     </h1>
                     <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto rounded-full" />
-                    <p className="mt-4 text-gray-300 text-lg">Insights, stories, and updates from our team</p>
+                    <p className="mt-4 text-gray-300 text-lg">{content.subtitle}</p>
                 </header>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -71,7 +78,6 @@ export default function BlogsPage() {
                         >
                             <div className="h-48 overflow-hidden relative">
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent z-10" />
-                                {/* Note: In a real app, use next/image. Using div bg for simplicity here or external img tag */}
                                 <img 
                                     src={post.image} 
                                     alt={post.title}
@@ -95,7 +101,7 @@ export default function BlogsPage() {
                                     {post.excerpt}
                                 </p>
                                 <a href="#" className="inline-flex items-center gap-1 text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors">
-                                    Read Article <span>→</span>
+                                    {content.read_article} <span>→</span>
                                 </a>
                             </div>
                         </article>
@@ -104,17 +110,17 @@ export default function BlogsPage() {
 
                 <div className="mt-16 text-center">
                     <button className="px-8 py-3 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-all font-medium">
-                        Load More Articles
+                        {content.load_more}
                     </button>
                 </div>
 
                 <footer className="mt-16 text-center">
-                    <a
-                        href="/"
+                    <Link
+                        href={`/${lang}`}
                         className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-medium hover:from-purple-500 hover:to-pink-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25"
                     >
-                        ← Back to Home
-                    </a>
+                        {content.back_home}
+                    </Link>
                 </footer>
             </div>
         </main>

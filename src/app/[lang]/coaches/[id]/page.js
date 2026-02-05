@@ -1,21 +1,24 @@
 import { notFound } from "next/navigation";
 import { findUserById } from "@/lib/user";
 import MessageCoachForm from "@/components/coaches/MessageCoachForm";
+import { getDictionary } from "@/lib/get-dictionary";
 
 export async function generateMetadata({ params }) {
-    const { id } = await params;
+    const { id, lang } = await params;
     const coach = await findUserById(id);
     if (!coach) return { title: "Coach Not Found" };
     
     return {
-        title: `${coach.fullName} | REPS Egypt Coach`,
+        title: `${coach.fullName} | REPS Egypt`,
         description: coach.bio || `Connect with ${coach.fullName}, a certified coach at REPS Egypt.`,
     };
 }
 
 export default async function CoachProfilePage({ params }) {
-    const { id } = await params;
+    const { id, lang } = await params;
     const coach = await findUserById(id);
+    const dictionary = await getDictionary(lang);
+    const t = dictionary.coach_profile;
 
     if (!coach || coach.role !== 'trainer') {
         notFound();
@@ -47,11 +50,11 @@ export default async function CoachProfilePage({ params }) {
                                 <h1 className="text-3xl md:text-4xl font-bold text-white">{coach.fullName}</h1>
                                 {coach.repsId && (
                                     <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg">
-                                        REPS ID: {coach.repsId}
+                                        {t.reps_id}: {coach.repsId}
                                     </span>
                                 )}
                             </div>
-                            <p className="text-muted text-lg">{coach.specialization || "Certified Coach"} • {coach.location || "Egypt"}</p>
+                            <p className="text-muted text-lg">{coach.specialization || t.certified_coach} • {coach.location || t.default_location}</p>
                         </div>
                      </div>
                 </div>
@@ -64,23 +67,23 @@ export default async function CoachProfilePage({ params }) {
                     <div className="space-y-6">
                          <div className="bg-secondary border border-border rounded-2xl p-6">
                              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <span className="text-red-500">ℹ️</span> About
+                                <span className="text-red-500">ℹ️</span> {t.about_title}
                             </h3>
                             <div className="space-y-4">
                                 {coach.specialization && (
                                     <div>
-                                        <div className="text-xs text-muted uppercase font-bold">Specialization</div>
+                                        <div className="text-xs text-muted uppercase font-bold">{t.label_specialization}</div>
                                         <div className="font-medium">{coach.specialization}</div>
                                     </div>
                                 )}
                                 {coach.experience && (
                                     <div>
-                                        <div className="text-xs text-muted uppercase font-bold">Experience</div>
-                                        <div className="font-medium">{coach.experience} Years</div>
+                                        <div className="text-xs text-muted uppercase font-bold">{t.label_experience}</div>
+                                        <div className="font-medium">{coach.experience} {t.label_years}</div>
                                     </div>
                                 )}
                                 <div className="pt-4 border-t border-border">
-                                    <div className="text-xs text-muted uppercase font-bold mb-2">Social Profiles</div>
+                                    <div className="text-xs text-muted uppercase font-bold mb-2">{t.label_social}</div>
                                     <div className="flex gap-3">
                                         {coach.socialMedia?.instagram && (
                                             <a href={coach.socialMedia.instagram} target="_blank" className="text-pink-500 hover:text-white transition-colors">Instagram</a>
@@ -89,7 +92,7 @@ export default async function CoachProfilePage({ params }) {
                                             <a href={coach.socialMedia.facebook} target="_blank" className="text-blue-500 hover:text-white transition-colors">Facebook</a>
                                         )}
                                         {!coach.socialMedia?.instagram && !coach.socialMedia?.facebook && (
-                                            <span className="text-muted text-sm italic">None linked</span>
+                                            <span className="text-muted text-sm italic">{t.no_social}</span>
                                         )}
                                     </div>
                                 </div>
@@ -100,14 +103,18 @@ export default async function CoachProfilePage({ params }) {
                     {/* Main Content */}
                     <div className="lg:col-span-2">
                         <div className="bg-secondary border border-border rounded-2xl p-6">
-                            <h2 className="text-xl font-bold mb-4">Biography</h2>
+                            <h2 className="text-xl font-bold mb-4">{t.bio_title}</h2>
                             <p className="text-muted leading-relaxed whitespace-pre-line">
-                                {coach.bio || "No biography provided."}
+                                {coach.bio || t.no_bio}
                             </p>
                         </div>
                         
                         {/* Secure Messaging System */}
-                        <MessageCoachForm coachId={coach._id.toString()} coachName={coach.fullName} />
+                        <MessageCoachForm 
+                            coachId={coach._id.toString()} 
+                            coachName={coach.fullName} 
+                            dictionary={t.form}
+                        />
                     </div>
                 </div>
             </div>
