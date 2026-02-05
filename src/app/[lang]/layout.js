@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Providers from "@/components/Providers";
 import { Toaster } from "sonner";
+import ChatWidget from "@/app/[lang]/components/ChatWidget";
 import "../globals.css";
 import { getDictionary } from "@/lib/get-dictionary";
 import { i18n } from "@/i18n-config";
@@ -52,6 +53,7 @@ export default async function RootLayout({ children, params }) {
           <main className="min-h-screen pt-20">
             {children}
           </main>
+          <ChatWidget />
           <Footer dictionary={dictionary.footer} lang={lang} />
         </Providers>
       </body>
