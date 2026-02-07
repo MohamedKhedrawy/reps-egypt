@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
 export default function NotificationCenter({ lang, content }) {
   const [alerts, setAlerts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [previousAlertCount, setPreviousAlertCount] = useState(0);
+  const previousAlertCountRef = useRef(0);
   const pathname = usePathname();
 
   // Close modal when navigating to profile
@@ -26,25 +26,25 @@ export default function NotificationCenter({ lang, content }) {
         const userAlerts = data.user?.alerts || [];
         
         // Check if we have new alerts compared to previous count
-        if (userAlerts.length > previousAlertCount) {
+        if (userAlerts.length > previousAlertCountRef.current) {
           // New alerts arrived
           setAlerts(userAlerts);
           setShowModal(true);
-          setPreviousAlertCount(userAlerts.length);
-        } else if (userAlerts.length > 0 && previousAlertCount === 0) {
+          previousAlertCountRef.current = userAlerts.length;
+        } else if (userAlerts.length > 0 && previousAlertCountRef.current === 0) {
           // First time loading alerts
           const hasShown = sessionStorage.getItem('alertsNotificationShown');
           if (!hasShown) {
             setAlerts(userAlerts);
             setShowModal(true);
             sessionStorage.setItem('alertsNotificationShown', 'true');
-            setPreviousAlertCount(userAlerts.length);
+            previousAlertCountRef.current = userAlerts.length;
           } else {
-            setPreviousAlertCount(userAlerts.length);
+            previousAlertCountRef.current = userAlerts.length;
           }
         } else {
           // Update alert count even if modal not shown
-          setPreviousAlertCount(userAlerts.length);
+          previousAlertCountRef.current = userAlerts.length;
         }
       }
     } catch (error) {
@@ -54,17 +54,15 @@ export default function NotificationCenter({ lang, content }) {
     }
   };
 
-  // Fetch alerts on mount and set up interval
+  // Fetch alerts on mount and set up interval (runs once)
   useEffect(() => {
     fetchAlerts();
     
-    // Fetch alerts every 3 seconds to catch new ones
-    const interval = setInterval(() => {
-      fetchAlerts();
-    }, 3000);
+    // Poll every 30 seconds (reasonable for notifications)
+    const interval = setInterval(fetchAlerts, 30000);
 
     return () => clearInterval(interval);
-  }, [previousAlertCount]);
+  }, []);
 
   // Severity color mapping
   const severityColors = {

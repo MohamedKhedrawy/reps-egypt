@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
 
 const ThemeContext = createContext(null);
 
@@ -12,10 +12,12 @@ export function ThemeProvider({ children }) {
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "dark";
     setTheme(savedTheme);
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(savedTheme);
     setMounted(true);
   }, []);
 
-  // Apply theme class to document
+  // Apply theme class to document on theme change
   useEffect(() => {
     if (mounted) {
       document.documentElement.classList.remove("light", "dark");
@@ -28,18 +30,17 @@ export function ThemeProvider({ children }) {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   };
 
-  const value = {
+  // Memoize context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
     theme,
     setTheme,
     toggleTheme,
     isDark: theme === "dark",
-  };
+    mounted,
+  }), [theme, mounted]);
 
-  // Prevent flash of wrong theme
-  if (!mounted) {
-    return null;
-  }
-
+  // Don't block rendering - render children immediately with default theme
+  // The theme will update once mounted (prevents flash by applying class in first useEffect)
   return (
     <ThemeContext.Provider value={value}>
       {children}

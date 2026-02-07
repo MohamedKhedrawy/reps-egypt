@@ -105,7 +105,9 @@ export async function updateUser(id, updateData) {
  */
 export async function getUsers(filter = {}) {
     const users = await getUsersCollection();
-    return users.find(filter).toArray();
+    return users.find(filter)
+        .project({ password: 0, alerts: 0 })
+        .toArray();
 }
 
 /**

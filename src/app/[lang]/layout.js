@@ -45,7 +45,24 @@ export default async function RootLayout({ children, params }) {
   const isRTL = lang === 'ar';
 
   return (
-    <html lang={lang} dir={isRTL ? "rtl" : "ltr"} className="scroll-smooth">
+    <html lang={lang} dir={isRTL ? "rtl" : "ltr"} className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        {/* Inline script to prevent theme flash - runs before React hydrates */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme') || 'dark';
+                  document.documentElement.classList.add(theme);
+                } catch (e) {
+                  document.documentElement.classList.add('dark');
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${cairo.variable} antialiased bg-background text-foreground ${isRTL ? 'font-cairo' : 'font-sans'}`}
       >

@@ -3,8 +3,17 @@
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { usePageSettings } from "@/context/PageSettingsContext";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import dynamic from 'next/dynamic';
 import GalleryDashboard from './GalleryDashboard';
+
+// Dynamic import for recharts - only loads when Analytics tab is viewed (~8.3MB saved on initial load)
+const AreaChart = dynamic(() => import('recharts').then(mod => mod.AreaChart), { ssr: false });
+const Area = dynamic(() => import('recharts').then(mod => mod.Area), { ssr: false });
+const XAxis = dynamic(() => import('recharts').then(mod => mod.XAxis), { ssr: false });
+const YAxis = dynamic(() => import('recharts').then(mod => mod.YAxis), { ssr: false });
+const CartesianGrid = dynamic(() => import('recharts').then(mod => mod.CartesianGrid), { ssr: false });
+const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr: false });
+const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false });
 
 export default function AdminDashboard({ dictionary }) {
   const [activeTab, setActiveTab] = useState("Overview");
@@ -37,38 +46,86 @@ export default function AdminDashboard({ dictionary }) {
   const [newNoteText, setNewNoteText] = useState("");
   const fileInputRef = useRef(null);
   const { refreshPages } = usePageSettings();
+  const fetchedTabs = useRef(new Set()); // Track which tabs have been fetched
 
-  // Fetch data on mount and tab change
+  // Fetch stats on mount (always needed for header)
   useEffect(() => {
-    fetchData();
+    fetchStats();
+  }, []);
+
+  // Fetch tab-specific data when tab changes
+  useEffect(() => {
+    fetchTabData(activeTab);
   }, [activeTab]);
 
-  const fetchData = async () => {
+  const fetchStats = async () => {
+    try {
+      const res = await fetch("/api/admin/stats");
+      if (res.ok) setStats(await res.json());
+    } catch (error) {
+      console.error("Failed to fetch stats:", error);
+    }
+  };
+
+  const fetchTabData = async (tab) => {
+    // Skip if already fetched this tab's data (unless it's a refresh)
+    if (fetchedTabs.current.has(tab)) return;
+    
     setLoading(true);
     try {
-      const [statsRes, pendingRes, usersRes, newsRes, pagesRes, analyticsRes] = await Promise.all([
-        fetch("/api/admin/stats"),
-        fetch("/api/admin/pending"),
-        fetch("/api/admin/users"),
-        fetch("/api/admin/news"),
-        fetch("/api/admin/pages"),
-        fetch("/api/admin/analytics"),
-      ]);
-      
-      if (statsRes.ok) setStats(await statsRes.json());
-      if (pendingRes.ok) setPending((await pendingRes.json()).pending || []);
-      if (usersRes.ok) setUsers((await usersRes.json()).users || []);
-      if (newsRes.ok) setNews((await newsRes.json()).articles || []);
-      if (pagesRes.ok) {
-        const pagesData = await pagesRes.json();
-        setPageSettings(pagesData.grouped || { main: [], footer: [], legal: [] });
+      switch (tab) {
+        case "Overview":
+          const pendingRes = await fetch("/api/admin/pending");
+          if (pendingRes.ok) setPending((await pendingRes.json()).pending || []);
+          break;
+          
+        case "Approvals":
+          if (!fetchedTabs.current.has("Overview")) {
+            const pendingRes2 = await fetch("/api/admin/pending");
+            if (pendingRes2.ok) setPending((await pendingRes2.json()).pending || []);
+          }
+          break;
+          
+        case "Users":
+          const usersRes = await fetch("/api/admin/users");
+          if (usersRes.ok) setUsers((await usersRes.json()).users || []);
+          break;
+          
+        case "News":
+          const newsRes = await fetch("/api/admin/news");
+          if (newsRes.ok) setNews((await newsRes.json()).articles || []);
+          break;
+          
+        case "Pages":
+          const pagesRes = await fetch("/api/admin/pages");
+          if (pagesRes.ok) {
+            const pagesData = await pagesRes.json();
+            setPageSettings(pagesData.grouped || { main: [], footer: [], legal: [] });
+          }
+          break;
+          
+        case "Analytics":
+          const analyticsRes = await fetch("/api/admin/analytics");
+          if (analyticsRes.ok) setAnalytics(await analyticsRes.json());
+          break;
+          
+        case "Gallery":
+          // Gallery component handles its own data fetching
+          break;
       }
-      if (analyticsRes.ok) setAnalytics(await analyticsRes.json());
+      fetchedTabs.current.add(tab);
     } catch (error) {
       toast.error("Failed to load data");
     } finally {
       setLoading(false);
     }
+  };
+
+  // Force refresh all data (for manual refresh button)
+  const refreshAllData = async () => {
+    fetchedTabs.current.clear();
+    await fetchStats();
+    await fetchTabData(activeTab);
   };
 
   // Approve/Reject item (user or qualification) - INSTANT with optimistic update
@@ -424,7 +481,7 @@ export default function AdminDashboard({ dictionary }) {
             <h1 className="text-3xl font-bold">{dictionary?.admin?.header_title || "Admin Dashboard"}</h1>
             <p className="text-muted">{dictionary?.admin?.header_subtitle || "Manage users, approvals, and content"}</p>
           </div>
-          <button onClick={fetchData} className="px-4 py-2 bg-secondary border border-border rounded-lg text-sm hover:bg-tertiary transition-colors flex items-center gap-2">
+          <button onClick={refreshAllData} className="px-4 py-2 bg-secondary border border-border rounded-lg text-sm hover:bg-tertiary transition-colors flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
             {dictionary?.admin?.refresh || "Refresh"}
           </button>
@@ -512,7 +569,7 @@ export default function AdminDashboard({ dictionary }) {
                       <span className="text-2xl mb-2 block">📝</span>
                       <span className="font-bold">{dictionary?.admin?.overview?.manage_news || "Manage News"}</span>
                     </button>
-                    <button onClick={fetchData} className="p-4 bg-tertiary rounded-xl text-left hover:bg-background transition-colors">
+                    <button onClick={refreshAllData} className="p-4 bg-tertiary rounded-xl text-left hover:bg-background transition-colors">
                       <span className="text-2xl mb-2 block">🔄</span>
                       <span className="font-bold">{dictionary?.admin?.overview?.refresh_data || "Refresh Data"}</span>
                     </button>

@@ -33,7 +33,7 @@ export default function Navbar({ dictionary, lang }) {
     <nav 
       className={`fixed top-0 w-full z-50 backdrop-blur-md border-b transition-colors duration-300 ${isDark ? 'bg-background/95 border-border' : 'bg-[#b91c1c] border-transparent text-white'}`}
     >
-        <div className="max-w-[1600px] mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-[1450px] mx-auto px-6 h-20 flex items-center justify-between">
           
           {/* Left: Logo + Theme Toggle + Lang Switch */}
           <div className="flex items-center gap-4">

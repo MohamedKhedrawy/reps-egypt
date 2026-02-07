@@ -7,15 +7,12 @@ import { getVisiblePagesGrouped, initializeDefaultPages } from '@/lib/pageSettin
  */
 export async function GET() {
     try {
-        // Ensure defaults exist
-        await initializeDefaultPages();
-        
         const pages = await getVisiblePagesGrouped();
         
         return NextResponse.json(pages, {
             headers: {
-                // No caching - always return fresh data for real-time updates
-                'Cache-Control': 'no-store, no-cache, must-revalidate',
+                // Cache for 60 seconds, allow stale data while revalidating
+                'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
             },
         });
     } catch (error) {

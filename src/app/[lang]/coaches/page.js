@@ -2,6 +2,9 @@ import { getUsers } from "@/lib/user";
 import Link from "next/link";
 import { getDictionary } from '@/lib/get-dictionary';
 
+// Force dynamic rendering to avoid MongoDB timeout during static build
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }) {
     const { lang } = await params;
     const dictionary = await getDictionary(lang);

@@ -4,6 +4,9 @@ import { getFeaturedPrograms, getProgramsCount } from "@/lib/programs";
 import { getDictionary } from "@/lib/get-dictionary";
 import HomeClient from "./HomeClient";
 
+// Force dynamic rendering to avoid MongoDB timeout during static build
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }) {
   const { lang } = await params;
   const dictionary = await getDictionary(lang);
