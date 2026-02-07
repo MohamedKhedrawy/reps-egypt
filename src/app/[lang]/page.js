@@ -52,7 +52,7 @@ export default async function LandingPage({ params }) {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-red-600 selection:text-white">
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden pt-20">
+      <section className="relative min-h-[65vh] flex items-center justify-center overflow-hidden pt-12">
         {/* Background & Overlay */}
         <div className="absolute inset-0 z-0">
             {/* Gradient overlays */}
@@ -86,22 +86,8 @@ export default async function LandingPage({ params }) {
             </p>
           </div>
 
-          {/* Search Bar */}
-          <div className="w-full max-w-xl mb-10 relative group">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-red-500 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-              </svg>
-            </div>
-            <input 
-              type="text" 
-              placeholder={home.search_placeholder}
-              className="w-full bg-secondary border border-border rounded-xl px-12 py-4 text-sm text-foreground placeholder-muted focus:outline-none focus:border-red-600/50 focus:bg-secondary focus:ring-1 focus:ring-red-600/20 transition-all shadow-xl"
-            />
-          </div>
-
           {/* Main CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 mb-12 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-center gap-4 mb-6 w-full sm:w-auto">
             <Link 
               href={`/${lang}/register/trainer`}
               className="w-full sm:w-auto px-8 py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-all shadow-lg shadow-red-600/20 hover:-translate-y-0.5 flex items-center justify-center gap-2"
