@@ -34,6 +34,7 @@ export async function POST(request) {
             phone,
             birthDate,
             age,
+            gender,
             socialMedia,
             specialization,
             role, // This is now guaranteed to be 'trainer' or 'trainee' by Zod
@@ -66,6 +67,7 @@ export async function POST(request) {
             phone,
             birthDate,
             age,
+            gender,
             socialMedia,
             specialization,
             uploadedFiles: body.uploadedFiles, // Files not in schema yet, pass through

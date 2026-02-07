@@ -2,6 +2,7 @@ import { Geist, Geist_Mono, Cairo } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Providers from "@/components/Providers";
+import NotificationCenter from "@/components/NotificationCenter";
 import { Toaster } from "sonner";
 import ChatWidget from "@/app/[lang]/components/ChatWidget";
 import "../globals.css";
@@ -50,6 +51,7 @@ export default async function RootLayout({ children, params }) {
       >
         <Providers>
           <Navbar dictionary={dictionary.navbar} lang={lang} />
+          <NotificationCenter lang={lang} content={dictionary.profile_page} />
           <div className="fixed z-[9999]">
              <Toaster position="bottom-right" theme="dark" richColors closeButton />
           </div>
@@ -57,7 +59,7 @@ export default async function RootLayout({ children, params }) {
             {children}
           </main>
           <ChatWidget />
-          <Footer dictionary={dictionary.footer} lang={lang} />
+          <Footer dictionary={dictionary} lang={lang} />
         </Providers>
       </body>
     </html>

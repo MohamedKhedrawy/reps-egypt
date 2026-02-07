@@ -40,6 +40,11 @@ export async function GET(request) {
                 profilePhoto: user.profilePhoto || null,
                 createdAt: user.createdAt,
                 repsId: user.repsId || null,
+                birthDate: user.birthDate || '',
+                age: user.age || '',
+                gender: user.gender || '',
+                alerts: user.alerts || [],
+                activityNotes: user.activityNotes || [],
             },
         });
     } catch (error) {

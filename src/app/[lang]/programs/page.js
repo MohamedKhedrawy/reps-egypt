@@ -93,9 +93,9 @@ export default async function ProgramsPage({ params }) {
                     </div>
                   </div>
                   
-                  <button className="mt-8 w-full py-3.5 bg-background hover:bg-red-600 text-sm font-bold rounded-xl transition-all border border-border hover:border-red-600 group-hover:shadow-[0_0_20px_rgba(220,38,38,0.2)] text-foreground hover:text-white">
-                     {content.btn_enroll}
-                  </button>
+                  <Link href={`/${lang}/register`} className="mt-8 w-full py-3.5 bg-background hover:bg-red-600 text-sm font-bold rounded-xl transition-all border border-border hover:border-red-600 group-hover:shadow-[0_0_20px_rgba(220,38,38,0.2)] text-foreground hover:text-white inline-flex items-center justify-center">
+                    {content.btn_enroll}
+                  </Link>
                </div>
              </div>
              );

@@ -11,7 +11,10 @@ export async function GET() {
             title: article.title,
             category: article.category,
             description: article.description,
+            content: article.content,
             imageUrl: article.imageUrl,
+            image: article.image,
+            images: article.images || [],
             isPublished: article.isPublished,
             createdAt: article.createdAt,
             updatedAt: article.updatedAt,
@@ -44,13 +47,15 @@ export async function POST(request) {
             );
         }
 
-        const { title, category, description, imageUrl, isPublished } = validation.data;
+        const { title, category, description, content, imageUrl, images, isPublished } = validation.data;
 
         const result = await createNewsArticle({
             title,
             category,
             description,
+            content,
             imageUrl,
+            images,
             isPublished: isPublished ?? true,
         });
 

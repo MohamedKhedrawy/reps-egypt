@@ -8,12 +8,16 @@ export default function ProfileEditForm({ user, content, onSave, onCancel }) {
   const [preview, setPreview] = useState(user.profilePhoto);
   const [files, setFiles] = useState(user.uploadedFiles || []);
   const [newFiles, setNewFiles] = useState([]);
+  const [photoChanged, setPhotoChanged] = useState(false);
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => setPreview(reader.result);
+      reader.onloadend = () => {
+        setPreview(reader.result);
+        setPhotoChanged(true);
+      };
       reader.readAsDataURL(file);
     }
   };
@@ -36,12 +40,19 @@ export default function ProfileEditForm({ user, content, onSave, onCancel }) {
     const formData = new FormData(e.target);
     const updates = Object.fromEntries(formData);
     
+    // Convert age to number if present and not empty
+    if (updates.age && updates.age !== '') {
+      updates.age = parseInt(updates.age, 10);
+    } else {
+      delete updates.age;  // Remove if empty
+    }
+    
     // Extract social media links
     const socialMedia = {
-      facebook: updates.facebook,
-      instagram: updates.instagram,
-      linkedin: updates.linkedin,
-      youtube: updates.youtube,
+      facebook: updates.facebook || '',
+      instagram: updates.instagram || '',
+      linkedin: updates.linkedin || '',
+      youtube: updates.youtube || '',
     };
     
     // Clean up updates object
@@ -49,6 +60,7 @@ export default function ProfileEditForm({ user, content, onSave, onCancel }) {
     delete updates.instagram;
     delete updates.linkedin;
     delete updates.youtube;
+    delete updates.uploadedFilesInput;
     
     // Handle qualifications and specialization changes
     let qualificationChanges = null;
@@ -60,29 +72,30 @@ export default function ProfileEditForm({ user, content, onSave, onCancel }) {
     }
 
     // Check if specialization changed
-    // Note: specialization comes from updates object now (formData)
     if (updates.specialization && updates.specialization !== user.specialization) {
         newSpecialization = updates.specialization;
-        // Remove from direct update, it goes to request
         delete updates.specialization;
     }
 
-    // Prepare payload
+    // Prepare payload with explicit profilePhoto handling
     const payload = { 
-        generalUpdates: { ...updates, socialMedia }, 
+        generalUpdates: { 
+            ...updates, 
+            socialMedia,
+            // Only include profilePhoto if it changed
+            ...(photoChanged && { profilePhoto: preview || null })
+        }, 
         qualificationChanges: (qualificationChanges || newSpecialization) ? {
             newQualifications: qualificationChanges,
             newSpecialization: newSpecialization
         } : null 
     };
 
-    delete updates.uploadedFilesInput; // Remove file input value
-
     // We pass structured data to parent
     try {
         await onSave(payload);
     } catch (error) {
-        // Error handling is done in parent or onSave
+        console.error("Save error:", error);
     } finally {
         setSaving(false);
     }
@@ -129,7 +142,7 @@ export default function ProfileEditForm({ user, content, onSave, onCancel }) {
                 />
             </div>
             {/* Hidden input to store base64 string for submission */}
-            <input type="hidden" name="profilePhoto" value={preview || ""} />
+            {/* Removed - profilePhoto is now handled in payload */}
             
             {preview && preview !== user.profilePhoto && (
                 <button 
@@ -176,6 +189,21 @@ export default function ProfileEditForm({ user, content, onSave, onCancel }) {
                     defaultValue={user.age} 
                     className="w-full bg-tertiary/50 border border-border/50 rounded-xl px-4 py-3 focus:border-red-600 focus:ring-1 focus:ring-red-600 focus:outline-none transition-all placeholder:text-muted/50" 
                 />
+            </div>
+            <div className="space-y-2">
+                <label className="text-xs font-bold text-muted uppercase tracking-wider">{content.gender || "Gender"}</label>
+                <div className="relative">
+                    <select 
+                        name="gender" 
+                        defaultValue={user.gender || ""} 
+                        className="w-full bg-tertiary/50 border border-border/50 rounded-xl px-4 py-3 focus:border-red-600 focus:ring-1 focus:ring-red-600 focus:outline-none transition-all appearance-none"
+                    >
+                        <option value="">{content.gender_select || "Select Gender"}</option>
+                        <option value="male">{content.gender_male || "Male"}</option>
+                        <option value="female">{content.gender_female || "Female"}</option>
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted">▼</div>
+                </div>
             </div>
             <div className="space-y-2">
                 <label className="text-xs font-bold text-muted uppercase tracking-wider">{content.location}</label>

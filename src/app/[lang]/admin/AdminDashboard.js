@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { usePageSettings } from "@/context/PageSettingsContext";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import GalleryDashboard from './GalleryDashboard';
 
 export default function AdminDashboard({ dictionary }) {
   const [activeTab, setActiveTab] = useState("Overview");
@@ -26,7 +27,14 @@ export default function AdminDashboard({ dictionary }) {
   const [viewItem, setViewItem] = useState(null); // For viewing full details
   const [userFilter, setUserFilter] = useState("all"); // "all" or "pending"
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [coverImagePreview, setCoverImagePreview] = useState(null);
+  const [articleImages, setArticleImages] = useState([]);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [userAlerts, setUserAlerts] = useState([]);
+  const [newAlertText, setNewAlertText] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("warning");
+  const [newNoteText, setNewNoteText] = useState("");
   const fileInputRef = useRef(null);
   const { refreshPages } = usePageSettings();
 
@@ -113,6 +121,114 @@ export default function AdminDashboard({ dictionary }) {
     } catch { toast.error("Delete failed"); }
   };
 
+  // View User Profile
+  const handleViewUserProfile = async (user) => {
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        // userData comes as { user: {...} } from API
+        setSelectedUser(data.user || data);
+        // Load alerts and notes
+        setUserAlerts(data.user?.alerts || data.alerts || []);
+        setNewAlertText("");
+        setNewNoteText("");
+      } else {
+        toast.error("Failed to load user profile");
+      }
+    } catch (error) {
+      toast.error("Failed to load user profile");
+      console.error(error);
+    }
+  };
+
+  // Add Alert to User
+  const handleAddAlert = async () => {
+    if (!newAlertText.trim() || !selectedUser) return;
+    
+    try {
+      const res = await fetch(`/api/admin/users/${selectedUser.id}/alerts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: newAlertText,
+          severity: alertSeverity,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setUserAlerts(data.alerts);
+        setNewAlertText("");
+        toast.success(dictionary?.admin?.users?.profile?.alert_added || "Alert added successfully");
+      } else {
+        toast.error(dictionary?.admin?.users?.profile?.alert_failed || "Failed to add alert");
+      }
+    } catch (error) {
+      toast.error(dictionary?.common?.error || "An error occurred");
+      console.error(error);
+    }
+  };
+
+  // Add Activity Note to User
+  const handleAddNote = async () => {
+    if (!newNoteText.trim() || !selectedUser) return;
+    
+    try {
+      const res = await fetch(`/api/admin/users/${selectedUser.id}/notes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: newNoteText,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setSelectedUser(prev => ({
+          ...prev,
+          activityNotes: data.notes
+        }));
+        setNewNoteText("");
+        toast.success(dictionary?.admin?.users?.profile?.note_added || "Note added successfully");
+      } else {
+        toast.error(dictionary?.admin?.users?.profile?.note_failed || "Failed to add note");
+      }
+    } catch (error) {
+      toast.error(dictionary?.common?.error || "An error occurred");
+      console.error(error);
+    }
+  };
+
+  // Delete User Profile Photo
+  const handleDeleteUserPhoto = async () => {
+    if (!selectedUser) return;
+    
+    if (!confirm("Are you sure you want to delete this user's profile photo?")) return;
+    
+    try {
+      const res = await fetch(`/api/admin/users/${selectedUser.id}/photo`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      if (res.ok) {
+        setSelectedUser(prev => ({
+          ...prev,
+          profilePhoto: null
+        }));
+        toast.success(dictionary?.admin?.users?.profile?.photo_deleted || "Photo deleted successfully");
+      } else {
+        toast.error(dictionary?.admin?.users?.profile?.photo_delete_failed || "Failed to delete photo");
+      }
+    } catch (error) {
+      toast.error("حدث خطأ");
+      console.error(error);
+    }
+  };
+
   // Update user details
   const handleSaveUser = async (e) => {
     e.preventDefault();
@@ -143,17 +259,33 @@ export default function AdminDashboard({ dictionary }) {
     const data = Object.fromEntries(formData);
     data.isPublished = formData.get("isPublished") === "on";
     
-    // Use uploaded image URL if available
-    if (imagePreview) {
-      data.imageUrl = imagePreview;
+    // Parse images array from JSON string
+    try {
+      if (data.images && typeof data.images === 'string') {
+        data.images = JSON.parse(data.images);
+      }
+    } catch (err) {
+      data.images = [];
+    }
+    
+    // Ensure imageUrl is set correctly
+    if (coverImagePreview) {
+      data.imageUrl = coverImagePreview;
+    } else if (editItem?.imageUrl) {
+      data.imageUrl = editItem.imageUrl;
+    } else if (editItem?.image) {
+      data.imageUrl = editItem.image;
+    } else {
+      data.imageUrl = '';
     }
     
     // Close modal immediately for better UX
     setShowModal(null);
     setEditItem(null);
-    setImagePreview(null);
+    setCoverImagePreview(null);
+    setArticleImages([]);
     
-    toast.success(editItem ? "Article updated" : "Article created");
+    toast.success(editItem ? "تم تحديث المقال" : "تم إنشاء المقال");
     
     try {
       const url = editItem ? `/api/admin/news/${editItem.id}` : "/api/admin/news";
@@ -165,29 +297,62 @@ export default function AdminDashboard({ dictionary }) {
       if (res.ok) {
         fetchData();
       } else {
-        toast.error("Save failed");
+        toast.error("فشل الحفظ");
       }
-    } catch { toast.error("Save failed"); }
+    } catch { toast.error("فشل الحفظ"); }
   };
 
-  // Handle image file upload
-  const handleImageUpload = async (e) => {
+  // Handle cover image upload (single image)
+  const handleCoverImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    // For now, we'll use a data URL (in production, upload to cloud storage)
-    setUploadingImage(true);
-    
+    setUploadingCover(true);
     const reader = new FileReader();
     reader.onloadend = () => {
-      setImagePreview(reader.result);
-      setUploadingImage(false);
+      setCoverImagePreview(reader.result);
+      setUploadingCover(false);
+      toast.success("تم تحميل صورة الغلاف");
     };
     reader.onerror = () => {
-      toast.error("Failed to read image");
-      setUploadingImage(false);
+      toast.error("فشل تحميل الصورة");
+      setUploadingCover(false);
     };
     reader.readAsDataURL(file);
+  };
+
+  // Handle gallery images upload (multiple images)
+  const handleGalleryImageUpload = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    setUploadingImage(true);
+    const newImages = [];
+    let uploadedCount = 0;
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        newImages.push(reader.result);
+        uploadedCount++;
+        
+        if (uploadedCount === files.length) {
+          setArticleImages(prev => [...prev, ...newImages]);
+          setUploadingImage(false);
+          toast.success(`${files.length} صورة تم تحميلها`);
+        }
+      };
+      reader.onerror = () => {
+        toast.error("فشل تحميل إحدى الصور");
+        setUploadingImage(false);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  const removeImage = (index) => {
+    setArticleImages(prev => prev.filter((_, i) => i !== index));
   };
 
   // Delete news
@@ -247,7 +412,7 @@ export default function AdminDashboard({ dictionary }) {
     }
   };
 
-  const tabs = ["Overview", "Approvals", "Users", "News", "Pages", "Analytics"];
+  const tabs = ["Overview", "Approvals", "Users", "News", "Gallery", "Pages", "Analytics"];
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6">
@@ -434,6 +599,7 @@ export default function AdminDashboard({ dictionary }) {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border text-start text-muted">
+                        <th className="pb-3 font-medium text-start w-12"></th>
                         <th className="pb-3 font-medium text-start">{dictionary?.admin?.users?.table?.name || "Name"}</th>
                         <th className="pb-3 font-medium text-start">{dictionary?.admin?.users?.table?.email || "Email"}</th>
                         <th className="pb-3 font-medium text-start">{dictionary?.admin?.users?.table?.role || "Role"}</th>
@@ -443,7 +609,20 @@ export default function AdminDashboard({ dictionary }) {
                     </thead>
                     <tbody>
                       {filteredUsers.map((user) => (
-                        <tr key={user.id} className="border-b border-border/50 hover:bg-tertiary/50">
+                        <tr key={user.id} className="border-b border-border/50 hover:bg-tertiary/50 cursor-pointer transition-colors" onClick={() => handleViewUserProfile(user)}>
+                          <td className="py-4">
+                            <div className="w-10 h-10 rounded-full bg-tertiary flex items-center justify-center overflow-hidden flex-shrink-0 text-lg">
+                              {user.profilePhoto ? (
+                                <img src={user.profilePhoto} alt={user.name} className="w-full h-full object-cover" />
+                              ) : user.gender === 'female' ? (
+                                <span>👩</span>
+                              ) : user.gender === 'male' ? (
+                                <span>👨</span>
+                              ) : (
+                                <svg className="w-5 h-5 text-muted" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>
+                              )}
+                            </div>
+                          </td>
                           <td className="py-4 font-medium">{user.name}</td>
                           <td className="py-4 text-muted">{user.email}</td>
                           <td className="py-4">
@@ -456,7 +635,7 @@ export default function AdminDashboard({ dictionary }) {
                               {dictionary?.admin?.users?.status?.[user.status] || user.status}
                             </span>
                           </td>
-                          <td className="py-4">
+                          <td className="py-4" onClick={(e) => e.stopPropagation()}>
                             <div className="flex gap-2">
                               {user.status === 'pending' && (
                                 <>
@@ -476,12 +655,19 @@ export default function AdminDashboard({ dictionary }) {
               </div>
             )}
 
+            {/* Gallery Tab */}
+            {activeTab === "Gallery" && (
+              <div>
+                <GalleryDashboard dictionary={dictionary} />
+              </div>
+            )}
+
             {/* News Tab */}
             {activeTab === "News" && (
               <div className="bg-secondary border border-border rounded-2xl p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">{dictionary?.admin?.news?.title || "News Articles"} ({news.length})</h2>
-                  <button onClick={() => { setEditItem(null); setShowModal("news"); }} className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 flex items-center gap-2">
+                  <button onClick={() => { setEditItem(null); setArticleImages([]); setCoverImagePreview(null); setShowModal("news"); }} className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 flex items-center gap-2">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                     {dictionary?.admin?.news?.add_article || "Add Article"}
                   </button>
@@ -499,7 +685,8 @@ export default function AdminDashboard({ dictionary }) {
                         <p className="text-sm text-muted">{article.category} • {article.description?.slice(0, 80)}...</p>
                       </div>
                       <div className="flex gap-2">
-                        <button onClick={() => { setEditItem(article); setShowModal("news"); }} className="px-3 py-1.5 bg-blue-500/10 text-blue-400 text-xs font-bold rounded-full hover:bg-blue-500/20">{dictionary?.admin?.news?.edit || "Edit"}</button>
+                        <button onClick={() => { setViewItem(article); }} className="px-3 py-1.5 bg-blue-500/10 text-blue-400 text-xs font-bold rounded-full hover:bg-blue-500/20">{dictionary?.admin?.news?.view_full || "View Full"}</button>
+                        <button onClick={() => { setEditItem(article); setArticleImages(article.images || []); setCoverImagePreview(article.imageUrl || article.image || null); setShowModal("news"); }} className="px-3 py-1.5 bg-amber-500/10 text-amber-400 text-xs font-bold rounded-full hover:bg-amber-500/20">{dictionary?.admin?.news?.edit || "Edit"}</button>
                         <button onClick={() => handleDeleteNews(article.id)} className="px-3 py-1.5 bg-red-500/10 text-red-400 text-xs font-bold rounded-full hover:bg-red-500/20">{dictionary?.admin?.news?.delete || "Delete"}</button>
                       </div>
                     </div>
@@ -753,9 +940,9 @@ export default function AdminDashboard({ dictionary }) {
         {/* News Modal */}
         {showModal === "news" && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-secondary border border-border rounded-2xl w-full max-w-lg p-6">
+            <div className="bg-secondary border border-border rounded-2xl w-full max-w-lg p-6 max-h-[90vh] flex flex-col">
               <h3 className="text-xl font-bold mb-6">{editItem ? (dictionary?.admin?.news?.modal?.edit_title || "Edit Article") : (dictionary?.admin?.news?.modal?.new_title || "New Article")}</h3>
-              <form onSubmit={handleSaveNews} className="space-y-4">
+              <form id="newsForm" onSubmit={handleSaveNews} className="space-y-4 overflow-y-auto flex-1 pr-2">
                 <div>
                   <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.news?.modal?.title_label || "Title"}</label>
                   <input name="title" defaultValue={editItem?.title} required className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" />
@@ -774,34 +961,91 @@ export default function AdminDashboard({ dictionary }) {
                 </div>
                 <div>
                   <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.news?.modal?.desc_label || "Description"}</label>
-                  <textarea name="description" defaultValue={editItem?.description} rows={4} required className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" />
+                  <textarea name="description" defaultValue={editItem?.description} rows={3} required className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.news?.modal?.image_label || "Image"}</label>
-                  <div className="mt-1 flex items-center gap-4">
-                    {(imagePreview || editItem?.image) && (
-                      <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-border">
-                        <img src={imagePreview || editItem.image} alt="Preview" className="w-full h-full object-cover" />
-                      </div>
-                    )}
-                    <label className="cursor-pointer bg-tertiary border border-border hover:bg-white/5 transition-colors px-4 py-2 rounded-lg flex items-center gap-2">
-                       <svg className="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                       <span className="text-sm font-medium">{uploading ? (dictionary?.admin?.news?.modal?.uploading || "Uploading...") : (dictionary?.admin?.news?.modal?.upload_btn || "Upload Image")}</span>
-                       <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                    </label>
-                  </div>
+                  <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.news?.modal?.content_label || "Full Article Content"}</label>
+                  <textarea name="content" defaultValue={editItem?.content} rows={5} placeholder="Write the full article content here..." className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" />
                 </div>
+
+                {/* صورة الغلاف الرئيسية */}
+                <div className="border-2 border-dashed border-red-600/50 rounded-lg p-4 bg-red-600/5">
+                  <label className="text-xs font-bold text-red-500 uppercase mb-3 block">
+                    {dictionary?.admin?.news?.modal?.cover_image_label || "Cover Image"}
+                    <span className="text-xs text-muted font-normal block mt-1">{dictionary?.admin?.news?.modal?.cover_image_desc || "(appears on card and popup)"}</span>
+                  </label>
+                  
+                  {/* معاينة الصورة الأساسية */}
+                  {(coverImagePreview || editItem?.imageUrl || editItem?.image) && (
+                    <div className="mb-4">
+                      <div className="relative w-full h-40 rounded-lg overflow-hidden border-2 border-red-600 bg-black/20">
+                        <img src={coverImagePreview || editItem?.imageUrl || editItem?.image} alt="Cover Image" className="w-full h-full object-cover" />
+                      </div>
+                      {coverImagePreview && (
+                        <button
+                          type="button"
+                          onClick={() => setCoverImagePreview(null)}
+                          className="mt-2 text-xs text-red-500 hover:text-red-600 font-bold"
+                        >
+                          {dictionary?.admin?.news?.modal?.cover_image_remove || "✕ Remove Image"}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* زر تحميل صورة الغلاف */}
+                  <label className="cursor-pointer block bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-4 py-3 rounded-lg text-center transition-colors">
+                    <svg className="w-5 h-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <span>{uploadingCover ? (dictionary?.admin?.news?.modal?.uploading || "Uploading...") : (dictionary?.admin?.news?.modal?.cover_image_btn || "Choose Cover Image")}</span>
+                    <input type="file" accept="image/*" onChange={handleCoverImageUpload} disabled={uploadingCover} className="hidden" />
+                  </label>
+                </div>
+
+                {/* الصور الإضافية */}
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.news?.modal?.gallery_label || "Additional Gallery Images"}</label>
+                  <input type="hidden" name="images" value={JSON.stringify(articleImages)} />
+                  
+                  {/* معرض الصور المضافة */}
+                  {articleImages.length > 0 && (
+                    <div className="mt-3 mb-4">
+                      <p className="text-xs text-muted mb-2">{dictionary?.admin?.news?.modal?.gallery_list || "Added Images"} ({articleImages.length})</p>
+                      <div className="grid grid-cols-3 gap-3">
+                        {articleImages.map((img, idx) => (
+                          <div key={idx} className="relative w-full aspect-square rounded-lg overflow-hidden border border-border hover:border-red-600 transition-colors">
+                            <img src={img} alt={`صورة ${idx+1}`} className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => removeImage(idx)}
+                              className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-700 shadow-lg"
+                            >
+                              {dictionary?.admin?.news?.modal?.gallery_remove_hint || "✕"}
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* زر تحميل الصور الإضافية */}
+                  <label className="cursor-pointer block bg-secondary hover:bg-tertiary border border-border text-foreground text-sm font-bold px-4 py-2.5 rounded-lg text-center transition-colors mt-2">
+                    <svg className="w-4 h-4 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                    <span>{uploadingImage ? (dictionary?.admin?.news?.modal?.uploading || "Uploading...") : (dictionary?.admin?.news?.modal?.gallery_add_btn || "Add Gallery Images")}</span>
+                    <input type="file" accept="image/*" multiple onChange={handleGalleryImageUpload} disabled={uploadingImage} className="hidden" />
+                  </label>
+                </div>
+
                 <div className="flex items-center gap-2">
                   <input type="checkbox" name="isPublished" defaultChecked={editItem?.isPublished} id="isPublished" className="w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500" />
                   <label htmlFor="isPublished" className="text-sm text-muted">{dictionary?.admin?.news?.modal?.publish_immediate || "Publish immediately"}</label>
                 </div>
-                <div className="flex justify-end gap-3 pt-4 border-t border-border">
-                  <button type="button" onClick={() => setShowModal(null)} className="px-4 py-2 text-muted hover:text-white transition-colors">{dictionary?.admin?.news?.modal?.cancel || "Cancel"}</button>
-                  <button type="submit" disabled={uploading} className="px-6 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed">
-                    {uploading ? "..." : (editItem ? (dictionary?.admin?.news?.modal?.update || "Update") : (dictionary?.admin?.news?.modal?.create || "Create"))}
-                  </button>
-                </div>
               </form>
+              <div className="flex justify-end gap-3 pt-4 border-t border-border mt-4">
+                <button type="button" onClick={() => { setShowModal(null); setArticleImages([]); setCoverImagePreview(null); }} className="px-4 py-2 text-muted hover:text-white transition-colors">{dictionary?.admin?.news?.modal?.cancel || "الإلغاء"}</button>
+                <button type="submit" form="newsForm" disabled={uploadingImage || uploadingCover} className="px-6 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                  {uploadingImage || uploadingCover ? "..." : (editItem ? (dictionary?.admin?.news?.modal?.update || "تحديث") : (dictionary?.admin?.news?.modal?.confirm || "تأكيد"))}
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -850,75 +1094,365 @@ export default function AdminDashboard({ dictionary }) {
         {/* View Details Modal */}
         {viewItem && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setViewItem(null)}>
-            <div className="bg-secondary border border-border rounded-2xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <h3 className="text-xl font-bold">{viewItem.name}</h3>
-                  <p className="text-muted text-sm">{viewItem.email}</p>
-                </div>
-                <button onClick={() => setViewItem(null)} className="text-muted hover:text-foreground text-xl">✕</button>
-              </div>
-              
-              {/* Details Grid */}
-              <div className="grid md:grid-cols-2 gap-4 mb-6">
-                <div className="bg-tertiary rounded-xl p-4">
-                  <p className="text-xs text-muted uppercase font-bold mb-1">Type</p>
-                  <p className="font-medium">{viewItem.type || "User Registration"}</p>
-                </div>
-                <div className="bg-tertiary rounded-xl p-4">
-                  <p className="text-xs text-muted uppercase font-bold mb-1">Specialization</p>
-                  <p className="font-medium">{viewItem.specialization || "N/A"}</p>
-                </div>
-                <div className="bg-tertiary rounded-xl p-4">
-                  <p className="text-xs text-muted uppercase font-bold mb-1">Request Date</p>
-                  <p className="font-medium">{viewItem.date || "N/A"}</p>
-                </div>
-                <div className="bg-tertiary rounded-xl p-4">
-                  <p className="text-xs text-muted uppercase font-bold mb-1">Action Type</p>
-                  <span className={`px-2 py-1 rounded text-xs font-bold ${viewItem.actionType === 'qualification' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>
-                    {viewItem.actionType === 'qualification' ? 'Qualification Change' : 'New Registration'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Additional Details */}
-              {viewItem.details && (
-                <div className="bg-tertiary rounded-xl p-4 mb-6">
-                  <p className="text-xs text-muted uppercase font-bold mb-2">Additional Details</p>
-                  <p className="text-sm">{typeof viewItem.details === 'string' ? viewItem.details : JSON.stringify(viewItem.details, null, 2)}</p>
-                </div>
-              )}
-
-              {/* Uploaded Files */}
-              {viewItem.uploadedFiles && viewItem.uploadedFiles.length > 0 && (
-                <div className="bg-tertiary rounded-xl p-4 mb-6">
-                  <p className="text-xs text-muted uppercase font-bold mb-2">Uploaded Documents</p>
-                  <div className="space-y-2">
-                    {viewItem.uploadedFiles.map((file, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm">
-                        <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                        <span>{typeof file === 'string' ? file : file.name || 'Document'}</span>
+            <div className="bg-secondary border border-border rounded-2xl w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              {/* Check if this is an article or approval */}
+              {viewItem.title ? (
+                // Article View
+                <>
+                  <div className="flex justify-between items-start mb-6">
+                    <div>
+                      <h2 className="text-3xl font-bold mb-2">{viewItem.title}</h2>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span className="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">{viewItem.category}</span>
+                        <span className={`px-2 py-1 rounded text-xs font-bold ${viewItem.isPublished ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                          {viewItem.isPublished ? 'Published' : 'Draft'}
+                        </span>
                       </div>
-                    ))}
+                    </div>
+                    <button onClick={() => setViewItem(null)} className="text-muted hover:text-foreground text-xl">✕</button>
+                  </div>
+                  
+                  {/* Article Image */}
+                  {(viewItem.imageUrl || viewItem.image) && (
+                    <div className="mb-6 rounded-xl overflow-hidden border border-border">
+                      <img src={viewItem.imageUrl || viewItem.image} alt={viewItem.title} className="w-full h-96 object-cover" />
+                    </div>
+                  )}
+                  
+                  {/* Article Images Gallery */}
+                  {viewItem.images && viewItem.images.length > 0 && (
+                    <div className="mb-6">
+                      <p className="text-sm text-muted uppercase font-bold mb-3">صور المقال ({viewItem.images.length})</p>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {viewItem.images.map((img, idx) => (
+                          <div key={idx} className="rounded-lg overflow-hidden border border-border hover:shadow-lg transition-shadow cursor-pointer">
+                            <img src={img} alt={`Article ${idx+1}`} className="w-full h-48 object-cover hover:scale-105 transition-transform" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Description */}
+                  <div className="mb-6 p-4 bg-tertiary rounded-xl border border-border">
+                    <p className="text-sm text-muted uppercase font-bold mb-2">Description</p>
+                    <p className="text-foreground leading-relaxed">{viewItem.description}</p>
+                  </div>
+                  
+                  {/* Full Content */}
+                  {viewItem.content && (
+                    <div className="mb-6 p-4 bg-tertiary rounded-xl border border-border">
+                      <p className="text-sm text-muted uppercase font-bold mb-2">Full Article</p>
+                      <div className="prose prose-invert max-w-none text-foreground leading-relaxed whitespace-pre-wrap">{viewItem.content}</div>
+                    </div>
+                  )}
+                  
+                  {/* Article Actions */}
+                  <div className="flex gap-3 pt-4 border-t border-border">
+                    <button
+                      onClick={() => { setEditItem(viewItem); setShowModal("news"); setViewItem(null); }}
+                      className="flex-1 py-3 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600"
+                    >
+                      Edit Article
+                    </button>
+                    <button
+                      onClick={() => { handleDeleteNews(viewItem.id); setViewItem(null); }}
+                      className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600"
+                    >
+                      Delete Article
+                    </button>
+                  </div>
+                </>
+              ) : (
+                // Approval Request View (original)
+                <>
+                  <div className="flex justify-between items-start mb-6">
+                    <div>
+                      <h3 className="text-xl font-bold">{viewItem.name}</h3>
+                      <p className="text-muted text-sm">{viewItem.email}</p>
+                    </div>
+                    <button onClick={() => setViewItem(null)} className="text-muted hover:text-foreground text-xl">✕</button>
+                  </div>
+                  
+                  {/* Details Grid */}
+                  <div className="grid md:grid-cols-2 gap-4 mb-6">
+                    <div className="bg-tertiary rounded-xl p-4">
+                      <p className="text-xs text-muted uppercase font-bold mb-1">Type</p>
+                      <p className="font-medium">{viewItem.type || "User Registration"}</p>
+                    </div>
+                    <div className="bg-tertiary rounded-xl p-4">
+                      <p className="text-xs text-muted uppercase font-bold mb-1">Specialization</p>
+                      <p className="font-medium">{viewItem.specialization || "N/A"}</p>
+                    </div>
+                    <div className="bg-tertiary rounded-xl p-4">
+                      <p className="text-xs text-muted uppercase font-bold mb-1">Request Date</p>
+                      <p className="font-medium">{viewItem.date || "N/A"}</p>
+                    </div>
+                    <div className="bg-tertiary rounded-xl p-4">
+                      <p className="text-xs text-muted uppercase font-bold mb-1">Action Type</p>
+                      <span className={`px-2 py-1 rounded text-xs font-bold ${viewItem.actionType === 'qualification' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                        {viewItem.actionType === 'qualification' ? 'Qualification Change' : 'New Registration'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Additional Details */}
+                  {viewItem.details && (
+                    <div className="bg-tertiary rounded-xl p-4 mb-6">
+                      <p className="text-xs text-muted uppercase font-bold mb-2">Additional Details</p>
+                      <p className="text-sm">{typeof viewItem.details === 'string' ? viewItem.details : JSON.stringify(viewItem.details, null, 2)}</p>
+                    </div>
+                  )}
+
+                  {/* Uploaded Files */}
+                  {viewItem.uploadedFiles && viewItem.uploadedFiles.length > 0 && (
+                    <div className="bg-tertiary rounded-xl p-4 mb-6">
+                      <p className="text-xs text-muted uppercase font-bold mb-2">Uploaded Documents</p>
+                      <div className="space-y-2">
+                        {viewItem.uploadedFiles.map((file, idx) => (
+                          <div key={idx} className="flex items-center gap-2 text-sm">
+                            <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            <span>{typeof file === 'string' ? file : file.name || 'Document'}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 pt-4 border-t border-border">
+                    <button
+                      onClick={() => handleApprovalAction(viewItem, "approved")}
+                      className="flex-1 py-3 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => handleApprovalAction(viewItem, "rejected")}
+                      className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                      Reject
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* User Profile Modal */}
+        {selectedUser && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedUser(null)}>
+            <div className="bg-secondary border border-border rounded-2xl w-full max-w-3xl p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-20 h-20 rounded-full bg-tertiary flex items-center justify-center overflow-hidden">
+                    {selectedUser.profilePhoto ? (
+                      <img src={selectedUser.profilePhoto} alt={selectedUser.fullName} className="w-full h-full object-cover" />
+                    ) : (
+                      <svg className="w-10 h-10 text-muted" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>
+                    )}
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold">{selectedUser.fullName}</h2>
+                    <p className="text-muted text-sm">{selectedUser.email}</p>
                   </div>
                 </div>
+                <button onClick={() => setSelectedUser(null)} className="text-muted hover:text-foreground text-xl">✕</button>
+              </div>
+
+              {/* User Info Grid */}
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-tertiary rounded-xl p-4">
+                  <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.admin?.users?.table?.role || "Role"}</p>
+                  <p className="font-medium">{selectedUser.role}</p>
+                </div>
+                <div className="bg-tertiary rounded-xl p-4">
+                  <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.admin?.users?.table?.status || "Status"}</p>
+                  <span className={`px-2 py-1 rounded text-xs font-bold inline-block ${selectedUser.status === 'approved' ? 'bg-green-500/20 text-green-400' : selectedUser.status === 'rejected' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                    {selectedUser.status}
+                  </span>
+                </div>
+                <div className="bg-tertiary rounded-xl p-4">
+                  <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.admin?.users?.table?.phone || "Phone"}</p>
+                  <p className="font-medium">{selectedUser.phone || "N/A"}</p>
+                </div>
+                <div className="bg-tertiary rounded-xl p-4">
+                  <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.admin?.users?.table?.status || "Specialization"}</p>
+                  <p className="font-medium">{selectedUser.specialization || "N/A"}</p>
+                </div>
+              </div>
+
+              {/* Bio */}
+              {selectedUser.bio && (
+                <div className="bg-tertiary rounded-xl p-4 mb-6">
+                  <p className="text-xs text-muted uppercase font-bold mb-2">Bio</p>
+                  <p className="text-sm">{selectedUser.bio}</p>
+                </div>
               )}
 
+              {/* Location & Social */}
+              {(selectedUser.location || selectedUser.socialLinks) && (
+                <div className="grid md:grid-cols-2 gap-4 mb-6">
+                  {selectedUser.location && (
+                    <div className="bg-tertiary rounded-xl p-4">
+                      <p className="text-xs text-muted uppercase font-bold mb-1">Location</p>
+                      <p className="text-sm">{selectedUser.location}</p>
+                    </div>
+                  )}
+                  {selectedUser.socialLinks && Object.keys(selectedUser.socialLinks).length > 0 && (
+                    <div className="bg-tertiary rounded-xl p-4">
+                      <p className="text-xs text-muted uppercase font-bold mb-2">Social Links</p>
+                      <div className="space-y-1">
+                        {Object.entries(selectedUser.socialLinks).map(([key, value]) => (
+                          value && <a key={key} href={value} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm block">{key}</a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Member Since */}
+              {selectedUser.createdAt && (
+                <div className="bg-tertiary rounded-xl p-4 mb-6">
+                  <p className="text-xs text-muted uppercase font-bold mb-1">Member Since</p>
+                  <p className="text-sm">{new Date(selectedUser.createdAt).toLocaleDateString()}</p>
+                </div>
+              )}
+
+              {/* Alerts Section */}
+              <div className="mb-6">
+                <div className="bg-tertiary rounded-xl p-4 mb-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold">⚠️ {dictionary?.admin?.users?.profile?.alerts || "Alerts"}</h3>
+                    <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded">{userAlerts.length}</span>
+                  </div>
+                  
+                  {/* Add New Alert */}
+                  <div className="space-y-3 mb-4 pb-4 border-b border-border">
+                    <textarea
+                      value={newAlertText}
+                      onChange={(e) => setNewAlertText(e.target.value)}
+                      placeholder={dictionary?.admin?.users?.profile?.alert_placeholder || "Add an alert about this user..."}
+                      className="w-full bg-background border border-border rounded-lg px-4 py-2 text-sm text-foreground placeholder-muted focus:outline-none focus:border-red-500"
+                      rows="2"
+                    />
+                    <div className="flex gap-2">
+                      <select
+                        value={alertSeverity}
+                        onChange={(e) => setAlertSeverity(e.target.value)}
+                        className="bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-red-500"
+                      >
+                        <option value="info">{dictionary?.admin?.users?.profile?.alert_severity?.info || "Info 🔵"}</option>
+                        <option value="warning">{dictionary?.admin?.users?.profile?.alert_severity?.warning || "Warning ⚠️"}</option>
+                        <option value="danger">{dictionary?.admin?.users?.profile?.alert_severity?.danger || "Danger 🔴"}</option>
+                      </select>
+                      <button
+                        onClick={handleAddAlert}
+                        className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 text-sm"
+                      >
+                        {dictionary?.admin?.users?.profile?.add_alert || "Add Alert"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Existing Alerts */}
+                  {userAlerts.length === 0 ? (
+                    <p className="text-muted text-sm">{dictionary?.admin?.users?.profile?.no_alerts || "No alerts"}</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {userAlerts.map((alert, idx) => (
+                        <div
+                          key={idx}
+                          className={`p-3 rounded-lg border-l-4 ${
+                            alert.severity === 'danger'
+                              ? 'bg-red-500/10 border-red-500 text-red-400'
+                              : alert.severity === 'warning'
+                              ? 'bg-amber-500/10 border-amber-500 text-amber-400'
+                              : 'bg-blue-500/10 border-blue-500 text-blue-400'
+                          }`}
+                        >
+                          <p className="text-sm font-medium">{alert.message}</p>
+                          <p className="text-xs opacity-70 mt-1">
+                            {new Date(alert.timestamp).toLocaleString('en-US')}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Activity Notes Section */}
+              <div className="mb-6">
+                <div className="bg-tertiary rounded-xl p-4 mb-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold">📝 {dictionary?.admin?.users?.profile?.activity_log || "Activity Log"}</h3>
+                    <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">
+                      {selectedUser?.activityNotes?.length || 0}
+                    </span>
+                  </div>
+
+                  {/* Add New Note */}
+                  <div className="space-y-2 mb-4 pb-4 border-b border-border">
+                    <textarea
+                      value={newNoteText}
+                      onChange={(e) => setNewNoteText(e.target.value)}
+                      placeholder={dictionary?.admin?.users?.profile?.note_placeholder || "Write a note about this user..."}
+                      className="w-full bg-background border border-border rounded-lg px-4 py-2 text-sm text-foreground placeholder-muted focus:outline-none focus:border-blue-500"
+                      rows="2"
+                    />
+                    <button
+                      onClick={handleAddNote}
+                      className="w-full px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 text-sm"
+                    >
+                      {dictionary?.admin?.users?.profile?.add_note || "Add Note"}
+                    </button>
+                  </div>
+
+                  {/* Existing Notes */}
+                  {(!selectedUser?.activityNotes || selectedUser.activityNotes.length === 0) ? (
+                    <p className="text-muted text-sm">{dictionary?.admin?.users?.profile?.no_notes || "No notes yet"}</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {selectedUser.activityNotes.map((note, idx) => (
+                        <div key={idx} className="bg-background rounded-lg p-3 border border-border/50">
+                          <p className="text-sm text-foreground">{note.message}</p>
+                          <p className="text-xs text-muted mt-2">
+                            {new Date(note.timestamp).toLocaleString('en-US')}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Action Buttons */}
-              <div className="flex gap-3 pt-4 border-t border-border">
+              <div className="flex gap-3 pt-4 border-t border-border flex-wrap">
+                {selectedUser.profilePhoto && (
+                  <button
+                    onClick={handleDeleteUserPhoto}
+                    className="flex-1 min-w-[150px] py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    {dictionary?.admin?.users?.profile?.delete_photo || "Delete Photo"}
+                  </button>
+                )}
                 <button
-                  onClick={() => handleApprovalAction(viewItem, "approved")}
-                  className="flex-1 py-3 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 flex items-center justify-center gap-2"
+                  onClick={() => { setSelectedUser(null); setEditItem(selectedUser); setShowModal("user"); }}
+                  className="flex-1 min-w-[150px] py-3 bg-blue-500 text-white font-bold rounded-xl hover:bg-blue-600"
                 >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                  Approve
+                  {dictionary?.admin?.users?.profile?.edit_user || "Edit User"}
                 </button>
                 <button
-                  onClick={() => handleApprovalAction(viewItem, "rejected")}
-                  className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 flex items-center justify-center gap-2"
+                  onClick={() => { handleDeleteUser(selectedUser.id); setSelectedUser(null); }}
+                  className="flex-1 min-w-[150px] py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600"
                 >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                  Reject
+                  {dictionary?.admin?.users?.profile?.delete_user || "Delete User"}
                 </button>
               </div>
             </div>

@@ -8,30 +8,28 @@ export const registerSchema = z.object({
     password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
     firstName: z.string().optional(),
     lastName: z.string().optional(),
-    fullName: z.string().min(2, { message: "Full name is required" }).optional(), // Optional because we construct it if missing
+    fullName: z.string().min(2, { message: "Full name is required" }).optional(),
     
     // Extended fields
     phone: z.string().regex(phoneRegex, { message: "Invalid Egyptian phone number" }).optional().or(z.literal('')),
-    birthDate: z.string().optional(), // Could add date validation
+    birthDate: z.string().optional(),
     age: z.union([z.string(), z.number()]).optional(),
+    gender: z.enum(['male', 'female']).optional().or(z.literal('')),
     
     socialMedia: z.object({
-        facebook: z.string().url().optional().or(z.literal('')),
-        instagram: z.string().url().optional().or(z.literal('')),
-        youtube: z.string().url().optional().or(z.literal('')),
-        linkedin: z.string().url().optional().or(z.literal('')),
+        facebook: z.literal('').or(z.string().url()).optional(),
+        instagram: z.literal('').or(z.string().url()).optional(),
+        youtube: z.literal('').or(z.string().url()).optional(),
+        linkedin: z.literal('').or(z.string().url()).optional(),
     }).optional(),
 
     specialization: z.string().optional(),
     
-    // Security: Allow 'trainer' or 'trainee' only. 
-    // If 'admin' is passed, the API route should override or ignore it, 
-    // but here we enforce struct validity.
     role: z.enum(['trainer', 'trainee']).optional().default('trainer'),
     
     termsAccepted: z.boolean().refine(val => val === true, {
         message: "You must accept the terms and conditions"
-    }).optional(), // Optional in schema, enforced in API if needed
+    }).optional(),
 });
 
 export const loginSchema = z.object({
@@ -46,16 +44,29 @@ export const userUpdateSchema = z.object({
     bio: z.string().optional(),
     location: z.string().optional(),
     specialization: z.string().optional(),
+    profilePhoto: z.string().nullable().optional(),
     
     birthDate: z.string().optional(),
     age: z.union([z.string(), z.number()]).optional(),
+    gender: z.enum(['male', 'female']).optional().or(z.literal('')),
 
     socialMedia: z.object({
-        facebook: z.string().url().optional().or(z.literal('')),
-        instagram: z.string().url().optional().or(z.literal('')),
-        youtube: z.string().url().optional().or(z.literal('')),
-        linkedin: z.string().url().optional().or(z.literal('')),
+        facebook: z.literal('').or(z.string().url()).optional(),
+        instagram: z.literal('').or(z.string().url()).optional(),
+        youtube: z.literal('').or(z.string().url()).optional(),
+        linkedin: z.literal('').or(z.string().url()).optional(),
     }).optional(),
+
+    alerts: z.array(z.object({
+        message: z.string(),
+        severity: z.enum(['info', 'warning', 'danger']),
+        timestamp: z.string(),
+    })).optional(),
+
+    activityNotes: z.array(z.object({
+        message: z.string(),
+        timestamp: z.string(),
+    })).optional(),
 });
 
 export const passwordChangeSchema = z.object({
@@ -71,7 +82,9 @@ export const newsSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters"),
     category: z.string().min(1, "Category is required"),
     description: z.string().min(10, "Description must be at least 10 characters"),
+    content: z.string().optional(),
     imageUrl: z.string().url().optional().or(z.literal('')),
+    images: z.array(z.string()).optional(),
     isPublished: z.boolean().optional(),
 });
 

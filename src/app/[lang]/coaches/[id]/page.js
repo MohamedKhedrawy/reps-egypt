@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { findUserById } from "@/lib/user";
 import MessageCoachForm from "@/components/coaches/MessageCoachForm";
+import ImageLightbox from "@/components/ImageLightbox";
 import { getDictionary } from "@/lib/get-dictionary";
 
 export async function generateMetadata({ params }) {
@@ -37,10 +38,10 @@ export default async function CoachProfilePage({ params }) {
                      <div className="flex flex-col md:flex-row items-end gap-6">
                         {/* Avatar */}
                         <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-background bg-tertiary overflow-hidden shadow-2xl">
-                            <img 
-                                src={coach.profilePhoto || `https://ui-avatars.com/api/?name=${coach.fullName}&background=dc2626&color=fff`} 
-                                alt={coach.fullName}
-                                className="w-full h-full object-cover"
+                            <ImageLightbox
+                                image={coach.profilePhoto || `https://ui-avatars.com/api/?name=${coach.fullName}&background=dc2626&color=fff`}
+                                title={`${coach.fullName}'s Profile Photo`}
+                                isOwnProfile={false}
                             />
                         </div>
 

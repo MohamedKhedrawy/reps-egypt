@@ -16,6 +16,8 @@
     "member-benefits": "Benefits",
     "standards": "Standards"
   },
+  "member-benefits": "Benefits",
+  "standards": "Standards",
   "coach_profile": {
     "reps_id": "REPS ID",
     "certified_coach": "Certified Coach",
@@ -391,6 +393,10 @@
     "birth_date": "Birth Date",
     "age": "Age",
     "age_auto": "Auto-calculated",
+    "gender": "Gender",
+    "gender_male": "Male",
+    "gender_female": "Female",
+    "gender_select": "Select Gender",
     "social_media": "Social Media",
     "optional": "(Optional)",
     "terms_agree": "I agree to the",
@@ -467,9 +473,17 @@
     "email": "Email",
     "phone": "Phone",
     "birth_date": "Birth Date",
+    "age": "Age",
+    "gender": "Gender",
+    "gender_male": "Male",
+    "gender_female": "Female",
+    "gender_select": "Select Gender",
     "specialization": "Specialization",
     "upload_photo": "Upload Photo",
     "remove_photo": "Remove Photo",
+    "close": "Close",
+    "delete_photo": "Delete Photo",
+    "profile_photo": "Profile Photo",
     "profile_strength": "Profile Strength",
     "complete_profile": "Complete your profile",
     "security": {
@@ -485,6 +499,22 @@
       "settings": "Settings",
       "certificates": "Certificates",
       "membership": "Membership"
+    },
+    "alerts_and_notes": "Alerts & Notes",
+    "alerts": "Alerts",
+    "activity_log": "Activity Log",
+    "no_alerts": "No alerts at the moment",
+    "no_notes": "No activity notes yet",
+    "alert_severity": {
+      "info": "Information",
+      "warning": "Warning",
+      "danger": "Danger"
+    },
+    "notification": {
+      "title": "You Have Alerts",
+      "close": "Close",
+      "view_profile": "View Profile",
+      "you_have": "You have"
     },
     "about_me": "About Me",
     "no_bio": "No bio information provided yet. Click 'Edit Profile' to add your story.",
@@ -608,6 +638,7 @@
       "approvals": "Approvals",
       "users": "Users",
       "news": "News",
+      "gallery": "Gallery",
       "pages": "Pages",
       "analytics": "Analytics"
     },
@@ -649,6 +680,30 @@
           "reject": "Reject",
           "edit": "Edit",
           "delete": "Delete"
+      },
+      "profile": {
+          "alerts": "Alerts",
+          "activity_log": "Activity Log",
+          "add_alert": "Add Alert",
+          "add_note": "Add Note",
+          "alert_placeholder": "Add an alert about this user...",
+          "note_placeholder": "Write a note about this user (e.g., verified documents, corrected data)...",
+          "alert_severity": {
+              "info": "Info 🔵",
+              "warning": "Warning ⚠️",
+              "danger": "Danger 🔴"
+          },
+          "no_alerts": "No alerts",
+          "no_notes": "No notes yet",
+          "edit_user": "Edit User",
+          "delete_user": "Delete User",
+          "delete_photo": "Delete Photo",
+          "photo_deleted": "Photo deleted successfully",
+          "photo_delete_failed": "Failed to delete photo",
+          "alert_added": "Alert added successfully",
+          "alert_failed": "Failed to add alert",
+          "note_added": "Note added successfully",
+          "note_failed": "Failed to add note"
       }
     },
     "analytics": {
@@ -678,19 +733,30 @@
       "draft": "Draft",
       "edit": "Edit",
       "delete": "Delete",
+      "view_full": "View Full",
       "modal": {
         "new_title": "New Article",
         "edit_title": "Edit Article",
         "title_label": "Title",
         "category_label": "Category",
         "desc_label": "Description",
+        "content_label": "Full Article Content",
         "image_label": "Image",
         "upload_btn": "Upload Image",
         "uploading": "Uploading...",
         "publish_immediate": "Publish immediately",
         "cancel": "Cancel",
         "create": "Create",
+        "confirm": "Confirm",
         "update": "Update",
+        "cover_image_label": "Cover Image",
+        "cover_image_desc": "(appears on card and popup)",
+        "cover_image_btn": "Choose Cover Image",
+        "cover_image_remove": "✕ Remove Image",
+        "gallery_label": "Additional Gallery Images",
+        "gallery_add_btn": "Add Gallery Images",
+        "gallery_list": "Added Images",
+        "gallery_remove_hint": "✕",
         "categories": {
             "Announcement": "Announcement",
             "Article": "Article",
@@ -709,6 +775,22 @@
       "legal_nav": "Legal Pages",
       "note_title": "Note about hidden pages",
       "note_desc": "Hidden pages are only removed from the navigation menus. Users can still access them directly via URL. Use this to temporarily hide pages without affecting direct links."
+    },
+    "gallery": {
+      "title": "Gallery Control",
+      "add_image_btn": "Add Image to Gallery",
+      "add_image_modal": "Add Image to Gallery",
+      "gallery_image": "Gallery image",
+      "select_image": "Choose an image first",
+      "image_added": "Image added to gallery successfully",
+      "add_failed": "Failed to add image",
+      "delete_confirm": "Delete this image?",
+      "image_deleted": "Image deleted successfully",
+      "delete_failed": "Failed to delete image",
+      "image_preview": "Preview",
+      "image_title_placeholder": "Image title (optional)",
+      "add": "Add",
+      "cancel": "Cancel"
     }
   },
   "program_content": {
@@ -769,7 +851,15 @@
     "newsletter_title": "Subscribe to our newsletter",
     "newsletter_desc": "Get the latest news and specialized fitness articles delivered directly to your inbox every week.",
     "email_placeholder": "Email address",
-    "btn_subscribe": "Subscribe"
+    "btn_subscribe": "Subscribe",
+    "article_not_found": "Article Not Found",
+    "back_to_news": "← Back to News",
+    "article_images": "Article Images",
+    "image": "Image",
+    "did_you_like": "Did you like this article?",
+    "share_article": "Share this article with your friends or read more news",
+    "read_more_news": "Read More News",
+    "back_home": "← Back to Home"
   },
   "blogs_page": {
     "title": "Our Blog",

@@ -10,6 +10,7 @@ import ProfileTabs from "./components/ProfileTabs";
 import ProfileEditForm from "./components/ProfileEditForm";
 import ProfileCertificates from "./components/ProfileCertificates";
 import ProfileSecurity from "./components/ProfileSecurity";
+import ProfileAlerts from "./components/ProfileAlerts";
 import SkeletonLoader from "./components/SkeletonLoader";
 
 export default function ProfileClient({ content, lang }) {
@@ -50,14 +51,13 @@ export default function ProfileClient({ content, lang }) {
 
       // 1. Handle Qualification Changes
       if (qualificationChanges) {
-          // qualificationChanges coming from ProfileEditForm is now an object: { newQualifications, newSpecialization }
           const resQual = await fetch(`/api/qualifications/request`, {
               method: "POST",
               headers: { 
                   "Content-Type": "application/json",
-                  "x-user-id": user.id // Pass ID safely 
+                  "x-user-id": user.id 
               }, 
-              body: JSON.stringify(qualificationChanges), // Pass the object directly
+              body: JSON.stringify(qualificationChanges),
           });
           
           if (!resQual.ok) {
@@ -70,18 +70,11 @@ export default function ProfileClient({ content, lang }) {
       }
 
       // 2. Handle General Updates
-      // Check if profilePhoto is just the base64 string. 
-      // If it's too large, we might have issues. But usually 100kb-500kb is fine.
-      // If the user didn't change it, `ProfileEditForm` sends the OLD url/base64?
-      // No, `ProfileEditForm` logic: `preview !== user.profilePhoto` check.
-      // But let's be safe.
-      
       if (generalUpdates && Object.keys(generalUpdates).length > 0) {
           const res = await fetch(`/api/admin/users/${user.id}`, {
             method: "PATCH",
             headers: { 
                 "Content-Type": "application/json",
-                // "x-user-id": user.id // Not strictly needed as we have auth middleware usually or ID in route
             },
             body: JSON.stringify(generalUpdates),
           });
@@ -91,10 +84,10 @@ export default function ProfileClient({ content, lang }) {
             setUser(prev => ({ 
                 ...prev, 
                 ...generalUpdates, 
-                // Don't update uploadedFiles here, they are pending
             }));
           } else {
             const data = await res.json();
+            console.error("Update error response:", data);
             toast.error(data.error || "Failed to update profile");
             success = false;
           }
@@ -104,8 +97,8 @@ export default function ProfileClient({ content, lang }) {
           setIsEditing(false);
       }
     } catch (error) {
+      console.error("Profile update error:", error);
       toast.error("Network error");
-      console.error(error);
     }
   };
 
@@ -129,6 +122,27 @@ export default function ProfileClient({ content, lang }) {
           toast.error(error.message || "Network error");
           throw error;
       }
+  };
+
+  const handleDeletePhoto = async () => {
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profilePhoto: null }),
+      });
+
+      if (res.ok) {
+        toast.success("Profile photo deleted successfully");
+        setUser(prev => ({ ...prev, profilePhoto: null }));
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Failed to delete photo");
+      }
+    } catch (error) {
+      toast.error("Failed to delete photo");
+      console.error(error);
+    }
   };
 
   const handleSendMessage = async () => {
@@ -182,6 +196,7 @@ export default function ProfileClient({ content, lang }) {
     content.tabs.overview, 
     content.tabs.settings, 
     content.security?.title || "Security",
+    content.alerts_and_notes || "Alerts & Notes",
     ...(user.role === 'trainer' ? [content.tabs.certificates] : [])
   ];
 
@@ -192,7 +207,9 @@ export default function ProfileClient({ content, lang }) {
         user={user} 
         content={content} 
         isEditing={isEditing} 
-        setIsEditing={setIsEditing} 
+        setIsEditing={setIsEditing}
+        onDeletePhoto={handleDeletePhoto}
+        isAdmin={user.role === 'admin'}
       />
 
       <div className="max-w-7xl mx-auto px-6 mt-8">
@@ -310,6 +327,11 @@ export default function ProfileClient({ content, lang }) {
                             {/* Security Tab */}
                             {activeTab === (content.security?.title || "Security") && (
                                 <ProfileSecurity content={content} onUpdatePassword={handleUpdatePassword} />
+                            )}
+
+                            {/* Alerts & Notes Tab */}
+                            {activeTab === (content.alerts_and_notes || "Alerts & Notes") && (
+                                <ProfileAlerts user={user} content={content} lang={lang} />
                             )}
                             
                             {/* Settings Tab (Redirect to Edit Mode) */}

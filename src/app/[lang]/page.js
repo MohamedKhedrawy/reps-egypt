@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getUsersPaginated, getUserStats } from "@/lib/user";
 import { getFeaturedPrograms, getProgramsCount } from "@/lib/programs";
 import { getDictionary } from "@/lib/get-dictionary";
+import HomeClient from "./HomeClient";
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
@@ -98,7 +99,7 @@ export default async function LandingPage({ params }) {
           {/* Main CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center gap-4 mb-12 w-full sm:w-auto">
             <Link 
-              href={`/${lang}/certification`}
+              href={`/${lang}/register/trainer`}
               className="w-full sm:w-auto px-8 py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-all shadow-lg shadow-red-600/20 hover:-translate-y-0.5 flex items-center justify-center gap-2"
             >
               {home.cta_get_certified} <ArrowRight />
@@ -133,57 +134,7 @@ export default async function LandingPage({ params }) {
       </section>
 
       {/* Trainers Section */}
-      <section className="py-24 max-w-7xl mx-auto px-6">
-        <div className="flex items-end justify-between mb-12">
-          <div>
-            <span className="text-red-500 font-bold uppercase tracking-wider text-sm">{home.section_trainers_badge}</span>
-            <h2 className="text-3xl lg:text-4xl font-bold mt-2 text-foreground">{home.section_trainers_title}</h2>
-          </div>
-          <Link href={`/${lang}/coaches`} className="hidden sm:flex items-center gap-2 text-sm font-bold text-muted hover:text-foreground transition-colors">
-            {home.section_trainers_view_all} <ArrowRight />
-          </Link>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {coaches.length > 0 ? coaches.map((trainer) => (
-            <div key={trainer._id.toString()} className="group relative bg-secondary rounded-xl overflow-hidden border border-border hover:border-red-600/50 transition-all duration-300">
-              <div className="aspect-[4/5] w-full overflow-hidden">
-                <img 
-                  src={trainer.profilePhoto || `https://ui-avatars.com/api/?name=${trainer.fullName}&background=dc2626&color=fff`} 
-                  alt={trainer.fullName} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
-                />
-              </div>
-              
-              {/* Overlay Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-80" />
-
-              {/* Tag */}
-              <div className="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">
-                {trainer.repsId ? `REPS #${trainer.repsId}` : home.certified}
-              </div>
-
-              {/* Content */}
-              <div className="absolute bottom-0 w-full p-4">
-                <h3 className="text-lg font-bold text-white mb-1 group-hover:text-red-500 transition-colors">{trainer.fullName}</h3>
-                <p className="text-sm text-gray-300 mb-4">{trainer.specialization || home.certified}</p>
-                
-                <Link 
-                  href={`/${lang}/coaches/${trainer._id.toString()}`}
-                  className="w-full py-2 bg-black/40 hover:bg-red-600 text-xs text-white font-bold uppercase rounded transition-colors flex items-center justify-center gap-2"
-                >
-                   {home.card_view_profile}
-                </Link>
-              </div>
-            </div>
-          )) : (
-            <div className="col-span-full text-center py-10 text-muted">
-              <p>{home.no_coaches_msg}</p>
-              <Link href={`/${lang}/register`} className="text-red-600 hover:underline mt-2 inline-block">{home.register_now}</Link>
-            </div>
-          )}
-        </div>
-      </section>
+      <HomeClient coaches={coaches} home={home} lang={lang} />
 
       {/* Programs Section */}
       <section className="py-24 bg-secondary">
@@ -296,7 +247,7 @@ export default async function LandingPage({ params }) {
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link 
-                  href={`/${lang}/certification`}
+                  href={`/${lang}/register/trainer`}
                   className="w-full sm:w-auto px-8 py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all hover:-translate-y-1"
                 >
                   {home.footer_cta_apply}
