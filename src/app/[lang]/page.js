@@ -39,7 +39,8 @@ export default async function LandingPage({ params }) {
   const { lang } = await params;
   const dictionary = await getDictionary(lang);
   const stats = await getUserStats();
-  const coaches = await getUsersPaginated({ role: 'trainer', status: 'approved' }, { limit: 4 });
+  const coachesData = await getUsersPaginated({ role: 'trainer', status: 'approved' }, { limit: 4 });
+  const coaches = JSON.parse(JSON.stringify(coachesData));
   const featuredPrograms = await getFeaturedPrograms();
   const programsCount = await getProgramsCount();
 
@@ -105,7 +106,7 @@ export default async function LandingPage({ params }) {
               {home.cta_get_certified} <ArrowRight />
             </Link>
             <Link 
-              href={`/${lang}/programs`}
+              href={`/${lang}/coaches`}
               className="w-full sm:w-auto px-8 py-3.5 bg-secondary border border-border hover:bg-tertiary text-foreground font-bold rounded-lg backdrop-blur-sm transition-all hover:-translate-y-0.5 text-center"
             >
               {home.cta_explore_programs}
