@@ -147,11 +147,11 @@ export default async function CodeOfEthicsPage({ params }) {
               <p className="text-muted text-sm leading-relaxed max-w-2xl mb-8">
                 {dictionary.ethics_page.reporting_text}
               </p>
-              <div className="flex gap-4">
-                 <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-[0_0_20px_rgba(220,38,38,0.3)]">
+              <div className="flex flex-col sm:flex-row gap-4">
+                 <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-[0_0_20px_rgba(220,38,38,0.3)] w-full sm:w-auto">
                    {dictionary.ethics_page.reporting_btn}
                  </button>
-                 <button className="bg-background/50 hover:bg-background/80 text-foreground font-bold py-3 px-6 rounded-xl border border-border transition-colors">
+                 <button className="bg-background/50 hover:bg-background/80 text-foreground font-bold py-3 px-6 rounded-xl border border-border transition-colors w-full sm:w-auto">
                    {dictionary.ethics_page.contact_btn}
                  </button>
               </div>

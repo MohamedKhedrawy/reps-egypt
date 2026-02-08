@@ -16,7 +16,7 @@ export default function Footer({ dictionary, lang }) {
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-red-900/50 to-transparent" />
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="grid md:grid-cols-12 gap-12 lg:gap-8 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 mb-16">
             
             <div className="md:col-span-4">
               <div className="flex items-center gap-3 mb-6">

@@ -107,7 +107,7 @@ export default async function LandingPage({ params }) {
       {/* Stats Bar */}
       <section className="border-y border-border bg-secondary">
         <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-theme">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-center divide-y sm:divide-y-0 sm:divide-x divide-theme">
             {[
               { number: `${stats.activeTrainers}+`, label: home.stats_coaches },
               { number: `${stats.activeTrainees}+`, label: home.stats_trainees },
@@ -139,7 +139,7 @@ export default async function LandingPage({ params }) {
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredPrograms.map((program, idx) => {
               // Translation lookup
               const translatedProgram = dictionary.program_content?.programs?.[program.title?.trim()] || {};
@@ -188,7 +188,7 @@ export default async function LandingPage({ params }) {
              <p className="text-muted text-lg">{home.section_why_subtitle}</p>
            </div>
 
-           <div className="grid md:grid-cols-3 gap-12">
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               {[
                 { 
                   title: home.why_standards_title, 
