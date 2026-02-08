@@ -380,7 +380,8 @@
       "approvals": "الموافقات",
       "users": "المستخدمين",
       "news": "الأخبار",      "gallery": "المعرض",      "pages": "الصفحات",
-      "analytics": "التحليلات"
+      "analytics": "التحليلات",
+      "emails": "البريد الإلكتروني"
     },
     "overview": {
       "recent_pending": "الموافقات المعلقة مؤخرًا",
@@ -409,6 +410,7 @@
         "roles": {
           "admin": "مدير",
           "trainer": "مدرب",
+          "trainee": "متدرب",
           "user": "مستخدم"
         },
         "status": {
@@ -567,6 +569,48 @@
       "image_title_placeholder": "عنوان الصورة (اختياري)",
       "add": "إضافة",
       "cancel": "إلغاء"
+    },
+    "emails": {
+      "title": "إدارة البريد الإلكتروني",
+      "subtitle": "إرسال رسائل جماعية للمستخدمين وإدارة عناوين البريد الإلكتروني للمنظمة",
+      "organization_emails": "بريد المنظمة",
+      "add_email": "إضافة بريد",
+      "email_placeholder": "email@organization.com",
+      "label_placeholder": "التسمية (مثال: الدعم)",
+      "no_emails": "لم يتم إعداد بريد إلكتروني للمنظمة",
+      "default": "الافتراضي",
+      "set_default": "تعيين كافتراضي",
+      "compose": "كتابة رسالة",
+      "from": "من",
+      "select_email": "اختر بريد المرسل...",
+      "subject": "الموضوع",
+      "subject_placeholder": "موضوع الرسالة...",
+      "content": "المحتوى",
+      "content_placeholder": "اكتب محتوى الرسالة...",
+      "filters": "فلاتر المستلمين",
+      "filter_role": "الدور",
+      "filter_age_range": "نطاق العمر",
+      "filter_id_range": "نطاق رقم ريبس",
+      "filter_age_min": "أقل عمر",
+      "filter_age_max": "أقصى عمر",
+      "filter_id_min": "أقل رقم",
+      "filter_id_max": "أقصى رقم",
+      "all_roles": "كل الأدوار",
+      "recipients": "مستلم يطابق الفلاتر",
+      "send": "إرسال الرسالة",
+      "sending": "جاري الإرسال...",
+      "send_confirm": "إرسال رسالة إلى",
+      "users": "مستخدم",
+      "send_success": "تم إرسال الرسائل بنجاح",
+      "send_failed": "فشل إرسال الرسائل",
+      "missing_fields": "يرجى ملء جميع الحقول المطلوبة",
+      "no_recipients": "لا يوجد مستلمين يطابقون الفلاتر",
+      "invalid_email": "يرجى إدخال بريد إلكتروني صالح",
+      "email_added": "تم إضافة البريد بنجاح",
+      "email_deleted": "تم حذف البريد",
+      "add_failed": "فشل إضافة البريد",
+      "delete_failed": "فشل حذف البريد",
+      "default_set": "تم تحديث البريد الافتراضي"
     }
   },
   "survey_page": {

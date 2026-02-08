@@ -50,3 +50,58 @@ export async function sendCoachMessage({ fromName, fromEmail, toEmail, message }
         throw new Error(error.message || "Failed to send email");
     }
 }
+
+/**
+ * Send bulk emails to multiple recipients
+ * @param {Object} params
+ * @param {string} params.fromEmail - Sender email address
+ * @param {string} params.fromLabel - Sender label/name
+ * @param {string[]} params.recipients - Array of recipient email addresses
+ * @param {string} params.subject - Email subject
+ * @param {string} params.htmlContent - HTML content of the email
+ * @param {string} params.textContent - Plain text content (fallback)
+ */
+export async function sendBulkEmail({ fromEmail, fromLabel, recipients, subject, htmlContent, textContent }) {
+    if (!process.env.RESEND_API_KEY) {
+        console.error("RESEND_API_KEY is missing");
+        throw new Error("Email service not configured");
+    }
+
+    try {
+        // Resend batch API supports up to 100 emails per request
+        const BATCH_SIZE = 100;
+        const results = [];
+
+        for (let i = 0; i < recipients.length; i += BATCH_SIZE) {
+            const batch = recipients.slice(i, i + BATCH_SIZE);
+            
+            // Create batch of emails
+            const emails = batch.map(to => ({
+                from: `${fromLabel || 'REPS Egypt'} <${fromEmail}>`,
+                to: [to],
+                subject,
+                html: htmlContent,
+                text: textContent,
+            }));
+
+            const { data, error } = await resend.batch.send(emails);
+
+            if (error) {
+                console.error("Resend batch API error:", error);
+                throw new Error(error.message || "Batch email sending failed");
+            }
+
+            results.push(...(data?.data || []));
+        }
+
+        return { 
+            success: true, 
+            id: results[0]?.id || 'batch-sent',
+            sentCount: recipients.length 
+        };
+    } catch (error) {
+        console.error("Resend bulk error:", error);
+        throw new Error(error.message || "Failed to send bulk emails");
+    }
+}
+

@@ -47,6 +47,17 @@ export default function AdminDashboard({ dictionary }) {
   const fileInputRef = useRef(null);
   const { refreshPages } = usePageSettings();
   const fetchedTabs = useRef(new Set()); // Track which tabs have been fetched
+  
+  // Email management state
+  const [organizationEmails, setOrganizationEmails] = useState([]);
+  const [newEmailAddress, setNewEmailAddress] = useState("");
+  const [newEmailLabel, setNewEmailLabel] = useState("");
+  const [selectedFromEmail, setSelectedFromEmail] = useState("");
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailContent, setEmailContent] = useState("");
+  const [emailFilters, setEmailFilters] = useState({ roles: [], ageMin: "", ageMax: "", idMin: "", idMax: "" });
+  const [recipientCount, setRecipientCount] = useState(0);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   // Fetch stats on mount (always needed for header)
   useEffect(() => {
@@ -111,6 +122,17 @@ export default function AdminDashboard({ dictionary }) {
           
         case "Gallery":
           // Gallery component handles its own data fetching
+          break;
+          
+        case "Emails":
+          const emailsRes = await fetch("/api/admin/emails");
+          if (emailsRes.ok) {
+            const emailsData = await emailsRes.json();
+            setOrganizationEmails(emailsData.emails || []);
+            // Set default selected email
+            const defaultEmail = emailsData.emails?.find(e => e.isDefault);
+            if (defaultEmail) setSelectedFromEmail(defaultEmail.id);
+          }
           break;
       }
       fetchedTabs.current.add(tab);
@@ -469,7 +491,161 @@ export default function AdminDashboard({ dictionary }) {
     }
   };
 
-  const tabs = ["Overview", "Approvals", "Users", "News", "Gallery", "Pages", "Analytics"];
+  // Email Management Functions
+  const handleAddOrganizationEmail = async () => {
+    if (!newEmailAddress || !newEmailAddress.includes('@')) {
+      toast.error(dictionary?.admin?.emails?.invalid_email || "Please enter a valid email address");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/admin/emails", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          email: newEmailAddress, 
+          label: newEmailLabel || newEmailAddress.split('@')[0],
+          isDefault: organizationEmails.length === 0 
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setOrganizationEmails(prev => [...prev, {
+          id: data.id,
+          email: newEmailAddress.toLowerCase(),
+          label: newEmailLabel || newEmailAddress.split('@')[0],
+          isDefault: organizationEmails.length === 0
+        }]);
+        setNewEmailAddress("");
+        setNewEmailLabel("");
+        toast.success(dictionary?.admin?.emails?.email_added || "Email added successfully");
+        if (organizationEmails.length === 0) setSelectedFromEmail(data.id);
+      } else {
+        toast.error(dictionary?.admin?.emails?.add_failed || "Failed to add email");
+      }
+    } catch {
+      toast.error(dictionary?.admin?.emails?.add_failed || "Failed to add email");
+    }
+  };
+
+  const handleDeleteOrganizationEmail = async (id) => {
+    try {
+      const res = await fetch(`/api/admin/emails/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setOrganizationEmails(prev => prev.filter(e => e.id !== id));
+        if (selectedFromEmail === id) setSelectedFromEmail("");
+        toast.success(dictionary?.admin?.emails?.email_deleted || "Email deleted");
+      } else {
+        toast.error(dictionary?.admin?.emails?.delete_failed || "Failed to delete email");
+      }
+    } catch {
+      toast.error(dictionary?.admin?.emails?.delete_failed || "Failed to delete email");
+    }
+  };
+
+  const handleSetDefaultEmail = async (id) => {
+    try {
+      const res = await fetch(`/api/admin/emails/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isDefault: true }),
+      });
+      if (res.ok) {
+        setOrganizationEmails(prev => prev.map(e => ({ ...e, isDefault: e.id === id })));
+        toast.success(dictionary?.admin?.emails?.default_set || "Default email updated");
+      }
+    } catch {
+      toast.error("Failed to set default email");
+    }
+  };
+
+  // Fetch recipient count when filters change
+  const fetchRecipientCount = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (emailFilters.roles.length > 0) params.append('roles', emailFilters.roles.join(','));
+      if (emailFilters.ageMin) params.append('ageMin', emailFilters.ageMin);
+      if (emailFilters.ageMax) params.append('ageMax', emailFilters.ageMax);
+      if (emailFilters.idMin) params.append('idMin', emailFilters.idMin);
+      if (emailFilters.idMax) params.append('idMax', emailFilters.idMax);
+
+      const res = await fetch(`/api/admin/emails/send?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setRecipientCount(data.count);
+      }
+    } catch {
+      console.error("Failed to fetch recipient count");
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "Emails") {
+      fetchRecipientCount();
+    }
+  }, [emailFilters, activeTab]);
+
+  const handleSendBulkEmail = async () => {
+    if (!selectedFromEmail || !emailSubject || !emailContent) {
+      toast.error(dictionary?.admin?.emails?.missing_fields || "Please fill in all required fields");
+      return;
+    }
+
+    if (recipientCount === 0) {
+      toast.error(dictionary?.admin?.emails?.no_recipients || "No recipients match your filters");
+      return;
+    }
+
+    if (!confirm(`${dictionary?.admin?.emails?.send_confirm || "Send email to"} ${recipientCount} ${dictionary?.admin?.emails?.users || "users"}?`)) {
+      return;
+    }
+
+    setSendingEmail(true);
+    try {
+      const res = await fetch("/api/admin/emails/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fromEmailId: selectedFromEmail,
+          subject: emailSubject,
+          htmlContent: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>${emailSubject}</h2>
+            <div style="white-space: pre-wrap;">${emailContent.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+            <hr style="margin-top: 30px; border: none; border-top: 1px solid #eee;" />
+            <p style="color: #888; font-size: 12px;">REPS Egypt</p>
+          </div>`,
+          textContent: emailContent,
+          filters: emailFilters,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(`${dictionary?.admin?.emails?.send_success || "Emails sent successfully"} (${data.sentCount})`);
+        setEmailSubject("");
+        setEmailContent("");
+      } else {
+        const data = await res.json();
+        toast.error(data.error || dictionary?.admin?.emails?.send_failed || "Failed to send emails");
+      }
+    } catch {
+      toast.error(dictionary?.admin?.emails?.send_failed || "Failed to send emails");
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
+  const toggleRoleFilter = (role) => {
+    setEmailFilters(prev => ({
+      ...prev,
+      roles: prev.roles.includes(role) 
+        ? prev.roles.filter(r => r !== role)
+        : [...prev.roles, role]
+    }));
+  };
+
+  const tabs = ["Overview", "Approvals", "Users", "News", "Gallery", "Pages", "Analytics", "Emails"];
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6">
@@ -986,6 +1162,240 @@ export default function AdminDashboard({ dictionary }) {
                     <div>
                       <h4 className="font-bold text-blue-400 text-sm mb-1">{dictionary?.admin?.pages?.note_title || "Note about hidden pages"}</h4>
                       <p className="text-sm text-blue-200/80">{dictionary?.admin?.pages?.note_desc || "Hidden pages are only removed from the navigation menus. Users can still access them directly via URL. Use this to temporarily hide pages without affecting direct links."}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Emails Tab */}
+            {activeTab === "Emails" && (
+              <div className="space-y-8">
+                {/* Header */}
+                <div className="bg-secondary border border-border rounded-2xl p-6">
+                  <h2 className="text-xl font-bold mb-2">{dictionary?.admin?.emails?.title || "Email Management"}</h2>
+                  <p className="text-muted text-sm">{dictionary?.admin?.emails?.subtitle || "Send bulk emails to users and manage organization email addresses"}</p>
+                </div>
+
+                <div className="grid lg:grid-cols-2 gap-8">
+                  {/* Organization Emails */}
+                  <div className="bg-secondary border border-border rounded-2xl p-6">
+                    <h3 className="font-bold mb-4 flex items-center gap-2">
+                      <span className="text-xl">📧</span>
+                      {dictionary?.admin?.emails?.organization_emails || "Organization Emails"}
+                    </h3>
+                    
+                    {/* Add New Email */}
+                    <div className="flex flex-col gap-2 mb-4">
+                      <input
+                        type="email"
+                        placeholder={dictionary?.admin?.emails?.email_placeholder || "email@organization.com"}
+                        value={newEmailAddress}
+                        onChange={(e) => setNewEmailAddress(e.target.value)}
+                        className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-red-500"
+                      />
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder={dictionary?.admin?.emails?.label_placeholder || "Label (e.g., Support)"}
+                          value={newEmailLabel}
+                          onChange={(e) => setNewEmailLabel(e.target.value)}
+                          className="flex-1 bg-tertiary border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-red-500"
+                        />
+                        <button
+                          onClick={handleAddOrganizationEmail}
+                          className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 text-sm whitespace-nowrap"
+                        >
+                          {dictionary?.admin?.emails?.add_email || "Add Email"}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Email List */}
+                    <div className="space-y-2">
+                      {organizationEmails.length === 0 ? (
+                        <p className="text-muted text-sm text-center py-4">{dictionary?.admin?.emails?.no_emails || "No organization emails configured"}</p>
+                      ) : (
+                        organizationEmails.map((email) => (
+                          <div key={email.id} className="flex items-center justify-between p-3 bg-tertiary rounded-lg border border-border">
+                            <div className="flex-1">
+                              <p className="font-medium text-sm">{email.label}</p>
+                              <p className="text-xs text-muted">{email.email}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {email.isDefault ? (
+                                <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full font-bold">
+                                  {dictionary?.admin?.emails?.default || "Default"}
+                                </span>
+                              ) : (
+                                <button
+                                  onClick={() => handleSetDefaultEmail(email.id)}
+                                  className="text-xs text-blue-400 hover:underline"
+                                >
+                                  {dictionary?.admin?.emails?.set_default || "Set Default"}
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleDeleteOrganizationEmail(email.id)}
+                                className="text-red-500 hover:text-red-400 p-1"
+                              >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Recipient Filters */}
+                  <div className="bg-secondary border border-border rounded-2xl p-6">
+                    <h3 className="font-bold mb-4 flex items-center gap-2">
+                      <span className="text-xl">🎯</span>
+                      {dictionary?.admin?.emails?.filters || "Recipient Filters"}
+                    </h3>
+
+                    {/* Role Filter */}
+                    <div className="mb-4">
+                      <label className="text-xs font-bold text-muted uppercase mb-2 block">{dictionary?.admin?.emails?.filter_role || "Role"}</label>
+                      <div className="flex flex-wrap gap-2">
+                        {['trainer', 'trainee', 'admin'].map((role) => (
+                          <button
+                            key={role}
+                            onClick={() => toggleRoleFilter(role)}
+                            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                              emailFilters.roles.includes(role)
+                                ? 'bg-red-600 text-white'
+                                : 'bg-tertiary text-muted hover:text-foreground border border-border'
+                            }`}
+                          >
+                            {dictionary?.admin?.users?.roles?.[role] || role}
+                          </button>
+                        ))}
+                        {emailFilters.roles.length === 0 && (
+                          <span className="text-xs text-muted italic px-2 py-1">{dictionary?.admin?.emails?.all_roles || "All roles"}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Age Range */}
+                    <div className="mb-4">
+                      <label className="text-xs font-bold text-muted uppercase mb-2 block">{dictionary?.admin?.emails?.filter_age_range || "Age Range"}</label>
+                      <div className="flex gap-2 items-center">
+                        <input
+                          type="number"
+                          placeholder={dictionary?.admin?.emails?.filter_age_min || "Min"}
+                          value={emailFilters.ageMin}
+                          onChange={(e) => setEmailFilters(prev => ({ ...prev, ageMin: e.target.value }))}
+                          className="w-24 bg-tertiary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-red-500"
+                        />
+                        <span className="text-muted">—</span>
+                        <input
+                          type="number"
+                          placeholder={dictionary?.admin?.emails?.filter_age_max || "Max"}
+                          value={emailFilters.ageMax}
+                          onChange={(e) => setEmailFilters(prev => ({ ...prev, ageMax: e.target.value }))}
+                          className="w-24 bg-tertiary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-red-500"
+                        />
+                      </div>
+                    </div>
+
+                    {/* ID Range */}
+                    <div className="mb-4">
+                      <label className="text-xs font-bold text-muted uppercase mb-2 block">{dictionary?.admin?.emails?.filter_id_range || "REPS ID Range"}</label>
+                      <div className="flex gap-2 items-center">
+                        <input
+                          type="number"
+                          placeholder={dictionary?.admin?.emails?.filter_id_min || "Min ID"}
+                          value={emailFilters.idMin}
+                          onChange={(e) => setEmailFilters(prev => ({ ...prev, idMin: e.target.value }))}
+                          className="w-28 bg-tertiary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-red-500"
+                        />
+                        <span className="text-muted">—</span>
+                        <input
+                          type="number"
+                          placeholder={dictionary?.admin?.emails?.filter_id_max || "Max ID"}
+                          value={emailFilters.idMax}
+                          onChange={(e) => setEmailFilters(prev => ({ ...prev, idMax: e.target.value }))}
+                          className="w-28 bg-tertiary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-red-500"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Recipient Count Preview */}
+                    <div className="bg-tertiary rounded-xl p-4 text-center border border-border">
+                      <p className="text-3xl font-bold text-red-500">{recipientCount}</p>
+                      <p className="text-sm text-muted">{dictionary?.admin?.emails?.recipients || "recipients match filters"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Email Composer */}
+                <div className="bg-secondary border border-border rounded-2xl p-6">
+                  <h3 className="font-bold mb-4 flex items-center gap-2">
+                    <span className="text-xl">✉️</span>
+                    {dictionary?.admin?.emails?.compose || "Compose Email"}
+                  </h3>
+
+                  <div className="space-y-4">
+                    {/* From Email */}
+                    <div>
+                      <label className="text-xs font-bold text-muted uppercase mb-2 block">{dictionary?.admin?.emails?.from || "From"}</label>
+                      <select
+                        value={selectedFromEmail}
+                        onChange={(e) => setSelectedFromEmail(e.target.value)}
+                        className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-red-500"
+                      >
+                        <option value="">{dictionary?.admin?.emails?.select_email || "Select sender email..."}</option>
+                        {organizationEmails.map((email) => (
+                          <option key={email.id} value={email.id}>{email.label} ({email.email})</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Subject */}
+                    <div>
+                      <label className="text-xs font-bold text-muted uppercase mb-2 block">{dictionary?.admin?.emails?.subject || "Subject"}</label>
+                      <input
+                        type="text"
+                        placeholder={dictionary?.admin?.emails?.subject_placeholder || "Email subject..."}
+                        value={emailSubject}
+                        onChange={(e) => setEmailSubject(e.target.value)}
+                        className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-red-500"
+                      />
+                    </div>
+
+                    {/* Content */}
+                    <div>
+                      <label className="text-xs font-bold text-muted uppercase mb-2 block">{dictionary?.admin?.emails?.content || "Content"}</label>
+                      <textarea
+                        placeholder={dictionary?.admin?.emails?.content_placeholder || "Write your email content..."}
+                        value={emailContent}
+                        onChange={(e) => setEmailContent(e.target.value)}
+                        rows={8}
+                        className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-red-500 resize-none"
+                      />
+                    </div>
+
+                    {/* Send Button */}
+                    <div className="flex justify-end">
+                      <button
+                        onClick={handleSendBulkEmail}
+                        disabled={sendingEmail || !selectedFromEmail || !emailSubject || !emailContent || recipientCount === 0}
+                        className="px-8 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        {sendingEmail ? (
+                          <>
+                            <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            {dictionary?.admin?.emails?.sending || "Sending..."}
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                            {dictionary?.admin?.emails?.send || "Send Email"} ({recipientCount})
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
                 </div>
