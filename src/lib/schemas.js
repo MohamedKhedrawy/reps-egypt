@@ -15,6 +15,7 @@ export const registerSchema = z.object({
     birthDate: z.string().optional(),
     age: z.union([z.string(), z.number()]).optional(),
     gender: z.enum(['male', 'female']).optional().or(z.literal('')),
+    governorate: z.string().min(1, { message: "Governorate is required" }).optional().or(z.literal('')),
     
     socialMedia: z.object({
         facebook: z.literal('').or(z.string().url()).optional(),
