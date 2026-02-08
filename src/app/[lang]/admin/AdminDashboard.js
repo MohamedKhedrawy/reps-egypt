@@ -1115,7 +1115,7 @@ export default function AdminDashboard({ dictionary }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {pageSettings.main?.map((setting) => (
                           <div key={setting.pageId} className="flex items-center justify-between p-4 bg-tertiary rounded-xl border border-border">
-                            <span className="font-medium capitalize">{setting.name}</span>
+                            <span className="font-medium capitalize">{dictionary?.admin?.pages?.page_names?.[setting.pageId] || setting.name}</span>
                             <label className="relative inline-flex items-center cursor-pointer">
                               <input type="checkbox" checked={setting.isVisible} onChange={() => handleTogglePageVisibility(setting.pageId, setting.isVisible)} className="sr-only peer" />
                               <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
@@ -1131,7 +1131,7 @@ export default function AdminDashboard({ dictionary }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {pageSettings.footer?.map((setting) => (
                           <div key={setting.pageId} className="flex items-center justify-between p-4 bg-tertiary rounded-xl border border-border">
-                            <span className="font-medium capitalize">{setting.name}</span>
+                            <span className="font-medium capitalize">{dictionary?.admin?.pages?.page_names?.[setting.pageId] || setting.name}</span>
                             <label className="relative inline-flex items-center cursor-pointer">
                               <input type="checkbox" checked={setting.isVisible} onChange={() => handleTogglePageVisibility(setting.pageId, setting.isVisible)} className="sr-only peer" />
                               <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
@@ -1147,7 +1147,7 @@ export default function AdminDashboard({ dictionary }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {pageSettings.legal?.map((setting) => (
                           <div key={setting.pageId} className="flex items-center justify-between p-4 bg-tertiary rounded-xl border border-border">
-                            <span className="font-medium capitalize">{setting.name}</span>
+                            <span className="font-medium capitalize">{dictionary?.admin?.pages?.page_names?.[setting.pageId] || setting.name}</span>
                             <label className="relative inline-flex items-center cursor-pointer">
                               <input type="checkbox" checked={setting.isVisible} onChange={() => handleTogglePageVisibility(setting.pageId, setting.isVisible)} className="sr-only peer" />
                               <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>

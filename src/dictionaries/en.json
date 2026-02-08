@@ -775,7 +775,24 @@
       "footer_nav": "Footer Quick Links",
       "legal_nav": "Legal Pages",
       "note_title": "Note about hidden pages",
-      "note_desc": "Hidden pages are only removed from the navigation menus. Users can still access them directly via URL. Use this to temporarily hide pages without affecting direct links."
+      "note_desc": "Hidden pages are only removed from the navigation menus. Users can still access them directly via URL. Use this to temporarily hide pages without affecting direct links.",
+      "page_names": {
+        "home": "Home",
+        "coaches": "Coaches",
+        "programs": "Specializations",
+        "gallery": "Gallery",
+        "news": "News",
+        "benefits": "Benefits",
+        "standards": "Standards",
+        "pricing": "Pricing",
+        "faq": "FAQ",
+        "about": "About",
+        "partners": "Partners",
+        "jobs": "Jobs",
+        "code-of-ethics": "Code of Ethics",
+        "privacy-policy": "Privacy Policy",
+        "terms-of-service": "Terms of Service"
+      }
     },
     "gallery": {
       "title": "Gallery Control",
