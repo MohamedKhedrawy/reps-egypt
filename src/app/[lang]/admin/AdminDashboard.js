@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { usePageSettings } from "@/context/PageSettingsContext";
 import dynamic from 'next/dynamic';
 import GalleryDashboard from './GalleryDashboard';
+import PartnersDashboard from './PartnersDashboard';
 
 // Dynamic import for recharts - only loads when Analytics tab is viewed (~8.3MB saved on initial load)
 const AreaChart = dynamic(() => import('recharts').then(mod => mod.AreaChart), { ssr: false });
@@ -789,7 +790,7 @@ export default function AdminDashboard({ dictionary }) {
     reader.readAsDataURL(file);
   };
 
-  const tabs = ["Overview", "Approvals", "Users", "News", "Gallery", "Pages", "Jobs", "Analytics", "Emails"];
+  const tabs = ["Overview", "Approvals", "Users", "News", "Gallery", "Pages", "Partners", "Jobs", "Analytics", "Emails"];
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6">
@@ -1316,6 +1317,17 @@ export default function AdminDashboard({ dictionary }) {
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Partners Tab */}
+            {activeTab === "Partners" && (
+              <div className="bg-secondary border border-border rounded-2xl p-6">
+                <div className="mb-6">
+                  <h2 className="text-xl font-bold">{dictionary?.admin?.partners?.title || "Partners Management"}</h2>
+                  <p className="text-muted text-sm">{dictionary?.admin?.partners?.subtitle || "Add, manage, and organize your business partners"}</p>
+                </div>
+                <PartnersDashboard dictionary={dictionary?.admin?.partners} />
               </div>
             )}
 

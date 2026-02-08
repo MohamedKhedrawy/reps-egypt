@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import Providers from "@/components/Providers";
 import NotificationCenter from "@/components/NotificationCenter";
 import { Toaster } from "sonner";
-import ChatWidget from "@/app/[lang]/components/ChatWidget";
+import ClientLayout from "@/app/[lang]/ClientLayout";
 import "../globals.css";
 import { getDictionary } from "@/lib/get-dictionary";
 import { i18n } from "@/i18n-config";
@@ -72,10 +72,9 @@ export default async function RootLayout({ children, params }) {
           <div className="fixed z-[9999]">
              <Toaster position="bottom-right" theme="dark" richColors closeButton />
           </div>
-          <main className="min-h-screen pt-20">
+          <ClientLayout>
             {children}
-          </main>
-          <ChatWidget />
+          </ClientLayout>
           <Footer dictionary={dictionary} lang={lang} />
         </Providers>
       </body>

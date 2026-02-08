@@ -188,7 +188,7 @@ export default function ChatWidget() {
         className="fixed bottom-6 right-6 z-50 p-4 bg-red-600 text-white rounded-full shadow-lg hover:shadow-red-600/40 transition-all duration-300 hover:scale-110 active:scale-90"
         aria-label="Toggle Support Chat"
       >
-        <div className={`transition-transform duration-200 ${isOpen ? 'rotate-0' : 'rotate-0'}`}>
+        <div className="transition-transform duration-200">
           {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
         </div>
       </button>
