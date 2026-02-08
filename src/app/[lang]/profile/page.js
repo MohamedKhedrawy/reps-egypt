@@ -15,5 +15,5 @@ export default async function ProfilePage({ params }) {
   const { lang } = await params;
   const dictionary = await getDictionary(lang);
 
-  return <ProfileClient content={dictionary.profile_page} lang={lang} />;
+  return <ProfileClient content={dictionary.profile_page} dictionary={dictionary} lang={lang} />;
 }

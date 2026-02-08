@@ -13,6 +13,33 @@ export async function getUsersCollection() {
 }
 
 /**
+ * Get next REPS ID (incremental counter)
+ * @returns {Promise<number>}
+ */
+export async function getNextRepsId() {
+    const client = await clientPromise;
+    const db = client.db(DB_NAME);
+    const countersCollection = db.collection('counters');
+    
+    const result = await countersCollection.findOneAndUpdate(
+        { _id: 'repsId' },
+        { $inc: { value: 1 } },
+        { upsert: true, returnDocument: 'after' }
+    );
+    
+    // If this is the first time, start from 1000
+    if (!result.value) {
+        await countersCollection.updateOne(
+            { _id: 'repsId' },
+            { $set: { value: 1000 } }
+        );
+        return 1000;
+    }
+    
+    return result.value.value;
+}
+
+/**
  * Find a user by email
  * @param {string} email 
  * @returns {Promise<object|null>}
@@ -41,11 +68,15 @@ export async function findUserById(id) {
 export async function createUser(userData) {
     const users = await getUsersCollection();
     
+    // Generate next REPS ID
+    const repsId = await getNextRepsId();
+    
     const user = {
         // Core fields
         email: userData.email.toLowerCase(),
         password: userData.password,
         fullName: userData.fullName,
+        repsId: repsId, // Auto-incremented REPS ID starting from 1000
         
         // Contact info
         phone: userData.phone || null,
@@ -53,6 +84,8 @@ export async function createUser(userData) {
         // Personal info
         birthDate: userData.birthDate || null,
         age: userData.age ? parseInt(userData.age) : null,
+        gender: userData.gender || null,
+        governorate: userData.governorate || null,
         
         // Social media
         socialMedia: {
@@ -129,23 +162,6 @@ export async function getUsersPaginated(filter = {}, options = {}) {
  */
 export async function getPendingUsers() {
     return getUsersPaginated({ status: 'pending' });
-}
-
-/**
- * Get the next available REPS ID (starts at 1000)
- * @returns {Promise<number>}
- */
-export async function getNextRepsId() {
-    const users = await getUsersCollection();
-    const result = await users.find({ repsId: { $exists: true } })
-        .sort({ repsId: -1 })
-        .limit(1)
-        .toArray();
-    
-    if (result.length === 0) {
-        return 1000; // Start from 1000
-    }
-    return result[0].repsId + 1;
 }
 
 /**

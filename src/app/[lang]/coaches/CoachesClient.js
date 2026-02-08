@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 
-export default function CoachesClient({ coaches, content, lang }) {
+export default function CoachesClient({ coaches, content, dictionary, lang }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('');
   const [selectedExperience, setSelectedExperience] = useState('');
@@ -144,6 +144,11 @@ export default function CoachesClient({ coaches, content, lang }) {
                        {trainer.repsId && (
                            <div className="inline-block mb-2 px-2 py-1 rounded bg-red-600/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
                              REPS #{trainer.repsId}
+                           </div>
+                       )}
+                       {trainer.governorate && (
+                           <div className="text-xs text-gray-400 mb-2 font-medium">
+                             📍 {dictionary?.admin?.jobs?.governorates?.[trainer.governorate] || trainer.governorate}
                            </div>
                        )}
                        

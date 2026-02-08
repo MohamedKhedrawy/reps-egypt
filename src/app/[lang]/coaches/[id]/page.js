@@ -55,7 +55,7 @@ export default async function CoachProfilePage({ params }) {
                                     </span>
                                 )}
                             </div>
-                            <p className="text-muted text-lg">{coach.specialization || t.certified_coach} • {coach.location || t.default_location}</p>
+                            <p className="text-muted text-lg">{coach.specialization || t.certified_coach} • {coach.location || t.default_location}{coach.governorate ? ` • 📍 ${dictionary?.admin?.jobs?.governorates?.[coach.governorate] || coach.governorate}` : ""}</p>
                         </div>
                      </div>
                 </div>
@@ -75,6 +75,12 @@ export default async function CoachProfilePage({ params }) {
                                     <div>
                                         <div className="text-xs text-muted uppercase font-bold">{t.label_specialization}</div>
                                         <div className="font-medium">{coach.specialization}</div>
+                                    </div>
+                                )}
+                                {coach.governorate && (
+                                    <div>
+                                        <div className="text-xs text-muted uppercase font-bold">{dictionary?.admin?.jobs?.governorate || "Governorate"}</div>
+                                        <div className="font-medium">📍 {dictionary?.admin?.jobs?.governorates?.[coach.governorate] || coach.governorate}</div>
                                     </div>
                                 )}
                                 {coach.experience && (

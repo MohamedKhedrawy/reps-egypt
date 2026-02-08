@@ -13,7 +13,7 @@ import ProfileSecurity from "./components/ProfileSecurity";
 import ProfileAlerts from "./components/ProfileAlerts";
 import SkeletonLoader from "./components/SkeletonLoader";
 
-export default function ProfileClient({ content, lang }) {
+export default function ProfileClient({ content, dictionary, lang }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(content.tabs.overview);
@@ -206,6 +206,7 @@ export default function ProfileClient({ content, lang }) {
       <ProfileHeader 
         user={user} 
         content={content} 
+        dictionary={dictionary}
         isEditing={isEditing} 
         setIsEditing={setIsEditing}
         onDeletePhoto={handleDeletePhoto}
@@ -236,6 +237,7 @@ export default function ProfileClient({ content, lang }) {
                         <ProfileEditForm 
                             user={user} 
                             content={content} 
+                            dictionary={dictionary}
                             onSave={handleUpdateProfile} 
                             onCancel={() => setIsEditing(false)} 
                         />

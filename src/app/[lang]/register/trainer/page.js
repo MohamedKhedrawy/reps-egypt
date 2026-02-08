@@ -21,5 +21,5 @@ export default async function TrainerRegisterPage({ params }) {
     ...dictionary.register_trainer_page
   };
 
-  return <TrainerRegisterClient content={content} lang={lang} />;
+  return <TrainerRegisterClient content={content} dictionary={dictionary} lang={lang} />;
 }

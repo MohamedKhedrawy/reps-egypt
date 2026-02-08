@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
-export default function ProfileHeader({ user, content, isEditing, setIsEditing, onDeletePhoto, isAdmin }) {
+export default function ProfileHeader({ user, content, dictionary, isEditing, setIsEditing, onDeletePhoto, isAdmin }) {
   const [showPhotoModal, setShowPhotoModal] = useState(false);
 
   const avatarUrl = useMemo(() => {
@@ -90,6 +90,12 @@ export default function ProfileHeader({ user, content, isEditing, setIsEditing, 
                       <span className="opacity-70">{user.specialization || content.fitness_enthusiast}</span>
                       <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
                       <span className="opacity-70">{user.location || "Egypt"}</span>
+                      {user.governorate && (
+                          <>
+                              <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
+                              <span className="opacity-70">📍 {dictionary?.admin?.jobs?.governorates?.[user.governorate] || user.governorate}</span>
+                          </>
+                      )}
                   </p>
               </div>
 

@@ -15,5 +15,5 @@ export default async function TraineeRegisterPage({ params }) {
   const { lang } = await params;
   const dictionary = await getDictionary(lang);
 
-  return <TraineeRegisterClient content={dictionary.register_trainee_page} lang={lang} />;
+  return <TraineeRegisterClient content={dictionary.register_trainee_page} dictionary={dictionary} lang={lang} />;
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
-export default function ProfileEditForm({ user, content, onSave, onCancel }) {
+export default function ProfileEditForm({ user, content, dictionary, onSave, onCancel }) {
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(user.profilePhoto);
   const [files, setFiles] = useState(user.uploadedFiles || []);
@@ -206,8 +206,21 @@ export default function ProfileEditForm({ user, content, onSave, onCancel }) {
                 </div>
             </div>
             <div className="space-y-2">
-                <label className="text-xs font-bold text-muted uppercase tracking-wider">{content.location}</label>
-                <input 
+                <label className="text-xs font-bold text-muted uppercase tracking-wider">{dictionary?.admin?.jobs?.governorate || "Governorate"}</label>
+                <div className="relative">
+                    <select 
+                        name="governorate" 
+                        defaultValue={user.governorate || ""} 
+                        className="w-full bg-tertiary/50 border border-border/50 rounded-xl px-4 py-3 focus:border-red-600 focus:ring-1 focus:ring-red-600 focus:outline-none transition-all appearance-none"
+                    >
+                        <option value="">{dictionary?.admin?.jobs?.select_governorate || "Select a governorate"}</option>
+                        {Object.entries(dictionary?.admin?.jobs?.governorates || {}).map(([key, label]) => (
+                            <option key={key} value={key}>{label}</option>
+                        ))}
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted">▼</div>
+                </div>
+            </div> 
                     name="location" 
                     defaultValue={user.location} 
                     placeholder={content.location_placeholder} 

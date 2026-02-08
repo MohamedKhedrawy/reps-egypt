@@ -9,7 +9,7 @@ export default function ProfileStats({ user, content, lang }) {
   // Calculate Profile Strength
   const calculateStrength = () => {
       let score = 0;
-      const totalPoints = 7; // Total number of checks
+      const totalPoints = 8; // Total number of checks
       
       if (user.fullName) score++;
       if (user.email) score++;
@@ -18,10 +18,11 @@ export default function ProfileStats({ user, content, lang }) {
       if (user.profilePhoto) score++;
       if (user.specialization) score++;
       if (user.location) score++;
+      if (user.governorate) score++;
       // Check for at least one social media link
       if (user.socialMedia && (user.socialMedia.instagram || user.socialMedia.facebook || user.socialMedia.linkedin)) {
           // Bonus point or counts towards total? Let's say social is optional bonus? 
-          // Or just stick to simple 7 fields.
+          // Or just stick to simple fields.
           // Let's add social as a field.
       }
       

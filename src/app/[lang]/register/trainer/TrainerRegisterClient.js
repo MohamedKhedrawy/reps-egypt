@@ -13,7 +13,7 @@ function debounce(func, wait) {
   };
 }
 
-export default function TrainerRegisterClient({ content, lang }) {
+export default function TrainerRegisterClient({ content, dictionary, lang }) {
   const router = useRouter();
   const fileInputRef = useRef(null);
   const certFileInputRef = useRef(null);
@@ -321,7 +321,7 @@ export default function TrainerRegisterClient({ content, lang }) {
                 <div><label className="text-xs font-bold text-muted uppercase tracking-wider">{content.age}</label><input readOnly value={formData.age} className="w-full bg-tertiary border border-border rounded-xl px-4 py-3.5 text-sm text-foreground opacity-70 cursor-not-allowed" placeholder={content.age_auto} /></div>
               </div>
               <div><label className="text-xs font-bold text-muted uppercase tracking-wider">{content.gender}</label><select name="gender" value={formData.gender} onChange={handleChange} className="w-full bg-tertiary border border-border rounded-xl px-4 py-3.5 text-sm text-foreground focus:outline-none focus:border-red-600 appearance-none cursor-pointer"><option value="">{content.gender_select}</option><option value="male">{content.gender_male}</option><option value="female">{content.gender_female}</option></select></div>
-              <div><label className="text-xs font-bold text-muted uppercase tracking-wider">{content.admin?.jobs?.governorate || "Governorate"} *</label><select name="governorate" value={formData.governorate} onChange={handleChange} className="w-full bg-tertiary border border-border rounded-xl px-4 py-3.5 text-sm text-foreground focus:outline-none focus:border-red-600 appearance-none cursor-pointer"><option value="">{content.admin?.jobs?.select_governorate || "Select a governorate"}</option>{Object.entries(content.admin?.jobs?.governorates || {}).map(([key, label]) => (<option key={key} value={key}>{label}</option>))}</select><FieldError name="governorate" /></div>
+              <div><label className="text-xs font-bold text-muted uppercase tracking-wider">{dictionary?.admin?.jobs?.governorate || "Governorate"} *</label><select name="governorate" value={formData.governorate} onChange={handleChange} className="w-full bg-tertiary border border-border rounded-xl px-4 py-3.5 text-sm text-foreground focus:outline-none focus:border-red-600 appearance-none cursor-pointer"><option value="">{dictionary?.admin?.jobs?.select_governorate || "Select a governorate"}</option>{Object.entries(dictionary?.admin?.jobs?.governorates || {}).map(([key, label]) => (<option key={key} value={key}>{label}</option>))}</select><FieldError name="governorate" /></div>
               <div className="pt-4 border-t border-border">
                 <h3 className="text-sm font-semibold text-foreground mb-4">{content.social_media} <span className="text-muted font-normal">{content.optional}</span></h3>
                 <div className="grid md:grid-cols-2 gap-4">

@@ -24,6 +24,6 @@ export default async function CoachesPage({ params }) {
   const coaches = await getUsers({ role: 'trainer', status: 'approved' });
 
   return (
-    <CoachesClient coaches={coaches} content={content} lang={lang} />
+    <CoachesClient coaches={coaches} content={content} dictionary={dictionary} lang={lang} />
   );
 }

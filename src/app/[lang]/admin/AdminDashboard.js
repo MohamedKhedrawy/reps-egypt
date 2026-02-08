@@ -986,6 +986,7 @@ export default function AdminDashboard({ dictionary }) {
                         <th className="pb-3 font-medium text-start w-12"></th>
                         <th className="pb-3 font-medium text-start">{dictionary?.admin?.users?.table?.name || "Name"}</th>
                         <th className="pb-3 font-medium text-start">{dictionary?.admin?.users?.table?.email || "Email"}</th>
+                        <th className="pb-3 font-medium text-start">{dictionary?.admin?.jobs?.governorate || "Governorate"}</th>
                         <th className="pb-3 font-medium text-start">{dictionary?.admin?.users?.table?.role || "Role"}</th>
                         <th className="pb-3 font-medium text-start">{dictionary?.admin?.users?.table?.status || "Status"}</th>
                         <th className="pb-3 font-medium text-start">{dictionary?.admin?.users?.table?.actions || "Actions"}</th>
@@ -1007,8 +1008,14 @@ export default function AdminDashboard({ dictionary }) {
                               )}
                             </div>
                           </td>
-                          <td className="py-4 font-medium">{user.name}</td>
+                          <td className="py-4 font-medium">
+                            <div>{user.name}</div>
+                            <div className="text-xs text-muted">REPS #{user.repsId || user.id?.slice(0, 8)}</div>
+                          </td>
                           <td className="py-4 text-muted">{user.email}</td>
+                          <td className="py-4 text-sm">
+                            {dictionary?.admin?.jobs?.governorates?.[user.governorate] || user.governorate || '-'}
+                          </td>
                           <td className="py-4">
                             <span className={`px-2 py-1 rounded text-xs font-bold ${user.role === 'admin' ? 'bg-purple-500/20 text-purple-400' : user.role === 'trainer' ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'}`}>
                               {dictionary?.admin?.users?.roles?.[user.role] || user.role}
