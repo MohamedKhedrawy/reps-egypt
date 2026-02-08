@@ -88,6 +88,20 @@ export const newsSchema = z.object({
     isPublished: z.boolean().optional(),
 });
 
+export const jobSchema = z.object({
+    title: z.string().min(3, "Title must be at least 3 characters"),
+    company: z.string().min(1, "Company name is required"),
+    location: z.string().min(1, "Location is required"),
+    governorate: z.string().min(1, "Governorate is required"),
+    type: z.enum(['full_time', 'part_time', 'contract']),
+    salary: z.string().min(1, "Salary is required"),
+    currency: z.enum(['EGP', 'USD', 'EUR', 'AED', 'SAR']).default('EGP'),
+    description: z.string().min(10, "Description must be at least 10 characters"),
+    logo: z.string().url().optional().or(z.literal('')),
+    featured: z.boolean().optional().default(false),
+    isPublished: z.boolean().optional().default(true),
+});
+
 export const messageSchema = z.object({
     coachId: z.string().min(1, "Coach ID is required"),
     message: z.string().min(1, "Message is required").max(2000, "Message cannot exceed 2000 characters"),
