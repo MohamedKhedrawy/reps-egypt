@@ -775,25 +775,18 @@ export default function AdminDashboard({ dictionary }) {
     if (!file) return;
 
     setUploadingJobLogo(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const uploadRes = await fetch("/api/gallery", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (uploadRes.ok) {
-        const data = await uploadRes.json();
-        setJobLogo(data.imageUrl);
-        setJobLogoPreview(data.imageUrl);
-      }
-    } catch (error) {
-      toast.error("Failed to upload logo");
-    } finally {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setJobLogo(reader.result);
+      setJobLogoPreview(reader.result);
       setUploadingJobLogo(false);
-    }
+      toast.success("تم تحميل شعار الشركة");
+    };
+    reader.onerror = () => {
+      toast.error("فشل تحميل الصورة");
+      setUploadingJobLogo(false);
+    };
+    reader.readAsDataURL(file);
   };
 
   const tabs = ["Overview", "Approvals", "Users", "News", "Gallery", "Pages", "Jobs", "Analytics", "Emails"];
