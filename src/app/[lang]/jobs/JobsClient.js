@@ -1,22 +1,128 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function JobsClient({ content, lang }) {
   const [filterType, setFilterType] = useState("all");
+  const [filterGovernorate, setFilterGovernorate] = useState("all");
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const jobs = content.jobs_list;
+  // محافظات مصر
+  const egyptianGovernorates = [
+    "Cairo",
+    "Alexandria",
+    "Giza",
+    "Sharqia",
+    "Dakahlia",
+    "Kafr El-Sheikh",
+    "Damietta",
+    "Port Said",
+    "Ismailia",
+    "Suez",
+    "Beheira",
+    "Gharbia",
+    "Menoufia",
+    "Qalyubia",
+    "Aswan",
+    "Luxor",
+    "Qena",
+    "Sohag",
+    "Assiut",
+    "Minya",
+    "Beni Suef",
+    "Faiyum",
+    "Helwan",
+    "Matruh",
+    "New Cairo",
+    "6th of October",
+    "Heliopolis",
+    "Nasr City",
+    "Zamalek",
+    "Giza City"
+  ];
 
-  const filteredJobs = filterType === "all" 
-    ? jobs 
-    : jobs.filter(j => j.type_key === filterType);
+  // Fetch jobs from API
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const res = await fetch("/api/admin/jobs");
+        if (res.ok) {
+          const data = await res.json();
+          // Map API jobs to display format
+          const mappedJobs = (data.jobs || []).map(job => ({
+            id: job._id,
+            title: job.title,
+            company: job.company,
+            location: job.location,
+            type_key: job.type,
+            type: getJobTypeLabel(job.type),
+            salary: `${job.salary}${job.currency ? ' ' + job.currency : ''}`,
+            logo: job.image || '/default-job-logo.png',
+            posted: formatDate(job.postedAt),
+            featured: job.featured || false,
+            description: job.description,
+            currency: job.currency
+          }));
+          setJobs(mappedJobs);
+        }
+      } catch (error) {
+        console.error("Failed to fetch jobs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
+  // Get job type label
+  const getJobTypeLabel = (type) => {
+    const typeLabels = {
+      full_time: content.filters?.full_time || "Full Time",
+      part_time: content.filters?.part_time || "Part Time",
+      contract: content.filters?.contract || "Contract"
+    };
+    return typeLabels[type] || type;
+  };
+
+  // Format date
+  const formatDate = (dateString) => {
+    if (!dateString) return "Recently posted";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    return `${Math.floor(diffDays / 30)} months ago`;
+  };
+
+  const filteredJobs = jobs.filter(job => {
+    const matchesType = filterType === "all" || job.type_key === filterType;
+    const matchesGovernorate = filterGovernorate === "all" || job.location === filterGovernorate;
+    const matchesSearch = searchQuery === "" || 
+      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      job.location.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesType && matchesGovernorate && matchesSearch;
+  }).sort((a, b) => {
+    // Sort featured jobs first
+    if (a.featured && !b.featured) return -1;
+    if (!a.featured && b.featured) return 1;
+    return 0;
+  });
 
   const filters = [
-    { key: "all", label: content.filters.all },
-    { key: "full_time", label: content.filters.full_time },
-    { key: "part_time", label: content.filters.part_time },
-    { key: "contract", label: content.filters.contract }
+    { key: "all", label: content.filters?.all || "All" },
+    { key: "full_time", label: content.filters?.full_time || "Full Time" },
+    { key: "part_time", label: content.filters?.part_time || "Part Time" },
+    { key: "contract", label: content.filters?.contract || "Contract" }
   ];
 
   return (
@@ -49,19 +155,40 @@ export default function JobsClient({ content, lang }) {
 
       {/* Filter Bar */}
       <section className="py-8 px-6 sticky top-20 z-40 bg-background/80 backdrop-blur-md border-b border-border">
-         <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-               <input 
-                 type="text" 
-                 placeholder={content.search_placeholder}
-                 className="w-full bg-secondary border border-border rounded-xl px-5 py-3 pl-12 focus:border-red-600 focus:outline-none transition-colors"
-               />
-               <svg className="w-5 h-5 text-muted absolute left-4 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-               </svg>
+         <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row gap-4 items-end">
+               <div className="relative flex-1">
+                  <input 
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={content.search_placeholder || "Search jobs..."}
+                    className="w-full bg-secondary border border-border rounded-xl px-5 py-3 pl-12 focus:border-red-600 focus:outline-none transition-colors"
+                  />
+                  <svg className="w-5 h-5 text-muted absolute left-4 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+               </div>
+               
+               <div className="relative w-full md:w-48">
+                  <select 
+                    value={filterGovernorate}
+                    onChange={(e) => setFilterGovernorate(e.target.value)}
+                    className="w-full bg-secondary border border-border rounded-xl px-4 py-2.5 text-sm focus:border-red-600 focus:outline-none transition-colors appearance-none cursor-pointer font-bold"
+                  >
+                    <option value="all">جميع المحافظات</option>
+                    {egyptianGovernorates.map((gov) => (
+                      <option key={gov} value={gov}>{gov}</option>
+                    ))}
+                  </select>
+                  <svg className="w-5 h-5 text-muted absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
+               </div>
             </div>
             
-            <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+            {/* Job Type Filters */}
+            <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar mt-4">
                {filters.map((filter) => (
                  <button
                    key={filter.key}
@@ -83,7 +210,14 @@ export default function JobsClient({ content, lang }) {
       <section className="py-12 px-6">
         <div className="max-w-7xl mx-auto space-y-4">
           
-          {filteredJobs.length > 0 ? filteredJobs.map((job) => (
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-10 h-10 text-red-600 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+              </div>
+              <p className="text-muted">{content.loading || "Loading jobs..."}</p>
+            </div>
+          ) : filteredJobs.length > 0 ? filteredJobs.map((job) => (
              <div 
                key={job.id} 
                className={`group bg-secondary border rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center gap-6 transition-all duration-300 hover:border-red-600/40 hover:-translate-y-1 hover:shadow-xl ${
@@ -130,16 +264,16 @@ export default function JobsClient({ content, lang }) {
                    </button>
                 </div>
              </div>
-          )) : (
+          )) : !loading ? (
              <div className="text-center py-20">
                 <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
                    <svg className="w-10 h-10 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </div>
-                <h3 className="text-xl font-bold mb-2">{content.no_jobs.title}</h3>
-                <p className="text-muted">{content.no_jobs.desc}</p>
-                <button onClick={() => setFilterType("all")} className="mt-4 text-red-500 font-bold hover:underline">{content.no_jobs.clear_btn}</button>
+                <h3 className="text-xl font-bold mb-2">{content.no_jobs?.title || "No jobs found"}</h3>
+                <p className="text-muted">{content.no_jobs?.desc || "Try adjusting your search criteria"}</p>
+                {(searchQuery || filterType !== "all" || filterGovernorate !== "all") && <button onClick={() => { setSearchQuery(""); setFilterType("all"); setFilterGovernorate("all"); }} className="mt-4 text-red-500 font-bold hover:underline">{content.no_jobs?.clear_btn || "Clear filters"}</button>}
              </div>
-          )}
+          ) : null}
 
         </div>
       </section>

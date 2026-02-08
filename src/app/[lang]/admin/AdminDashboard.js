@@ -48,6 +48,23 @@ export default function AdminDashboard({ dictionary }) {
   const { refreshPages } = usePageSettings();
   const fetchedTabs = useRef(new Set()); // Track which tabs have been fetched
   
+  // Jobs management state
+  const [jobs, setJobs] = useState([]);
+  const [jobFormData, setJobFormData] = useState({
+    title: "",
+    company: "",
+    location: "",
+    type: "full_time",
+    salary: "",
+    currency: "EGP",
+    description: "",
+    requirements: "",
+    benefits: "",
+    image: "",
+    featured: false
+  });
+  const [jobImagePreview, setJobImagePreview] = useState(null);
+  
   // Email management state
   const [organizationEmails, setOrganizationEmails] = useState([]);
   const [newEmailAddress, setNewEmailAddress] = useState("");
@@ -122,6 +139,14 @@ export default function AdminDashboard({ dictionary }) {
           
         case "Gallery":
           // Gallery component handles its own data fetching
+          break;
+          
+        case "Jobs":
+          const jobsRes = await fetch("/api/admin/jobs");
+          if (jobsRes.ok) {
+            const jobsData = await jobsRes.json();
+            setJobs(jobsData.jobs || []);
+          }
           break;
           
         case "Emails":
@@ -446,6 +471,72 @@ export default function AdminDashboard({ dictionary }) {
     } catch { toast.error("Delete failed"); }
   };
 
+  // Jobs handlers
+  const handleSaveJob = async (e) => {
+    e.preventDefault();
+    
+    if (!jobFormData.title || !jobFormData.company || !jobFormData.location || !jobFormData.type) {
+      toast.error("All required fields must be filled");
+      return;
+    }
+
+    setShowModal(null);
+    toast.success(editItem ? (dictionary?.admin?.jobs?.job_updated || "Job updated") : (dictionary?.admin?.jobs?.job_created || "Job created"));
+
+    try {
+      const url = editItem ? `/api/admin/jobs/${editItem._id}` : "/api/admin/jobs";
+      const res = await fetch(url, {
+        method: editItem ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(jobFormData),
+      });
+      if (res.ok) {
+        // Refresh jobs data
+        fetchedTabs.current.delete("Jobs");
+        await fetchTabData("Jobs");
+        // Reset form
+        setEditItem(null);
+        setJobImagePreview(null);
+        setJobFormData({
+          title: "",
+          company: "",
+          location: "",
+          type: "full_time",
+          salary: "",
+          currency: "EGP",
+          description: "",
+          requirements: "",
+          benefits: "",
+          image: "",
+          featured: false
+        });
+      } else {
+        toast.error("Failed to save job");
+      }
+    } catch (error) {
+      console.error("Error saving job:", error);
+      toast.error("Failed to save job");
+    }
+  };
+
+  const handleDeleteJob = async (id) => {
+    if (!confirm("Delete this job?")) return;
+    try {
+      const res = await fetch(`/api/admin/jobs/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        toast.success(dictionary?.admin?.jobs?.job_deleted || "Job deleted");
+        // Refresh jobs data
+        fetchedTabs.current.delete("Jobs");
+        await fetchTabData("Jobs");
+      } else {
+        toast.error("Failed to delete job");
+      }
+    } catch (error) {
+      console.error("Error deleting job:", error);
+      toast.error("Failed to delete job");
+    }
+  };
+
   // Filter users by search and status
   const filteredUsers = users.filter(u => {
     const matchesSearch = u.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -645,7 +736,7 @@ export default function AdminDashboard({ dictionary }) {
     }));
   };
 
-  const tabs = ["Overview", "Approvals", "Users", "News", "Gallery", "Pages", "Analytics", "Emails"];
+  const tabs = ["Overview", "Approvals", "Users", "News", "Gallery", "Pages", "Jobs", "Analytics", "Emails"];
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6">
@@ -928,6 +1019,45 @@ export default function AdminDashboard({ dictionary }) {
               </div>
             )}
 
+            {/* Jobs Tab */}
+            {activeTab === "Jobs" && (
+              <div className="bg-secondary border border-border rounded-2xl p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold">{dictionary?.admin?.jobs?.title || "Job Listings"} ({jobs.length})</h2>
+                  <button onClick={() => { setEditItem(null); setJobImagePreview(null); setJobFormData({ title: "", company: "", location: "", type: "full_time", salary: "", currency: "EGP", description: "", requirements: "", benefits: "", image: "", featured: false }); setShowModal("jobs"); }} className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                    {dictionary?.admin?.jobs?.add_job || "Add Job"}
+                  </button>
+                </div>
+                {jobs.length === 0 ? (
+                  <div className="text-center py-12 text-muted">
+                    {dictionary?.admin?.jobs?.no_jobs || "No jobs available yet"}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {jobs.map((job) => (
+                      <div key={job._id} className="bg-tertiary border border-border rounded-xl p-5 flex justify-between items-center">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-1">
+                            <h3 className="font-bold">{job.title}</h3>
+                            <span className={`px-2 py-0.5 rounded text-xs ${job.featured ? 'bg-yellow-500/20 text-yellow-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                              {job.featured ? (dictionary?.admin?.jobs?.status?.featured || 'Featured') : (dictionary?.admin?.jobs?.status?.regular || 'Regular')}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted">{job.company} • {job.location} • {job.type}</p>
+                          <p className="text-sm text-muted mt-1">{job.description?.slice(0, 100)}...</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button onClick={() => { setEditItem(job); setJobImagePreview(job.image || null); setJobFormData({ title: job.title, company: job.company, location: job.location, type: job.type, salary: job.salary || "", currency: job.currency || "EGP", description: job.description || "", requirements: job.requirements || "", benefits: job.benefits || "", image: job.image || "", featured: job.featured || false }); setShowModal("jobs"); }} className="px-3 py-1.5 bg-amber-500/10 text-amber-400 text-xs font-bold rounded-full hover:bg-amber-500/20">{dictionary?.admin?.jobs?.edit_job || "Edit"}</button>
+                          <button onClick={() => handleDeleteJob(job._id)} className="px-3 py-1.5 bg-red-500/10 text-red-400 text-xs font-bold rounded-full hover:bg-red-500/20">{dictionary?.admin?.jobs?.delete_job || "Delete"}</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Analytics Tab */}
             {activeTab === "Analytics" && (
               <div className="space-y-8">
@@ -1115,7 +1245,7 @@ export default function AdminDashboard({ dictionary }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {pageSettings.main?.map((setting) => (
                           <div key={setting.pageId} className="flex items-center justify-between p-4 bg-tertiary rounded-xl border border-border">
-                            <span className="font-medium capitalize">{setting.name}</span>
+                            <span className="font-medium capitalize">{dictionary?.admin?.pages?.page_names?.[setting.pageId] || setting.name}</span>
                             <label className="relative inline-flex items-center cursor-pointer">
                               <input type="checkbox" checked={setting.isVisible} onChange={() => handleTogglePageVisibility(setting.pageId, setting.isVisible)} className="sr-only peer" />
                               <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
@@ -1131,7 +1261,7 @@ export default function AdminDashboard({ dictionary }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {pageSettings.footer?.map((setting) => (
                           <div key={setting.pageId} className="flex items-center justify-between p-4 bg-tertiary rounded-xl border border-border">
-                            <span className="font-medium capitalize">{setting.name}</span>
+                            <span className="font-medium capitalize">{dictionary?.admin?.pages?.page_names?.[setting.pageId] || setting.name}</span>
                             <label className="relative inline-flex items-center cursor-pointer">
                               <input type="checkbox" checked={setting.isVisible} onChange={() => handleTogglePageVisibility(setting.pageId, setting.isVisible)} className="sr-only peer" />
                               <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
@@ -1147,7 +1277,7 @@ export default function AdminDashboard({ dictionary }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {pageSettings.legal?.map((setting) => (
                           <div key={setting.pageId} className="flex items-center justify-between p-4 bg-tertiary rounded-xl border border-border">
-                            <span className="font-medium capitalize">{setting.name}</span>
+                            <span className="font-medium capitalize">{dictionary?.admin?.pages?.page_names?.[setting.pageId] || setting.name}</span>
                             <label className="relative inline-flex items-center cursor-pointer">
                               <input type="checkbox" checked={setting.isVisible} onChange={() => handleTogglePageVisibility(setting.pageId, setting.isVisible)} className="sr-only peer" />
                               <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
@@ -1705,6 +1835,205 @@ export default function AdminDashboard({ dictionary }) {
                   </div>
                 </>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Jobs Modal */}
+        {showModal === "jobs" && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-secondary border border-border rounded-2xl w-full max-w-lg p-6 max-h-[90vh] flex flex-col">
+              <h3 className="text-xl font-bold mb-6">{editItem ? (dictionary?.admin?.jobs?.modal?.edit_title || "Edit Job") : (dictionary?.admin?.jobs?.modal?.new_title || "New Job")}</h3>
+              <form onSubmit={handleSaveJob} className="space-y-4 overflow-y-auto flex-1 pr-2">
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.jobs?.modal?.title_label || "Job Title"} *</label>
+                  <input 
+                    value={jobFormData.title} 
+                    onChange={(e) => setJobFormData({...jobFormData, title: e.target.value})}
+                    required 
+                    className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" 
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.jobs?.modal?.company_label || "Company"} *</label>
+                  <input 
+                    value={jobFormData.company} 
+                    onChange={(e) => setJobFormData({...jobFormData, company: e.target.value})}
+                    required 
+                    className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.jobs?.modal?.location_label || "Location"} *</label>
+                    <select 
+                      value={jobFormData.location} 
+                      onChange={(e) => setJobFormData({...jobFormData, location: e.target.value})}
+                      required 
+                      className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500"
+                    >
+                      <option value="">Select Governorate</option>
+                      <option value="Cairo">Cairo</option>
+                      <option value="Alexandria">Alexandria</option>
+                      <option value="Giza">Giza</option>
+                      <option value="Sharqia">Sharqia</option>
+                      <option value="Dakahlia">Dakahlia</option>
+                      <option value="Kafr El-Sheikh">Kafr El-Sheikh</option>
+                      <option value="Damietta">Damietta</option>
+                      <option value="Port Said">Port Said</option>
+                      <option value="Ismailia">Ismailia</option>
+                      <option value="Suez">Suez</option>
+                      <option value="Beheira">Beheira</option>
+                      <option value="Gharbia">Gharbia</option>
+                      <option value="Menoufia">Menoufia</option>
+                      <option value="Qalyubia">Qalyubia</option>
+                      <option value="Aswan">Aswan</option>
+                      <option value="Luxor">Luxor</option>
+                      <option value="Qena">Qena</option>
+                      <option value="Sohag">Sohag</option>
+                      <option value="Assiut">Assiut</option>
+                      <option value="Minya">Minya</option>
+                      <option value="Beni Suef">Beni Suef</option>
+                      <option value="Faiyum">Faiyum</option>
+                      <option value="Helwan">Helwan</option>
+                      <option value="Matruh">Matruh</option>
+                      <option value="New Cairo">New Cairo</option>
+                      <option value="6th of October">6th of October</option>
+                      <option value="Heliopolis">Heliopolis</option>
+                      <option value="Nasr City">Nasr City</option>
+                      <option value="Zamalek">Zamalek</option>
+                      <option value="Giza City">Giza City</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.jobs?.modal?.type_label || "Job Type"} *</label>
+                    <select 
+                      value={jobFormData.type} 
+                      onChange={(e) => setJobFormData({...jobFormData, type: e.target.value})}
+                      required 
+                      className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500"
+                    >
+                      <option value="full_time">{dictionary?.admin?.jobs?.modal?.type_options?.full_time || "Full Time"}</option>
+                      <option value="part_time">{dictionary?.admin?.jobs?.modal?.type_options?.part_time || "Part Time"}</option>
+                      <option value="contract">{dictionary?.admin?.jobs?.modal?.type_options?.contract || "Contract"}</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.jobs?.modal?.salary_label || "Salary"}</label>
+                  <input 
+                    value={jobFormData.salary} 
+                    onChange={(e) => setJobFormData({...jobFormData, salary: e.target.value})}
+                    placeholder="e.g., 40,000 - 60,000"
+                    className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" 
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.jobs?.modal?.currency_label || "Currency"}</label>
+                  <select 
+                    value={jobFormData.currency} 
+                    onChange={(e) => setJobFormData({...jobFormData, currency: e.target.value})}
+                    className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500"
+                  >
+                    <option value="EGP">🇪🇬 {dictionary?.admin?.jobs?.modal?.currency_options?.egp || "Egyptian Pound (EGP)"}</option>
+                    <option value="USD">🇺🇸 {dictionary?.admin?.jobs?.modal?.currency_options?.usd || "US Dollar (USD)"}</option>
+                    <option value="EUR">🇪🇺 {dictionary?.admin?.jobs?.modal?.currency_options?.eur || "Euro (EUR)"}</option>
+                    <option value="GBP">🇬🇧 {dictionary?.admin?.jobs?.modal?.currency_options?.gbp || "British Pound (GBP)"}</option>
+                    <option value="AED">🇦🇪 {dictionary?.admin?.jobs?.modal?.currency_options?.aed || "UAE Dirham (AED)"}</option>
+                    <option value="SAR">🇸🇦 {dictionary?.admin?.jobs?.modal?.currency_options?.sar || "Saudi Riyal (SAR)"}</option>
+                  </select>
+                </div>
+                <div className="border-2 border-dashed border-blue-600/50 rounded-lg p-4 bg-blue-600/5">
+                  <label className="text-xs font-bold text-blue-500 uppercase mb-3 block">
+                    {dictionary?.admin?.jobs?.modal?.image_label || "Job Image"}
+                  </label>
+                  
+                  {/* معاينة الصورة */}
+                  {(jobImagePreview || jobFormData.image) && (
+                    <div className="mb-4">
+                      <div className="relative w-full h-40 rounded-lg overflow-hidden border-2 border-blue-600 bg-black/20">
+                        <img src={jobImagePreview || jobFormData.image} alt="Job Image" className="w-full h-full object-cover" />
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            setJobImagePreview(null);
+                            setJobFormData({...jobFormData, image: ""});
+                          }}
+                          className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-2 hover:bg-red-700"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <input 
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setJobImagePreview(reader.result);
+                        setJobFormData({...jobFormData, image: reader.result});
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                    className="w-full bg-tertiary border border-blue-600/50 rounded-lg px-4 py-2.5 mt-1 text-sm cursor-pointer file:mr-4 file:px-3 file:py-2 file:bg-blue-600 file:text-white file:rounded file:border-0 file:cursor-pointer hover:file:bg-blue-700" 
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.jobs?.modal?.description_label || "Description"}</label>
+                  <textarea 
+                    value={jobFormData.description} 
+                    onChange={(e) => setJobFormData({...jobFormData, description: e.target.value})}
+                    rows={3} 
+                    className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" 
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.jobs?.modal?.requirements_label || "Requirements"}</label>
+                  <textarea 
+                    value={jobFormData.requirements} 
+                    onChange={(e) => setJobFormData({...jobFormData, requirements: e.target.value})}
+                    placeholder="Enter requirements (one per line)"
+                    rows={3} 
+                    className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" 
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.jobs?.modal?.benefits_label || "Benefits"}</label>
+                  <textarea 
+                    value={jobFormData.benefits} 
+                    onChange={(e) => setJobFormData({...jobFormData, benefits: e.target.value})}
+                    placeholder="Enter benefits (one per line)"
+                    rows={3} 
+                    className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" 
+                  />
+                </div>
+                <div className="flex items-center gap-3 bg-tertiary p-3 rounded-lg">
+                  <input 
+                    type="checkbox" 
+                    id="featured" 
+                    checked={jobFormData.featured} 
+                    onChange={(e) => setJobFormData({...jobFormData, featured: e.target.checked})}
+                    className="w-4 h-4 accent-red-600"
+                  />
+                  <label htmlFor="featured" className="text-sm font-bold cursor-pointer">
+                    {dictionary?.admin?.jobs?.modal?.featured_label || "Mark as Featured"}
+                  </label>
+                </div>
+
+                <div className="flex gap-3 pt-4 border-t border-border">
+                  <button type="button" onClick={() => setShowModal(null)} className="flex-1 py-2.5 bg-tertiary border border-border rounded-lg hover:bg-background transition-colors font-bold">
+                    {dictionary?.admin?.jobs?.modal?.cancel || "Cancel"}
+                  </button>
+                  <button type="submit" className="flex-1 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-bold">
+                    {editItem ? (dictionary?.admin?.jobs?.modal?.update || "Update") : (dictionary?.admin?.jobs?.modal?.create || "Create")}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
