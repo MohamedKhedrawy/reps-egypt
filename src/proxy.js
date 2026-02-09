@@ -12,6 +12,9 @@ const protectedRoutes = ['/api/auth/me', '/api/messages/send'];
 // Routes that require admin role
 const adminRoutes = ['/admin', '/api/admin'];
 
+// Public GET endpoints that don't require authentication
+const publicGetEndpoints = ['/api/admin/partners', '/api/admin/jobs'];
+
 function getLocale(request) {
   const negotiatorHeaders = {};
   request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
@@ -62,7 +65,15 @@ export async function proxy(request) {
     // Admin route check needs to handle both /api/admin (no locale) and /en/admin (locale)
     const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route) || pathWithoutLocale.startsWith(route));
 
+    // Allow public GET requests to specific endpoints
+    const isPublicGetEndpoint = request.method === 'GET' && publicGetEndpoints.some(route => pathname.startsWith(route));
+
     if (!isProtectedRoute && !isAdminRoute) {
+        return NextResponse.next();
+    }
+
+    // Skip authentication check for public GET endpoints
+    if (isPublicGetEndpoint) {
         return NextResponse.next();
     }
 

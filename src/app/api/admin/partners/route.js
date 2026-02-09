@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 
 const DB_NAME = process.env.MONGODB_DB || 'reps-egypt';
 
-// GET /api/admin/partners - Get all partners
+// GET /api/admin/partners - Get all partners (PUBLIC)
 export async function GET(request) {
   try {
     const client = await clientPromise;
