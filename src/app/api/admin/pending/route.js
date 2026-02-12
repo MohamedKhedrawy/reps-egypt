@@ -14,11 +14,21 @@ export async function GET() {
             id: user._id.toString(),
             name: user.fullName,
             email: user.email,
-            type: 'Trainer Application', // Distinguisher
+            phone: user.phone || null,
+            birthDate: user.birthDate || null,
+            age: user.age || null,
+            gender: user.gender || null,
+            governorate: user.governorate || null,
+            repsId: user.repsId || null,
+            specialization: user.specialization || null,
+            profilePhoto: user.profilePhoto || null,
+            socialMedia: user.socialMedia || null,
+            uploadedFiles: user.uploadedFiles || user.certifications || null,
+            role: user.role || 'trainer',
+            type: 'Trainer Application',
             info: user.specialization || 'Not specified',
             date: user.createdAt,
             rawDate: user.createdAt,
-            // Action needed is 'approve_user'
             actionType: 'user'
         }));
 

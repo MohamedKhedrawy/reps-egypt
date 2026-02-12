@@ -129,8 +129,9 @@ export default function CoachesClient({ coaches, content, dictionary, lang }) {
                        </div>
 
                        <img 
-                            src={trainer.profilePhoto || `https://ui-avatars.com/api/?name=${trainer.fullName}&background=dc2626&color=fff`} 
+                            src={`/api/users/${trainer._id}/photo`}
                             alt={trainer.fullName} 
+                            loading="lazy"
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
                        />
                        

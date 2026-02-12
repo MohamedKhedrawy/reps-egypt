@@ -66,8 +66,8 @@
     "stats_coaches": "Certified Coaches",
     "stats_trainees": "Active Trainees",
     "stats_programs": "Specializations",
-    "stats_excellence": "Excellence",
-    "stats_years": "Years",
+    "stats_excellence": "Partners",
+    "stats_years": "+",
     "section_trainers_badge": "World Class Talent",
     "section_trainers_title": "Meet Our Elite Trainers",
     "section_trainers_view_all": "View All Coaches",
@@ -706,8 +706,11 @@
           "alert_added": "Alert added successfully",
           "alert_failed": "Failed to add alert",
           "note_added": "Note added successfully",
-          "note_failed": "Failed to add note"
-      }
+          "note_failed": "Failed to add note",
+          "error": "An error occurred"
+      },
+      "edit": "Edit",
+      "specialization": "Specialization"
     },
     "analytics": {
         "title": "Platform Analytics",
@@ -737,6 +740,12 @@
       "edit": "Edit",
       "delete": "Delete",
       "view_full": "View Full",
+      "updated": "Article updated",
+      "created": "Article created",
+      "save_failed": "Save failed",
+      "cover_uploaded": "Cover image uploaded",
+      "upload_failed": "Image upload failed",
+      "images_uploaded": "images uploaded",
       "modal": {
         "new_title": "New Article",
         "edit_title": "Edit Article",
@@ -966,7 +975,9 @@
         "north_sinai": "North Sinai",
         "new_valley": "New Valley",
         "red_sea": "Red Sea"
-      }
+      },
+      "logo_uploaded": "Company logo uploaded",
+      "upload_failed": "Image upload failed"
     }
   },
   "program_content": {
@@ -1051,5 +1062,185 @@
     "filter_tags": ["All", "Certifications", "Workshops", "Events", "Community"],
     "event": "Event",
     "load_more": "Load More Photos"
+  },
+  "chatbot": {
+    "header": { "title": "REPS Assistant", "subtitle": "Platform Support" },
+    "input_placeholder": "Select an option...",
+    "restart": "Restart Chat",
+    "thinking": "Thinking...",
+    "error": "I can't connect right now. Please try again.",
+    "flow": {
+      "root": {
+        "text": "Welcome to REPS Egypt! How can I assist you today?",
+        "options": [
+          { "label": "Determining My Verification Status", "nextNode": "verification_status" },
+          { "label": "Registration & Membership", "nextNode": "registration_menu" },
+          { "label": "Standards & Ethics", "nextNode": "standards_menu" },
+          { "label": "Contact Support", "nextNode": "contact_info" }
+        ]
+      },
+      "verification_status": {
+        "text": "I can help explain your status. Are you a Trainer or a Trainee?",
+        "options": [
+          { "label": "I am a Trainer", "nextNode": "trainer_verification" },
+          { "label": "I am a Trainee", "nextNode": "trainee_verification" },
+          { "label": "What is the difference?", "nextNode": "role_explanation" }
+        ]
+      },
+      "trainer_verification": {
+        "text": "As a Trainer, 'Pending' means your documents (Certificates, CV) are being reviewed. 'Approved' means you are listed on the public register. 'Rejected' usually means missing documents.",
+        "options": [
+          { "label": "How long does it take?", "nextNode": "timeline_faq" },
+          { "label": "Update my documents", "nextNode": "update_docs_guide" },
+          { "label": "Back to Menu", "nextNode": "root" }
+        ]
+      },
+      "trainee_verification": {
+        "text": "As a Trainee, verification confirms your enrollment in an accredited course. Your status remains 'Active' as long as your membership is valid.",
+        "options": [
+          { "label": "Upgrade to Trainer", "nextNode": "upgrade_guide" },
+          { "label": "Back to Menu", "nextNode": "root" }
+        ]
+      },
+      "registration_menu": {
+        "text": "What would you like to know about registration?",
+        "options": [
+          { "label": "How to Register", "nextNode": "how_to_register" },
+          { "label": "Membership Fees", "nextNode": "fees_info" },
+          { "label": "Required Documents", "nextNode": "docs_info" },
+          { "label": "Back to Menu", "nextNode": "root" }
+        ]
+      },
+      "how_to_register": {
+        "text": "To register, click 'Register' in the top right. You'll need to create an account, complete your profile, and upload required certifications.",
+        "options": [
+          { "label": "Go to Register Page", "action": "link", "href": "/register", "nextNode": "root" },
+          { "label": "Back", "nextNode": "registration_menu" }
+        ]
+      },
+      "fees_info": {
+        "text": "Membership fees conform to the fiscal year. Current rates are available on the 'Member Benefits' page.",
+        "options": [
+          { "label": "View Benefits", "action": "link", "href": "/member-benefits", "nextNode": "root" },
+          { "label": "Back", "nextNode": "registration_menu" }
+        ]
+      },
+      "standards_menu": {
+        "text": "REPS Egypt enforces strict ethical and professional standards.",
+        "options": [
+          { "label": "Code of Ethics", "nextNode": "ethics_info" },
+          { "label": "ICREP Standards", "nextNode": "icreps_info" },
+          { "label": "Report a Violation", "nextNode": "report_violation" },
+          { "label": "Back to Menu", "nextNode": "root" }
+        ]
+      },
+      "ethics_info": {
+        "text": "Our Code of Ethics ensures safety and professionalism. All members must pledge to uphold these values.",
+        "options": [
+          { "label": "Read Code of Ethics", "action": "link", "href": "/code-of-ethics", "nextNode": "root" },
+          { "label": "Back", "nextNode": "standards_menu" }
+        ]
+      },
+      "contact_info": {
+        "text": "You can reach our human support team via email or phone.",
+        "options": [
+          { "label": "Email Support", "action": "link", "href": "mailto:support@repsegypt.org", "nextNode": "root" },
+          { "label": "Back to Menu", "nextNode": "root" }
+        ]
+      },
+      "timeline_faq": {
+        "text": "Verification typically takes 3-5 business days after all documents are submitted.",
+        "options": [ { "label": "Back to Menu", "nextNode": "root" } ]
+      },
+      "update_docs_guide": {
+        "text": "Go to your Profile and select 'Edit'. You can upload new certificates there. They will be sent for re-approval.",
+        "options": [
+          { "label": "Go to Profile", "action": "link", "href": "/profile", "nextNode": "root", "requiredRole": ["trainer", "trainee"] },
+          { "label": "Back to Menu", "nextNode": "root" }
+        ]
+      },
+      "upgrade_guide": {
+        "text": "To upgrade from Trainee to Trainer, you must complete your accredited qualification and upload the final certificate in your Profile.",
+        "options": [ { "label": "Back to Menu", "nextNode": "root" } ]
+      },
+      "docs_info": {
+        "text": "Trainers need: valid Personal Trainer certification, CPR/First Aid cert, and a recent photo. Trainees need: Enrollment proof.",
+        "options": [ { "label": "Back", "nextNode": "registration_menu" } ]
+      },
+      "icreps_info": {
+        "text": "REPS Egypt is a member of ICREPs, ensuring your portability to other national registers.",
+        "options": [ { "label": "Back", "nextNode": "standards_menu" } ]
+      },
+      "report_violation": {
+        "text": "Please email complaints@repsegypt.org with details of the violation.",
+        "options": [ { "label": "Back", "nextNode": "root" } ]
+      },
+      "role_explanation": {
+        "text": "Trainers are qualified professionals. Trainees are students currently studying an accredited course.",
+        "options": [ { "label": "Back", "nextNode": "verification_status" } ]
+      }
+    }
+  },
+  "pricing_page": {
+    "title_prefix": "Invest in Your",
+    "title_highlight": "Future",
+    "subtitle": "Choose the plan that fits your career stage. Upgrade anytime as your business grows.",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "save_percent": "SAVE 30%",
+    "year": "year",
+    "month": "month",
+    "per_month": "EGP/month",
+    "most_popular": "Most Popular",
+    "offer_pro_duration": "First 3 Months Free",
+    "offer_elite_duration": "First Month Free",
+    "offer_expires": "Offer expires in",
+    "save_100": "Save 100%",
+    "plans": {
+      "trainee": {
+        "name": "Trainee",
+        "desc": "Train with accredited coaches for free!",
+        "price": "0",
+        "features": [
+          "Access to coaches in different specializations",
+          "Easy communication with coaches",
+          "Join the community forum (Soon)"
+        ],
+        "cta": "Register Free"
+      },
+      "pro": {
+        "name": "Premium Coach",
+        "desc": "For certified professionals growing their career",
+        "price": "150",
+        "yearly_price": "1200",
+        "features": [
+          "REPS Verified Badge",
+          "Partner Discounts (Equipment/Supplements)"
+        ],
+        "cta": "Upgrade to Pro"
+      },
+      "master": {
+        "name": "Elite Coach",
+        "desc": "Elite status for industry leaders & mentors",
+        "price": "300",
+        "yearly_price": "2500",
+        "features": [
+          "Everything in Pro",
+          "Featured on the Homepage",
+          "Priority Search Listing",
+          "Featured in Weekly Newsletter",
+          "Exclusive Mentorship Opportunities",
+          "VIP Support Access"
+        ],
+        "cta": "Become a Master"
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "Can I cancel anytime?",
+      "a1": "Yes, you can cancel your subscription at any time. Your access will remain active until the end of your billing period.",
+      "q2": "Is the certificate international?",
+      "a2": "Yes, REPS Egypt certifications are recognized globally in participating countries including UAE, UK, and Australia."
+    }
   }
 }

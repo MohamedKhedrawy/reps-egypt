@@ -234,3 +234,29 @@ export async function searchUsers(query, filter = {}) {
         .limit(50)
         .toArray();
 }
+
+/**
+ * Get public coaches data (optimized projection)
+ */
+export async function getPublicCoaches(filter = { role: 'trainer', status: 'approved' }, options = {}) {
+    // Default sort by creation date (newest first)
+    const { limit = 0, skip = 0, sort = { createdAt: -1 } } = options;
+    const users = await getUsersCollection();
+    
+    let query = users.find(filter)
+        .project({ 
+            fullName: 1, 
+            specialization: 1, 
+            // profilePhoto: 1, // Excluded for performance (fetched via API)
+            repsId: 1, 
+            governorate: 1, 
+            experience: 1, 
+            socialMedia: 1 // Keep for profile links
+        })
+        .sort(sort);
+
+    if (skip > 0) query = query.skip(skip);
+    if (limit > 0) query = query.limit(limit);
+        
+    return query.toArray();
+}

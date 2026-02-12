@@ -201,11 +201,11 @@ export default function AdminDashboard({ dictionary }) {
       
       if (!res.ok) {
         // Revert on error
-        fetchData();
+        refreshAllData();
         toast.error("Action failed - reverted");
       }
     } catch { 
-      fetchData();
+      refreshAllData();
       toast.error("Network error - reverted"); 
     }
   };
@@ -217,7 +217,7 @@ export default function AdminDashboard({ dictionary }) {
       const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
       if (res.ok) {
         toast.success("User deleted");
-        fetchData();
+        refreshAllData();
       }
     } catch { toast.error("Delete failed"); }
   };
@@ -325,7 +325,7 @@ export default function AdminDashboard({ dictionary }) {
         toast.error(dictionary?.admin?.users?.profile?.photo_delete_failed || "Failed to delete photo");
       }
     } catch (error) {
-      toast.error("حدث خطأ");
+      toast.error(dictionary?.admin?.users?.profile?.error || "An error occurred");
       console.error(error);
     }
   };
@@ -346,7 +346,7 @@ export default function AdminDashboard({ dictionary }) {
         toast.success("User updated successfully");
         setShowModal(null);
         setEditItem(null);
-        fetchData();
+        refreshAllData();
       } else {
         toast.error("Update failed");
       }
@@ -386,7 +386,7 @@ export default function AdminDashboard({ dictionary }) {
     setCoverImagePreview(null);
     setArticleImages([]);
     
-    toast.success(editItem ? "تم تحديث المقال" : "تم إنشاء المقال");
+    toast.success(editItem ? (dictionary?.admin?.news?.updated || "Article updated") : (dictionary?.admin?.news?.created || "Article created"));
     
     try {
       const url = editItem ? `/api/admin/news/${editItem.id}` : "/api/admin/news";
@@ -396,11 +396,11 @@ export default function AdminDashboard({ dictionary }) {
         body: JSON.stringify(data),
       });
       if (res.ok) {
-        fetchData();
+        refreshAllData();
       } else {
-        toast.error("فشل الحفظ");
+        toast.error(dictionary?.admin?.news?.save_failed || "Save failed");
       }
-    } catch { toast.error("فشل الحفظ"); }
+    } catch { toast.error(dictionary?.admin?.news?.save_failed || "Save failed"); }
   };
 
   // Handle cover image upload (single image)
@@ -413,10 +413,10 @@ export default function AdminDashboard({ dictionary }) {
     reader.onloadend = () => {
       setCoverImagePreview(reader.result);
       setUploadingCover(false);
-      toast.success("تم تحميل صورة الغلاف");
+      toast.success(dictionary?.admin?.news?.cover_uploaded || "Cover image uploaded");
     };
     reader.onerror = () => {
-      toast.error("فشل تحميل الصورة");
+      toast.error(dictionary?.admin?.news?.upload_failed || "Image upload failed");
       setUploadingCover(false);
     };
     reader.readAsDataURL(file);
@@ -441,11 +441,11 @@ export default function AdminDashboard({ dictionary }) {
         if (uploadedCount === files.length) {
           setArticleImages(prev => [...prev, ...newImages]);
           setUploadingImage(false);
-          toast.success(`${files.length} صورة تم تحميلها`);
+          toast.success(`${files.length} ${dictionary?.admin?.news?.images_uploaded || "images uploaded"}`);
         }
       };
       reader.onerror = () => {
-        toast.error("فشل تحميل إحدى الصور");
+        toast.error(dictionary?.admin?.news?.upload_failed || "Image upload failed");
         setUploadingImage(false);
       };
       reader.readAsDataURL(file);
@@ -463,7 +463,7 @@ export default function AdminDashboard({ dictionary }) {
       const res = await fetch(`/api/admin/news/${id}`, { method: "DELETE" });
       if (res.ok) {
         toast.success("Article deleted");
-        fetchData();
+        refreshAllData();
       }
     } catch { toast.error("Delete failed"); }
   };
@@ -504,12 +504,12 @@ export default function AdminDashboard({ dictionary }) {
       } else {
         // Revert on error
         toast.error("Failed to update - reverted");
-        fetchData();
+        refreshAllData();
       }
     } catch {
       // Revert on network error
       toast.error("Network error - reverted");
-      fetchData();
+      refreshAllData();
     }
   };
 
@@ -697,6 +697,7 @@ export default function AdminDashboard({ dictionary }) {
         toast.success(dictionary?.admin?.jobs?.job_added || "Job added successfully");
         setShowModal(null);
         resetJobForm();
+        fetchedTabs.current.delete("Jobs");
         fetchTabData("Jobs");
       } else {
         toast.error(dictionary?.admin?.jobs?.add_failed || "Failed to add job");
@@ -730,6 +731,7 @@ export default function AdminDashboard({ dictionary }) {
         toast.success(dictionary?.admin?.jobs?.job_updated || "Job updated successfully");
         setShowModal(null);
         resetJobForm();
+        fetchedTabs.current.delete("Jobs");
         fetchTabData("Jobs");
       } else {
         toast.error(dictionary?.admin?.jobs?.update_failed || "Failed to update job");
@@ -781,10 +783,10 @@ export default function AdminDashboard({ dictionary }) {
       setJobLogo(reader.result);
       setJobLogoPreview(reader.result);
       setUploadingJobLogo(false);
-      toast.success("تم تحميل شعار الشركة");
+      toast.success(dictionary?.admin?.jobs?.logo_uploaded || "Company logo uploaded");
     };
     reader.onerror = () => {
-      toast.error("فشل تحميل الصورة");
+      toast.error(dictionary?.admin?.jobs?.upload_failed || "Image upload failed");
       setUploadingJobLogo(false);
     };
     reader.readAsDataURL(file);
@@ -1953,7 +1955,7 @@ export default function AdminDashboard({ dictionary }) {
                 <form onSubmit={handleSaveUser} className="space-y-4">
                   <div>
                     <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.users?.table?.name || "Name"}</label>
-                    <input name="name" defaultValue={editItem.name} className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" />
+                    <input name="fullName" defaultValue={editItem.fullName || editItem.name} className="w-full bg-tertiary border border-border rounded-lg px-4 py-2.5 mt-1 focus:outline-none focus:border-red-500" />
                   </div>
                   <div>
                     <label className="text-xs font-bold text-muted uppercase">{dictionary?.admin?.users?.table?.email || "Email"}</label>
@@ -2058,37 +2060,94 @@ export default function AdminDashboard({ dictionary }) {
                   </div>
                 </>
               ) : (
-                // Approval Request View (original)
+                // Approval Request View - Full Details
                 <>
                   <div className="flex justify-between items-start mb-6">
-                    <div>
-                      <h3 className="text-xl font-bold">{viewItem.name}</h3>
-                      <p className="text-muted text-sm">{viewItem.email}</p>
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-full bg-tertiary flex items-center justify-center overflow-hidden">
+                        {viewItem.profilePhoto ? (
+                          <img src={viewItem.profilePhoto} alt={viewItem.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <svg className="w-8 h-8 text-muted" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold">{viewItem.name}</h3>
+                        <p className="text-muted text-sm">{viewItem.email}</p>
+                      </div>
                     </div>
                     <button onClick={() => setViewItem(null)} className="text-muted hover:text-foreground text-xl">✕</button>
                   </div>
                   
+                  {/* Status Badges */}
+                  <div className="flex gap-2 mb-6">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${viewItem.actionType === 'qualification' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                      {viewItem.actionType === 'qualification' ? 'Qualification Change' : 'New Registration'}
+                    </span>
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400">
+                      {viewItem.role || 'trainer'}
+                    </span>
+                  </div>
+
                   {/* Details Grid */}
                   <div className="grid md:grid-cols-2 gap-4 mb-6">
                     <div className="bg-tertiary rounded-xl p-4">
-                      <p className="text-xs text-muted uppercase font-bold mb-1">Type</p>
-                      <p className="font-medium">{viewItem.type || "User Registration"}</p>
+                      <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.admin?.users?.table?.role || "Role"}</p>
+                      <p className="font-medium capitalize">{viewItem.role || "trainer"}</p>
                     </div>
+                    {viewItem.specialization && (
+                      <div className="bg-tertiary rounded-xl p-4">
+                        <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.admin?.users?.specialization || "Specialization"}</p>
+                        <p className="font-medium">{viewItem.specialization}</p>
+                      </div>
+                    )}
+                    {viewItem.phone && (
+                      <div className="bg-tertiary rounded-xl p-4">
+                        <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.profile_page?.phone || "Phone"}</p>
+                        <p className="font-medium" dir="ltr">{viewItem.phone}</p>
+                      </div>
+                    )}
+                    {viewItem.birthDate && (
+                      <div className="bg-tertiary rounded-xl p-4">
+                        <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.profile_page?.birth_date || "Birth Date"}</p>
+                        <p className="font-medium">{new Date(viewItem.birthDate).toLocaleDateString()}{viewItem.age ? ` (${viewItem.age} yrs)` : ''}</p>
+                      </div>
+                    )}
+                    {viewItem.gender && (
+                      <div className="bg-tertiary rounded-xl p-4">
+                        <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.profile_page?.gender || "Gender"}</p>
+                        <p className="font-medium capitalize">{viewItem.gender === 'male' ? (dictionary?.profile_page?.gender_male || 'Male') : (dictionary?.profile_page?.gender_female || 'Female')}</p>
+                      </div>
+                    )}
+                    {viewItem.governorate && (
+                      <div className="bg-tertiary rounded-xl p-4">
+                        <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.admin?.jobs?.governorate || "Governorate"}</p>
+                        <p className="font-medium">{dictionary?.admin?.jobs?.governorates?.[viewItem.governorate] || viewItem.governorate}</p>
+                      </div>
+                    )}
+                    {viewItem.repsId && (
+                      <div className="bg-tertiary rounded-xl p-4">
+                        <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.profile_page?.reps_id || "REPS ID"}</p>
+                        <p className="font-medium">{viewItem.repsId}</p>
+                      </div>
+                    )}
                     <div className="bg-tertiary rounded-xl p-4">
-                      <p className="text-xs text-muted uppercase font-bold mb-1">Specialization</p>
-                      <p className="font-medium">{viewItem.specialization || "N/A"}</p>
-                    </div>
-                    <div className="bg-tertiary rounded-xl p-4">
-                      <p className="text-xs text-muted uppercase font-bold mb-1">Request Date</p>
+                      <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.profile_page?.member_since || "Request Date"}</p>
                       <p className="font-medium">{viewItem.date || "N/A"}</p>
                     </div>
-                    <div className="bg-tertiary rounded-xl p-4">
-                      <p className="text-xs text-muted uppercase font-bold mb-1">Action Type</p>
-                      <span className={`px-2 py-1 rounded text-xs font-bold ${viewItem.actionType === 'qualification' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>
-                        {viewItem.actionType === 'qualification' ? 'Qualification Change' : 'New Registration'}
-                      </span>
-                    </div>
                   </div>
+
+                  {/* Social Media */}
+                  {viewItem.socialMedia && Object.values(viewItem.socialMedia).some(v => v) && (
+                    <div className="bg-tertiary rounded-xl p-4 mb-6">
+                      <p className="text-xs text-muted uppercase font-bold mb-2">{dictionary?.profile_page?.social_media || "Social Media"}</p>
+                      <div className="space-y-1">
+                        {Object.entries(viewItem.socialMedia).map(([key, value]) => (
+                          value && <a key={key} href={value} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm block capitalize">{key}: {value}</a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Additional Details */}
                   {viewItem.details && (
@@ -2106,7 +2165,13 @@ export default function AdminDashboard({ dictionary }) {
                         {viewItem.uploadedFiles.map((file, idx) => (
                           <div key={idx} className="flex items-center gap-2 text-sm">
                             <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                            <span>{typeof file === 'string' ? file : file.name || 'Document'}</span>
+                            {typeof file === 'string' ? (
+                              file.startsWith('data:') || file.startsWith('http') ? (
+                                <a href={file} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">Document {idx + 1}</a>
+                              ) : <span>{file}</span>
+                            ) : (
+                              <a href={file.url || file.data || '#'} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">{file.name || `Document ${idx + 1}`}</a>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -2120,14 +2185,14 @@ export default function AdminDashboard({ dictionary }) {
                       className="flex-1 py-3 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 flex items-center justify-center gap-2"
                     >
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                      Approve
+                      {dictionary?.admin?.overview?.approve || "Approve"}
                     </button>
                     <button
                       onClick={() => handleApprovalAction(viewItem, "rejected")}
                       className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 flex items-center justify-center gap-2"
                     >
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                      Reject
+                      {dictionary?.admin?.overview?.reject || "Reject"}
                     </button>
                   </div>
                 </>
@@ -2161,7 +2226,7 @@ export default function AdminDashboard({ dictionary }) {
               <div className="grid md:grid-cols-2 gap-4 mb-6">
                 <div className="bg-tertiary rounded-xl p-4">
                   <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.admin?.users?.table?.role || "Role"}</p>
-                  <p className="font-medium">{selectedUser.role}</p>
+                  <p className="font-medium capitalize">{selectedUser.role}</p>
                 </div>
                 <div className="bg-tertiary rounded-xl p-4">
                   <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.admin?.users?.table?.status || "Status"}</p>
@@ -2171,29 +2236,65 @@ export default function AdminDashboard({ dictionary }) {
                 </div>
                 <div className="bg-tertiary rounded-xl p-4">
                   <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.admin?.users?.table?.phone || "Phone"}</p>
-                  <p className="font-medium">{selectedUser.phone || "N/A"}</p>
+                  <p className="font-medium" dir="ltr">{selectedUser.phone || "N/A"}</p>
                 </div>
-                <div className="bg-tertiary rounded-xl p-4">
-                  <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.admin?.users?.table?.status || "Specialization"}</p>
-                  <p className="font-medium">{selectedUser.specialization || "N/A"}</p>
-                </div>
+                {selectedUser.specialization && (
+                  <div className="bg-tertiary rounded-xl p-4">
+                    <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.admin?.users?.specialization || "Specialization"}</p>
+                    <p className="font-medium">{selectedUser.specialization}</p>
+                  </div>
+                )}
+                {selectedUser.birthDate && (
+                  <div className="bg-tertiary rounded-xl p-4">
+                    <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.profile_page?.birth_date || "Birth Date"}</p>
+                    <p className="font-medium">{new Date(selectedUser.birthDate).toLocaleDateString()}{selectedUser.age ? ` (${selectedUser.age} yrs)` : ''}</p>
+                  </div>
+                )}
+                {selectedUser.gender && (
+                  <div className="bg-tertiary rounded-xl p-4">
+                    <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.profile_page?.gender || "Gender"}</p>
+                    <p className="font-medium capitalize">{selectedUser.gender === 'male' ? (dictionary?.profile_page?.gender_male || 'Male') : (dictionary?.profile_page?.gender_female || 'Female')}</p>
+                  </div>
+                )}
+                {selectedUser.governorate && (
+                  <div className="bg-tertiary rounded-xl p-4">
+                    <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.admin?.jobs?.governorate || "Governorate"}</p>
+                    <p className="font-medium">{dictionary?.admin?.jobs?.governorates?.[selectedUser.governorate] || selectedUser.governorate}</p>
+                  </div>
+                )}
+                {selectedUser.repsId && (
+                  <div className="bg-tertiary rounded-xl p-4">
+                    <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.profile_page?.reps_id || "REPS ID"}</p>
+                    <p className="font-medium">{selectedUser.repsId}</p>
+                  </div>
+                )}
               </div>
 
               {/* Bio */}
               {selectedUser.bio && (
                 <div className="bg-tertiary rounded-xl p-4 mb-6">
-                  <p className="text-xs text-muted uppercase font-bold mb-2">Bio</p>
+                  <p className="text-xs text-muted uppercase font-bold mb-2">{dictionary?.profile_page?.bio || "Bio"}</p>
                   <p className="text-sm">{selectedUser.bio}</p>
                 </div>
               )}
 
               {/* Location & Social */}
-              {(selectedUser.location || selectedUser.socialLinks) && (
+              {(selectedUser.location || selectedUser.socialLinks || (selectedUser.socialMedia && Object.values(selectedUser.socialMedia).some(v => v))) && (
                 <div className="grid md:grid-cols-2 gap-4 mb-6">
                   {selectedUser.location && (
                     <div className="bg-tertiary rounded-xl p-4">
-                      <p className="text-xs text-muted uppercase font-bold mb-1">Location</p>
+                      <p className="text-xs text-muted uppercase font-bold mb-1">{dictionary?.profile_page?.location || "Location"}</p>
                       <p className="text-sm">{selectedUser.location}</p>
+                    </div>
+                  )}
+                  {selectedUser.socialMedia && Object.values(selectedUser.socialMedia).some(v => v) && (
+                    <div className="bg-tertiary rounded-xl p-4">
+                      <p className="text-xs text-muted uppercase font-bold mb-2">{dictionary?.profile_page?.social_media || "Social Media"}</p>
+                      <div className="space-y-1">
+                        {Object.entries(selectedUser.socialMedia).map(([key, value]) => (
+                          value && <a key={key} href={value} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm block capitalize">{key}: {value}</a>
+                        ))}
+                      </div>
                     </div>
                   )}
                   {selectedUser.socialLinks && Object.keys(selectedUser.socialLinks).length > 0 && (

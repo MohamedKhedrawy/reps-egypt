@@ -25,7 +25,12 @@ export async function getPrograms(filter = {}, options = {}) {
  * Get featured programs for the home page (e.g., limit 3)
  */
 export async function getFeaturedPrograms(limit = 3) {
-    return getPrograms({}, { limit });
+    const collection = await getProgramsCollection();
+    return collection.find({})
+        .project({ title: 1, desc: 1, category: 1, instructor: 1, _id: 1 })
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .toArray();
 }
 
 /**

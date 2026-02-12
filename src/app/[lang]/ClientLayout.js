@@ -8,13 +8,13 @@ const ChatWidget = dynamic(
   { ssr: false }
 );
 
-export default function ClientLayout({ children }) {
+export default function ClientLayout({ children, dictionary, userRole }) {
   return (
     <>
       <main className="min-h-screen pt-20">
         {children}
       </main>
-      <ChatWidget />
+      <ChatWidget config={dictionary?.chatbot} userRole={userRole} />
     </>
   );
 }

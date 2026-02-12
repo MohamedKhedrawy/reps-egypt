@@ -1,9 +1,9 @@
-import { getUsers } from "@/lib/user";
+import { getUsers, getPublicCoaches } from "@/lib/user";
 import { getDictionary } from '@/lib/get-dictionary';
 import CoachesClient from './CoachesClient';
 
-// Force dynamic rendering to avoid MongoDB timeout during static build
-export const dynamic = 'force-dynamic';
+// Revalidate every 10 minutes (ISR)
+export const revalidate = 600;
 
 export async function generateMetadata({ params }) {
     const { lang } = await params;
@@ -21,7 +21,8 @@ export default async function CoachesPage({ params }) {
   const content = dictionary.coaches_page;
 
   // Fetch approved trainers
-  const coaches = await getUsers({ role: 'trainer', status: 'approved' });
+  const rawCoaches = await getPublicCoaches();
+  const coaches = JSON.parse(JSON.stringify(rawCoaches));
 
   return (
     <CoachesClient coaches={coaches} content={content} dictionary={dictionary} lang={lang} />

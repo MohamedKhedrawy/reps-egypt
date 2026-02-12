@@ -1,182 +1,247 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { MessageCircle, X, RefreshCcw, Send, ChevronRight } from "lucide-react";
+import { MessageCircle, X, RefreshCcw, Send, ChevronRight, Minimize2, User, Sparkles } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { usePathname } from "next/navigation";
 
-export default function ChatWidget() {
+export default function ChatWidget({ config }) {
+  const { user } = useAuth();
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [options, setOptions] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Initial load
-  useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      fetchFlow("root");
-    }
-  }, [isOpen]);
+  // Use provided config or fallback to empty object to prevent crashes
+  const t = config || {};
+  const flow = t.flow || {};
 
-  // Auto-scroll to bottom
+  // Initialize Chat
+  useEffect(() => {
+    if (isOpen && messages.length === 0 && t.flow) {
+      processNode("root");
+    }
+  }, [isOpen, config]);
+
+  // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, options, isLoading]);
+  }, [messages, isTyping, options]);
 
-  // Handle open/close animation
+  // Animation State
   useEffect(() => {
     if (isOpen) {
       setIsAnimating(true);
+    } else {
+      const timer = setTimeout(() => setIsAnimating(false), 300);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
-  const fetchFlow = async (targetNodeId, label = null) => {
-    setIsLoading(true);
+  const processNode = (nodeId) => {
+    const node = flow[nodeId];
+    if (!node) return;
 
-    if (label) {
-      setMessages((prev) => [...prev, { type: "user", text: label }]);
-    }
+    setIsTyping(true);
+    setOptions([]); // Clear options while thinking
 
-    try {
-      const res = await fetch("/api/chat/flow", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentNodeId: targetNodeId }),
+    // Simulate thinking delay
+    setTimeout(() => {
+      setMessages((prev) => [...prev, { type: "bot", text: node.text }]);
+      
+      // Filter options based on role
+      const userRole = user?.role || "guest";
+      const safeOptions = (node.options || []).filter(opt => {
+        if (!opt.requiredRole) return true;
+        const roles = Array.isArray(opt.requiredRole) ? opt.requiredRole : [opt.requiredRole];
+        return roles.includes(userRole) || userRole === 'admin';
       });
 
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error || "Failed");
-
-      // Artificial small delay for "thinking" feel
-      setTimeout(() => {
-        setMessages((prev) => [...prev, { type: "bot", text: data.text }]);
-        setOptions(data.options || []);
-        setIsLoading(false);
-      }, 600);
-    } catch (error) {
-      console.error(error);
-      setMessages((prev) => [
-        ...prev,
-        { type: "bot", text: "I'm having trouble connecting. Please try again." },
-      ]);
-      setOptions([{ label: "Start Over", nextNode: "root" }]);
-      setIsLoading(false);
-    }
+      setOptions(safeOptions);
+      setIsTyping(false);
+    }, 600);
   };
 
   const handleOptionClick = (option) => {
+    // Add User Message
+    setMessages((prev) => [...prev, { type: "user", text: option.label }]);
+    setOptions([]); // Hide options immediately
+
+    // Handle Actions
     if (option.action === "link" && option.href) {
-      window.location.href = option.href;
-      return;
+        setIsTyping(true);
+        setTimeout(() => {
+            setMessages((prev) => [...prev, { type: "bot", text: "Navigating..." }]);
+            window.location.href = option.href;
+            setIsTyping(false);
+        }, 500);
+        return;
     }
+
+    // Process Next Node
     if (option.nextNode) {
-      setOptions([]); // Clear options while loading next
-      fetchFlow(option.nextNode, option.label);
+      processNode(option.nextNode);
     }
   };
 
   const resetChat = () => {
     setMessages([]);
     setOptions([]);
-    fetchFlow("root");
+    processNode("root");
   };
 
-  const handleClose = () => {
-    setIsAnimating(false);
-    setTimeout(() => setIsOpen(false), 200);
+  const closeChat = () => {
+    const chatWindow = document.getElementById('chat-window');
+    if (chatWindow) {
+        chatWindow.classList.add('scale-95', 'opacity-0', 'translate-y-4');
+        setTimeout(() => setIsOpen(false), 200);
+    } else {
+        setIsOpen(false);
+    }
   };
+
+  if (!config) return null; // Don't render until config is loaded
 
   return (
     <>
       {/* Chat Window */}
       {isOpen && (
         <div
-          className={`fixed bottom-24 right-6 z-50 w-[350px] md:w-[380px] h-[600px] max-h-[80vh] flex flex-col bg-background/95 backdrop-blur-md border border-border rounded-2xl shadow-2xl overflow-hidden font-sans transition-all duration-200 ${
+          id="chat-window"
+          className={`fixed bottom-24 right-6 z-50 w-[360px] md:w-[400px] h-[650px] max-h-[80vh] flex flex-col bg-background/80 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 origin-bottom-right transform ${
             isAnimating ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'
           }`}
+          style={{ boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-[var(--background-secondary)] to-[var(--background)] p-4 border-b border-border flex justify-between items-center shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center shadow-inner">
-                 <MessageCircle size={16} className="text-white" />
+          <div className="relative bg-gradient-to-r from-red-700 to-red-900 p-5 flex justify-between items-center text-white overflow-hidden">
+            {/* Decorative circles */}
+            <div className="absolute top-[-20%] right-[-10%] w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+            <div className="absolute bottom-[-20%] left-[-10%] w-24 h-24 bg-black/20 rounded-full blur-xl pointer-events-none"></div>
+
+            <div className="flex items-center gap-3 relative z-10">
+              <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20 shadow-inner">
+                 <Sparkles size={20} className="text-white fill-white/20" />
               </div>
-              <div>
-                <h3 className="font-bold text-sm text-[var(--foreground)]">REPS Assistant</h3>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
-                  Platform Support
+              <div className="flex flex-col">
+                <h3 className="font-bold text-lg leading-tight">{t.header?.title || "Assistant"}</h3>
+                <p className="text-[10px] text-red-100/80 uppercase tracking-widest font-semibold">
+                  {t.header?.subtitle || "Support"}
                 </p>
               </div>
             </div>
-            <button
-              onClick={resetChat}
-              className="p-2 hover:bg-[var(--border)] rounded-full transition-colors text-muted-foreground hover:text-foreground"
-              title="Restart Chat"
-            >
-              <RefreshCcw size={16} />
-            </button>
+            <div className="flex items-center gap-1 relative z-10">
+                <button
+                onClick={resetChat}
+                className="p-2 hover:bg-white/20 rounded-full transition-colors text-white/80 hover:text-white"
+                title={t.restart}
+                >
+                <RefreshCcw size={18} />
+                </button>
+                <button
+                onClick={closeChat}
+                className="p-2 hover:bg-white/20 rounded-full transition-colors text-white/80 hover:text-white"
+                title="Close"
+                >
+                <Minimize2 size={18} />
+                </button>
+            </div>
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-border">
+          <div className="flex-1 overflow-y-auto p-4 space-y-5 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+            {/* Disclaimer / Intro Date */}
+            <div className="text-center">
+                <span className="text-[10px] text-muted-foreground uppercase tracking-widest bg-secondary/50 px-3 py-1 rounded-full">{new Date().toLocaleDateString()}</span>
+            </div>
+
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`flex w-full animate-fade-in-up ${
+                className={`flex w-full ${
                   msg.type === "user" ? "justify-end" : "justify-start"
-                }`}
+                } animate-in fade-in slide-in-from-bottom-2 duration-300`}
               >
+                {/* Bot Avatar */}
+                {msg.type === 'bot' && (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center me-2 shadow-lg mt-auto shrink-0 border border-white/10">
+                        <Sparkles size={14} className="text-white" />
+                    </div>
+                )}
+
                 <div
-                  className={`max-w-[85%] p-3.5 text-sm leading-relaxed shadow-sm ${
+                  className={`max-w-[80%] p-4 text-sm leading-relaxed shadow-sm backdrop-blur-sm ${
                     msg.type === "user"
-                      ? "bg-red-600 text-white rounded-2xl rounded-br-sm"
-                      : "bg-[var(--background-secondary)] text-[var(--foreground)] border border-border rounded-2xl rounded-bl-sm"
+                      ? "bg-gradient-to-br from-red-600 to-red-700 text-white rounded-2xl rounded-te-sm border border-red-500/50"
+                      : "bg-secondary/80 text-foreground border border-white/5 rounded-2xl rounded-tl-sm"
                   }`}
                 >
                   {msg.text}
                 </div>
+
+                {/* User Avatar */}
+                {msg.type === 'user' && (
+                    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center ms-2 mt-auto shrink-0 border border-white/5">
+                        <User size={14} className="text-muted-foreground" />
+                    </div>
+                )}
               </div>
             ))}
 
-            {isLoading && (
-              <div className="flex justify-start animate-fade-in">
-                <div className="bg-[var(--background-secondary)] border border-border px-4 py-3 rounded-2xl rounded-bl-sm flex gap-1.5 items-center">
-                  <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                  <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                  <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce"></span>
+            {isTyping && (
+              <div className="flex justify-start items-center animate-in fade-in duration-300">
+                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center me-2 shadow-lg border border-white/10">
+                    <Sparkles size={14} className="text-white" />
+                </div>
+                <div className="bg-secondary/40 border border-white/5 px-4 py-3 rounded-2xl rounded-tl-sm flex gap-1.5 items-center backdrop-blur-sm">
+                  <span className="w-1.5 h-1.5 bg-foreground/40 rounded-full animate-[bounce_1s_infinite_-0.3s]"></span>
+                  <span className="w-1.5 h-1.5 bg-foreground/40 rounded-full animate-[bounce_1s_infinite_-0.15s]"></span>
+                  <span className="w-1.5 h-1.5 bg-foreground/40 rounded-full animate-[bounce_1s_infinite]"></span>
                 </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input / Options Area */}
-          <div className="p-4 bg-[var(--background-secondary)]/50 border-t border-border backdrop-blur-sm">
+          {/* Options Area */}
+          <div className="p-4 bg-secondary/30 border-t border-white/5 backdrop-blur-md">
             {options.length > 0 ? (
-              <div className="animate-fade-in-up">
-                <p className="text-xs text-muted-foreground mb-1 ml-1">Suggested Options:</p>
-                <div className="flex flex-col gap-2">
+              <div className="animate-in slide-in-from-bottom-4 duration-300 fade-in">
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3 ms-1 font-semibold">{t.input_placeholder || "Suggested Options"}</p>
+                <div className="grid grid-cols-1 gap-2">
                     {options.map((opt, idx) => (
                     <button
                         key={idx}
                         onClick={() => handleOptionClick(opt)}
-                        className="text-xs font-medium bg-[var(--background)] hover:bg-red-600 hover:text-white hover:border-red-600 border border-border text-[var(--foreground)] px-4 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-2 group w-full justify-between hover:scale-[1.02] active:scale-[0.98]"
+                        className="group text-sm font-medium bg-background/80 hover:bg-gradient-to-r hover:from-red-600 hover:to-red-700 hover:text-white hover:border-transparent border border-white/10 text-foreground px-4 py-3 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-between hover:shadow-lg hover:shadow-red-900/20 active:scale-[0.98]"
                     >
-                        {opt.label}
+                        <span>{opt.label}</span>
                         {opt.action === "link" ? (
-                        <Send size={12} className="opacity-50 group-hover:opacity-100 -rotate-45" />
+                        <div className="bg-secondary/50 p-1 rounded-full group-hover:bg-white/20 transition-colors">
+                            <Send size={12} className="opacity-70 group-hover:opacity-100 -rotate-45" />
+                        </div>
                         ) : (
-                        <ChevronRight size={12} className="opacity-50 group-hover:opacity-100" />
+                        <div className="bg-secondary/50 p-1 rounded-full group-hover:bg-white/20 transition-colors">
+                             <ChevronRight size={12} className="opacity-70 group-hover:opacity-100" />
+                        </div>
                         )}
                     </button>
                     ))}
                 </div>
               </div>
-            ) : !isLoading && (
-              <p className="text-xs text-center text-muted-foreground py-2 animate-fade-in">
-                Bot has finished. Reset to start over.
-              </p>
+            ) : !isTyping && (
+                <div className="flex items-center justify-center py-2">
+                    <button 
+                        onClick={resetChat} 
+                        className="text-xs text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1.5"
+                    >
+                        <RefreshCcw size={12} />
+                        {t.restart || "Start Over"}
+                    </button>
+                </div>
             )}
           </div>
         </div>
@@ -184,38 +249,18 @@ export default function ChatWidget() {
 
       {/* Floating Toggle Button */}
       <button
-        onClick={() => isOpen ? handleClose() : setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 p-4 bg-red-600 text-white rounded-full shadow-lg hover:shadow-red-600/40 transition-all duration-300 hover:scale-110 active:scale-90"
-        aria-label="Toggle Support Chat"
+        onClick={() => setIsOpen(true)}
+        className={`fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-2xl transition-all duration-500 group ${
+            isOpen ? 'bg-red-600 rotate-90 scale-0 opacity-0' : 'bg-gradient-to-br from-red-600 to-red-800 scale-100 opacity-100 hover:scale-110'
+        }`}
+        aria-label="Open Chat"
       >
-        <div className="transition-transform duration-200">
-          {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
-        </div>
+        <span className="absolute inset-0 rounded-full bg-red-400 opacity-0 group-hover:animate-ping"></span>
+        <MessageCircle size={28} className="text-white relative z-10" />
+        
+        {/* Notification Dot (optional, implies 'online') */}
+        <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-background rounded-full"></span>
       </button>
-
-      {/* CSS Animations */}
-      <style jsx>{`
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        .animate-fade-in-up {
-          animation: fade-in-up 0.2s ease-out;
-        }
-        .animate-fade-in {
-          animation: fade-in 0.2s ease-out;
-        }
-      `}</style>
     </>
   );
 }

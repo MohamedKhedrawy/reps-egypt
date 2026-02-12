@@ -27,6 +27,7 @@ export default async function NewsPage({ params }) {
     articles = articles.map(a => ({
       ...a,
       id: a._id.toString(),
+      imageUrl: `/api/news/${a._id.toString()}/image`,
       _id: undefined,
     }));
   } catch (error) {

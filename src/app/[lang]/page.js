@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { getUsersPaginated, getUserStats } from "@/lib/user";
+import { getUserStats, getPublicCoaches } from "@/lib/user";
 import { getFeaturedPrograms, getProgramsCount } from "@/lib/programs";
 import { getDictionary } from "@/lib/get-dictionary";
 import HomeClient from "./HomeClient";
 
-// Force dynamic rendering to avoid MongoDB timeout during static build
-export const dynamic = 'force-dynamic';
+// Revalidate every 10 minutes (ISR)
+export const revalidate = 600;
 
 export async function generateMetadata({ params }) {
   const { lang } = await params;
@@ -40,13 +40,18 @@ const CheckBadge = () => (
 
 export default async function LandingPage({ params }) {
   const { lang } = await params;
-  const dictionary = await getDictionary(lang);
-  const stats = await getUserStats();
-  const coachesData = await getUsersPaginated({ role: 'trainer', status: 'approved' }, { limit: 4 });
-  const coaches = JSON.parse(JSON.stringify(coachesData));
-  const featuredPrograms = await getFeaturedPrograms();
-  const programsCount = await getProgramsCount();
 
+  // Parallel Data Fetching
+  const [dictionary, stats, coachesData, featuredProgramsData, programsCount] = await Promise.all([
+    getDictionary(lang),
+    getUserStats(),
+    getPublicCoaches({ role: 'trainer', status: 'approved' }, { limit: 4 }),
+    getFeaturedPrograms(),
+    getProgramsCount()
+  ]);
+
+  const coaches = JSON.parse(JSON.stringify(coachesData));
+  const featuredPrograms = JSON.parse(JSON.stringify(featuredProgramsData));
   const { home } = dictionary;
 
   return (
@@ -154,7 +159,7 @@ export default async function LandingPage({ params }) {
                    <div className="absolute top-4 left-4 z-10 bg-red-600 text-[10px] font-bold px-2 py-1 rounded uppercase">
                      {category}
                    </div>
-                   <img src={program.img} alt={program.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                   <img src={`/api/programs/${program._id}/image`} alt={program.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                 </div>
                 
                 {/* Content Area */}

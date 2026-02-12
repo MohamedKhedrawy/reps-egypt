@@ -23,7 +23,7 @@ export default function LanguageSwitcher({ lang }) {
   return (
     <button
       onClick={toggleLanguage}
-      className={`relative w-12 h-7 rounded-full p-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 bg-tertiary shadow-inner font-bold text-[10px] flex items-center justify-between px-1.5`}
+      className={`relative w-15 h-7 rounded-full p-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 bg-tertiary shadow-inner font-bold text-[10px] flex items-center justify-between px-1.5`}
       aria-label={`Switch to ${lang === 'en' ? 'Arabic' : 'English'}`}
     >
       {/* Thumb */}
@@ -33,12 +33,12 @@ export default function LanguageSwitcher({ lang }) {
           left: lang === 'en' ? '4px' : 'calc(100% - 24px)', // Align with LTR logic visually
         }}
       >
-        {lang === 'en' ? 'EN' : 'ع'}
+        {lang === 'en' ? 'EN' : 'AR'}
       </div>
       
       {/* Background Labels */}
       <span className={`transition-opacity duration-300 ${lang === 'en' ? 'opacity-0' : 'opacity-100 text-foreground'}`}>EN</span>
-      <span className={`transition-opacity duration-300 ${lang === 'en' ? 'opacity-100 text-foreground' : 'opacity-0'}`}>ع</span>
+      <span className={`transition-opacity duration-300 ${lang === 'en' ? 'opacity-100 text-foreground' : 'opacity-0'}`}>AR</span>
     </button>
   );
 }

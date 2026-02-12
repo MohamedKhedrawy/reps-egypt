@@ -72,7 +72,7 @@ export default async function RootLayout({ children, params }) {
           <div className="fixed z-[9999]">
              <Toaster position="bottom-right" theme="dark" richColors closeButton />
           </div>
-          <ClientLayout>
+          <ClientLayout dictionary={dictionary} lang={lang}>
             {children}
           </ClientLayout>
           <Footer dictionary={dictionary} lang={lang} />

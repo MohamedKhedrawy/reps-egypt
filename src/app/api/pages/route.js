@@ -9,12 +9,7 @@ export async function GET() {
     try {
         const pages = await getVisiblePagesGrouped();
         
-        return NextResponse.json(pages, {
-            headers: {
-                // Cache for 60 seconds, allow stale data while revalidating
-                'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
-            },
-        });
+        return NextResponse.json(pages);
     } catch (error) {
         console.error('Fetch visible pages error:', error);
         return NextResponse.json(

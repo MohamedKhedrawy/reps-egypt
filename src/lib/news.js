@@ -25,7 +25,11 @@ export async function getNewsArticles(filter = {}, options = {}) {
  * Get published news articles (for public page)
  */
 export async function getPublishedNews() {
-    return getNewsArticles({ isPublished: true });
+    const news = await getNewsCollection();
+    return news.find({ isPublished: true })
+        .project({ title: 1, category: 1, description: 1, createdAt: 1, _id: 1 })
+        .sort({ createdAt: -1 })
+        .toArray();
 }
 
 /**

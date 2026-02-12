@@ -66,8 +66,8 @@
     "stats_coaches": "مدرب معتمد",
     "stats_trainees": "متدرب نشط",
     "stats_programs": "تخصصات",
-    "stats_excellence": "سنوات من التميز",
-    "stats_years": "سنوات",
+    "stats_excellence": "شركاء",
+    "stats_years": "+",
     "section_trainers_badge": "مواهب عالمية",
     "section_trainers_title": "قابل نخبة المدربين",
     "section_trainers_view_all": "عرض كل المدربين",
@@ -452,8 +452,10 @@
           "alert_added": "تم إضافة التنبيه بنجاح",
           "alert_failed": "فشل إضافة التنبيه",
           "note_added": "تمت إضافة الملاحظة بنجاح",
-          "note_failed": "فشل إضافة الملاحظة"
-        }
+          "note_failed": "فشل إضافة الملاحظة",
+          "error": "حدث خطأ"
+        },
+        "specialization": "التخصص"
     },
     "news": {
       "title": "الأخبار",
@@ -463,6 +465,12 @@
       "view_full": "عرض كامل",
       "published": "منشور",
       "draft": "مسودة",
+      "updated": "تم تحديث المقال",
+      "created": "تم إنشاء المقال",
+      "save_failed": "فشل الحفظ",
+      "cover_uploaded": "تم تحميل صورة الغلاف",
+      "upload_failed": "فشل تحميل الصورة",
+      "images_uploaded": "صور تم تحميلها",
       "modal": {
         "new_title": "مقال جديد",
         "edit_title": "تعديل المقال",
@@ -485,10 +493,6 @@
         "gallery_add_btn": "أضف صور إضافية",
         "gallery_list": "الصور المضافة",
         "gallery_remove_hint": "✕",
-        "cancel": "الإلغاء",
-        "create": "إنشاء",
-        "confirm": "تأكيد",
-        "update": "تحديث",
         "categories": {
           "Announcement": "إعلان",
           "Article": "مقال",
@@ -518,36 +522,6 @@
             "trainers": "مدربين",
             "trainees": "متدربين"
         }
-    },
-    "news": {
-      "title": "مقالات الأخبار",
-      "add_article": "إضافة مقال",
-      "published": "منشور",
-      "draft": "مسودة",
-      "edit": "تعديل",
-      "delete": "حذف",
-      "modal": {
-        "new_title": "مقال جديد",
-        "edit_title": "تعديل المقال",
-        "title_label": "العنوان",
-        "category_label": "الفئة",
-        "desc_label": "الوصف",
-        "image_label": "الصورة",
-        "upload_btn": "رفع صورة",
-        "uploading": "جاري الرفع...",
-        "publish_immediate": "نشر فوراً",
-        "cancel": "إلغاء",
-        "create": "إنشاء",
-        "update": "تحديث",
-        "categories": {
-            "Announcement": "إعلان",
-            "Article": "مقال",
-            "Community": "مجتمع",
-            "Events": "فعاليات",
-            "Partnership": "شراكة",
-            "Trends": "اتجاهات"
-        }
-      }
     },
     "pages": {
       "title": "التحكم في الصفحات",
@@ -745,7 +719,9 @@
         "north_sinai": "شمال سيناء",
         "new_valley": "الوادي الجديد",
         "red_sea": "البحر الأحمر"
-      }
+      },
+      "logo_uploaded": "تم تحميل شعار الشركة",
+      "upload_failed": "فشل تحميل الصورة"
     }
   },
   "survey_page": {
@@ -1088,5 +1064,185 @@
     "filter_tags": ["الكل", "الشهادات", "ورش العمل", "الفعاليات", "المجتمع"],
     "event": "فعالية",
     "load_more": "تحميل المزيد من الصور"
+  },
+  "chatbot": {
+    "header": { "title": "المساعد الذكي", "subtitle": "دعم المنصة" },
+    "input_placeholder": "اختر خياراً...",
+    "restart": "إعادة المحادثة",
+    "thinking": "جاري التفكير...",
+    "error": "لا يمكنني الاتصال حالياً. يرجى المحاولة مرة أخرى.",
+    "flow": {
+      "root": {
+        "text": "أهلاً بك في ريبس مصر! كيف يمكنني مساعدتك اليوم؟",
+        "options": [
+          { "label": "التحقق من حالة تسجيلي", "nextNode": "verification_status" },
+          { "label": "التسجيل والعضوية", "nextNode": "registration_menu" },
+          { "label": "المعايير والأخلاقيات", "nextNode": "standards_menu" },
+          { "label": "تواصل مع الدعم", "nextNode": "contact_info" }
+        ]
+      },
+      "verification_status": {
+        "text": "يمكنني مساعدتك في شرح حالتك. هل أنت مدرب أم متدرب؟",
+        "options": [
+          { "label": "أنا مدرب", "nextNode": "trainer_verification" },
+          { "label": "أنا متدرب", "nextNode": "trainee_verification" },
+          { "label": "ما الفرق؟", "nextNode": "role_explanation" }
+        ]
+      },
+      "trainer_verification": {
+        "text": "كمدرب، 'معلق' يعني أن مستنداتك قيد المراجعة. 'مقبول' يعني أنك مدرج في السجل العام. 'مرفوض' يعني عادةً نقص في المستندات.",
+        "options": [
+          { "label": "كم يستغرق الأمر؟", "nextNode": "timeline_faq" },
+          { "label": "تحديث مستنداتي", "nextNode": "update_docs_guide" },
+          { "label": "العودة للقائمة", "nextNode": "root" }
+        ]
+      },
+      "trainee_verification": {
+        "text": "كمتدرب، التحقق يؤكد التحاقك بدورة معتمدة. تظل حالتك 'نشط' طالما عضويتك سارية.",
+        "options": [
+          { "label": "الترقية إلى مدرب", "nextNode": "upgrade_guide" },
+          { "label": "العودة للقائمة", "nextNode": "root" }
+        ]
+      },
+      "registration_menu": {
+        "text": "ماذا تود أن تعرف عن التسجيل؟",
+        "options": [
+          { "label": "كيفية التسجيل", "nextNode": "how_to_register" },
+          { "label": "رسوم العضوية", "nextNode": "fees_info" },
+          { "label": "المستندات المطلوبة", "nextNode": "docs_info" },
+          { "label": "العودة للقائمة", "nextNode": "root" }
+        ]
+      },
+      "how_to_register": {
+        "text": "للتسجيل، اضغط على 'سجل الآن' في أعلى اليسار. ستحتاج لإنشاء حساب وإكمال ملفك الشخصي ورفع الشهادات المطلوبة.",
+        "options": [
+          { "label": "الذهاب لصفحة التسجيل", "action": "link", "href": "/register", "nextNode": "root" },
+          { "label": "رجوع", "nextNode": "registration_menu" }
+        ]
+      },
+      "fees_info": {
+        "text": "رسوم العضوية تتوافق مع السنة المالية. الأسعار الحالية متاحة في صفحة 'مزايا الأعضاء'.",
+        "options": [
+          { "label": "عرض المزايا", "action": "link", "href": "/member-benefits", "nextNode": "root" },
+          { "label": "رجوع", "nextNode": "registration_menu" }
+        ]
+      },
+      "standards_menu": {
+        "text": "تطبق ريبس مصر معايير أخلاقية ومهنية صارمة.",
+        "options": [
+          { "label": "ميثاق الأخلاقيات", "nextNode": "ethics_info" },
+          { "label": "معايير ICREPs", "nextNode": "icreps_info" },
+          { "label": "الإبلاغ عن مخالفة", "nextNode": "report_violation" },
+          { "label": "العودة للقائمة", "nextNode": "root" }
+        ]
+      },
+      "ethics_info": {
+        "text": "ميثاق الأخلاقيات يضمن السلامة والاحترافية. يجب على جميع الأعضاء التعهد بالالتزام بهذه القيم.",
+        "options": [
+          { "label": "قراءة الميثاق", "action": "link", "href": "/code-of-ethics", "nextNode": "root" },
+          { "label": "رجوع", "nextNode": "standards_menu" }
+        ]
+      },
+      "contact_info": {
+        "text": "يمكنك التواصل مع فريق الدعم البشري عبر البريد الإلكتروني أو الهاتف.",
+        "options": [
+          { "label": "مراسلة الدعم", "action": "link", "href": "mailto:support@repsegypt.org", "nextNode": "root" },
+          { "label": "العودة للقائمة", "nextNode": "root" }
+        ]
+      },
+      "timeline_faq": {
+        "text": "يستغرق التحقق عادةً 3-5 أيام عمل بعد تقديم جميع المستندات.",
+        "options": [ { "label": "العودة للقائمة", "nextNode": "root" } ]
+      },
+      "update_docs_guide": {
+        "text": "اذهب إلى ملفك الشخصي واختر 'تعديل'. يمكنك رفع شهادات جديدة هناك وسيتم إرسالها لإعادة الموافقة.",
+        "options": [
+          { "label": "الذهاب للملف الشخصي", "action": "link", "href": "/profile", "nextNode": "root", "requiredRole": ["trainer", "trainee"] },
+          { "label": "العودة للقائمة", "nextNode": "root" }
+        ]
+      },
+      "upgrade_guide": {
+        "text": "للترقية من متدرب إلى مدرب، يجب عليك إكمال مؤهلك المعتمد ورفع الشهادة النهائية في ملفك الشخصي.",
+        "options": [ { "label": "العودة للقائمة", "nextNode": "root" } ]
+      },
+      "docs_info": {
+        "text": "يحتاج المدربين: شهادة مدرب شخصي سارية، شهادة إسعافات أولية/CPR، وصورة حديثة. المتدربين: إثبات قيد.",
+        "options": [ { "label": "رجوع", "nextNode": "registration_menu" } ]
+      },
+      "icreps_info": {
+        "text": "ريبس مصر عضو في ICREPs، مما يضمن قابليتك للانتقال إلى سجلات وطنية أخرى.",
+        "options": [ { "label": "رجوع", "nextNode": "standards_menu" } ]
+      },
+      "report_violation": {
+        "text": "يرجى مراسلة complaints@repsegypt.org بتفاصيل المخالفة.",
+        "options": [ { "label": "رجوع", "nextNode": "root" } ]
+      },
+      "role_explanation": {
+        "text": "المدربون هم محترفون مؤهلون. المتدربون هم طلاب يدرسون حالياً دورة معتمدة.",
+        "options": [ { "label": "رجوع", "nextNode": "verification_status" } ]
+      }
+    }
+  },
+  "pricing_page": {
+    "title_prefix": "استثمر في",
+    "title_highlight": "مستقبلك",
+    "subtitle": "اختر الخطة التي تناسب مرحلتك المهنية. يمكنك الترقية في أي وقت مع نمو أعمالك.",
+    "monthly": "شهري",
+    "yearly": "سنوي",
+    "save_percent": "وفر 30%",
+    "year": "سنة",
+    "month": "شهر",
+    "per_month": "جنيه/شهر",
+    "most_popular": "الأكثر شيوعاً",
+    "offer_pro_duration": "أول 3 أشهر مجاناً",
+    "offer_elite_duration": "أول شهر مجاناً",
+    "offer_expires": "ينتهي العرض خلال",
+    "save_100": "وفر 100%",
+    "plans": {
+      "trainee": {
+        "name": "متدرب",
+        "desc": "تدرب مع مدربين معتمدين مجاناً!",
+        "price": "0",
+        "features": [
+          "الوصول لمدربين في تخصصات مختلفة",
+          "تواصل سهل مع المدربين",
+          "الانضمام لمنتدى المجتمع (قريباً)"
+        ],
+        "cta": "سجل مجاناً"
+      },
+      "pro": {
+        "name": "مدرب محترف",
+        "desc": "للمحترفين المعتمدين لتنمية مسيرتهم المهنية",
+        "price": "150",
+        "yearly_price": "1200",
+        "features": [
+          "شارة التحقق من REPS",
+          "خصومات الشركاء (معدات/مكملات)"
+        ],
+        "cta": "ترقية لمحترف"
+      },
+      "master": {
+        "name": "مدرب نخبة",
+        "desc": "مكانة متميزة لقادة المجال والموجهين",
+        "price": "300",
+        "yearly_price": "2500",
+        "features": [
+          "كل مميزات المحترف",
+          "ظهور مميز على الصفحة الرئيسية",
+          "أولوية في نتائج البحث",
+          "ظهور في النشرة الإخبارية الأسبوعية",
+          "فرص توجيه حصرية",
+          "دعم فني VIP"
+        ],
+        "cta": "كن مدرب نخبة"
+      }
+    },
+    "faq": {
+      "title": "أسئلة شائعة",
+      "q1": "هل يمكنني الإلغاء في أي وقت؟",
+      "a1": "نعم، يمكنك إلغاء اشتراكك في أي وقت. سيظل دخولك مفعلًا حتى نهاية فترة الفوترة.",
+      "q2": "هل الشهادة دولية؟",
+      "a2": "نعم، شهادات REPS Egypt معترف بها عالمياً في الدول المشاركة بما في ذلك الإمارات، المملكة المتحدة، وأستراليا."
+    }
   }
 }

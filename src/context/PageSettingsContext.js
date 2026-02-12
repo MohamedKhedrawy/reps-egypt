@@ -4,43 +4,21 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 
 const PageSettingsContext = createContext(null);
 
-const CACHE_KEY = 'reps-egypt-page-settings';
-const CACHE_TTL = 60 * 1000; // 1 minute
-
 export function PageSettingsProvider({ children }) {
     const [pages, setPages] = useState({ main: [], footer: [], legal: [] });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     /**
-     * Fetch visible pages from API
+     * Fetch visible pages from API (no caching - always fresh from server)
      */
-    const fetchPages = useCallback(async (skipCache = false) => {
+    const fetchPages = useCallback(async () => {
         try {
-            // Check cache first
-            if (!skipCache) {
-                const cached = localStorage.getItem(CACHE_KEY);
-                if (cached) {
-                    const { data, timestamp } = JSON.parse(cached);
-                    if (Date.now() - timestamp < CACHE_TTL) {
-                        setPages(data);
-                        setLoading(false);
-                        return;
-                    }
-                }
-            }
-
             const res = await fetch('/api/pages', { cache: 'no-store' });
             if (!res.ok) throw new Error('Failed to fetch pages');
             
             const data = await res.json();
             setPages(data);
-            
-            // Cache the result
-            localStorage.setItem(CACHE_KEY, JSON.stringify({
-                data,
-                timestamp: Date.now()
-            }));
         } catch (err) {
             console.error('PageSettings fetch error:', err);
             setError(err.message);
@@ -75,6 +53,12 @@ export function PageSettingsProvider({ children }) {
         fetchPages();
     }, [fetchPages]);
 
+    // Poll every 60 seconds so all users pick up page visibility changes
+    useEffect(() => {
+        const interval = setInterval(() => fetchPages(), 60 * 1000);
+        return () => clearInterval(interval);
+    }, [fetchPages]);
+
     /**
      * Check if a specific page path is visible
      */
@@ -93,11 +77,10 @@ export function PageSettingsProvider({ children }) {
     }, [pages]);
 
     /**
-     * Force refresh pages from server
+     * Force refresh pages from server (used by admin after toggling)
      */
     const refreshPages = useCallback(() => {
-        localStorage.removeItem(CACHE_KEY);
-        return fetchPages(true);
+        return fetchPages();
     }, [fetchPages]);
 
     const value = {
