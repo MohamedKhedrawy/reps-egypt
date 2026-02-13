@@ -120,7 +120,7 @@ export default async function CoachProfilePage({ params }) {
                         <MessageCoachForm 
                             coachId={coach._id.toString()} 
                             coachName={coach.fullName} 
-                            dictionary={t.form}
+                            dictionary={dictionary.coach_contact}
                         />
                     </div>
                 </div>

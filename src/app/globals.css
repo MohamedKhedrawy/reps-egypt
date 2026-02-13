@@ -18,7 +18,7 @@
 :root,
 .dark {
   --background: #0a0a0a;
-  --background-secondary: #121212;
+  --background-secondary: #000000;
   --background-tertiary: #1a1a1a;
   --foreground: #ffffff;
   --foreground-secondary: #e5e5e5;

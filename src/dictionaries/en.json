@@ -41,6 +41,29 @@
         "error_long": "Message is too long (max 2000 characters)"
     }
   },
+  "coach_contact": {
+    "title": "Send a Message to",
+    "subtitle": "Connect with this coach",
+    "email_note": "Your email address will be shared with the coach so they can reply to you directly.",
+    "your_name": "Your Name",
+    "your_email": "Your Email Address",
+    "message_subject": "Message Subject",
+    "message_body": "Your Message",
+    "placeholder_name": "e.g., John Doe",
+    "placeholder_email": "e.g., john@example.com",
+    "placeholder_subject": "e.g., Interested in coaching",
+    "placeholder_message": "Write your message here...",
+    "send_btn": "Send Message",
+    "sending": "Sending...",
+    "success": "Message sent successfully!",
+    "error_generic": "Failed to send message. Please try again.",
+    "error_rate_limit": "You've sent too many messages. Please wait before sending another.",
+    "error_long": "Message is too long (max 2000 characters)",
+    "error_required": "This field is required",
+    "error_invalid_email": "Please enter a valid email address",
+    "char_count": "Characters",
+    "char_warning": "Getting close... {remaining} characters left"
+  },
   "footer": {
     "about": "About Reps Egypt",
     "about_desc": "Empowering fitness professionals with world-class education and certification.",

@@ -247,7 +247,7 @@ export async function getPublicCoaches(filter = { role: 'trainer', status: 'appr
         .project({ 
             fullName: 1, 
             specialization: 1, 
-            // profilePhoto: 1, // Excluded for performance (fetched via API)
+            profilePhoto: 1, // Included for home page display
             repsId: 1, 
             governorate: 1, 
             experience: 1, 
